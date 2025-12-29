@@ -1,0 +1,35 @@
+<div *ngIf="shape === 'default'" 
+     class="flex items-center cursor-pointer select-none"
+     [ngClass]="className">
+
+  <input 
+    type="checkbox"
+    [name]="name"
+    [value]="value"
+    [checked]="checked"
+    [disabled]="disabled"
+    [attr.aria-labelledby]="ariaLabelledBy"
+    (change)="toggle($event)"
+    class="h-4 w-4 {{checkboxColorClass}}"
+  />
+
+  <label 
+    [for]="name"
+    class="{{labelColorClass}} {{inputLabelSpacingClass}} cursor-pointer">
+    {{label}}
+  </label>
+</div>
+
+<div *ngIf="shape === 'box'"
+     (click)="toggle({target:{checked:!checked}})"
+     class="{{ boxClasses }}">
+
+  <input 
+    type="checkbox"
+    hidden
+    [checked]="checked"
+    [disabled]="disabled"
+  />
+
+  <span class="text-sm font-medium">{{label}}</span>
+</div>

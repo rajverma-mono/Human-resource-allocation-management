@@ -1,0 +1,89 @@
+{
+  "title": "Add Employee",
+  "layout": "two-column",
+  "fields": [
+    {
+      "id": "employeeCode",
+      "type": "text",
+      "label": "Employee Code",
+      "required": true,
+      "validationType": "alphanumeric",  
+      "errorMessage": "Alphanumeric only",
+       "backgroundColor": ""
+    },
+    {
+      "id": "employeeName",
+      "type": "text",
+      "label": "Employee Name",
+      "required": true,
+      "validationType": "name",
+       "backgroundColor": ""  
+    },
+    {
+      "id": "email",
+      "type": "email",
+      "label": "Work Email",
+      "required": true,
+      "validationType": "email"  
+    },
+    {
+      "id": "mobile",
+      "type": "text", 
+      "label": "Mobile Number",
+      "required": true,
+      "validationType": "mobile"  
+    },
+    {
+      "id": "gender",
+      "type": "radio",
+      "label": "Gender",
+      "required": true,
+      "options": [
+        { "label": "Male", "value": "male" },
+        { "label": "Female", "value": "female" },
+        { "label": "Other", "value": "other" }
+      ]
+    },
+    {
+      "id": "department",
+      "type": "select",
+      "label": "Department",
+      "required": true,
+      "options": [
+        { "label": "Development", "value": "dev" },
+        { "label": "QA", "value": "qa" },
+        { "label": "HR", "value": "hr" }
+      ]
+    },
+    {
+      "id": "dateOfJoining",
+      "type": "date",
+      "label": "Joining Date",
+      "required": true
+    },
+    {
+      "id": "status",
+      "type": "toggle",
+      "label": "Active Status",
+      "default": true
+    },
+    {
+      "id": "remarks",
+      "type": "textarea",
+      "label": "Remarks",
+      "rows": 3
+    }
+  ],
+  "actions": [
+    {
+      "id": "save",
+      "label": "Save",
+      "variant": "primary"
+    },
+    {
+      "id": "cancel",
+      "label": "Cancel",
+      "variant": "secondary"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+<header class="w-full bg-white border-b px-10 py-6 shadow-sm flex items-center justify-between">
+
+  <div class="flex items-center gap-5">
+    <img [src]="config.logo" class="h-16"/>
+
+    <div>
+      <h1 class="text-3xl font-bold">{{config.title}}</h1>
+      <p class="text-sm text-gray-500">{{config.subtitle}}</p>
+    </div>
+  </div>
+
+  <div *ngIf="config.avatar.enabled"
+    class="rounded-full bg-red-600 w-12 h-12 flex justify-center items-center text-white font-bold">
+    {{config.avatar.initials}}
+  </div>
+
+</header>

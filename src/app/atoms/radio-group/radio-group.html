@@ -1,0 +1,13 @@
+<div [ngClass]="containerClass">
+  <atom-radio
+    *ngFor="let opt of options"
+    [label]="opt.label"
+    [subLabel]="opt.subLabel"
+    [value]="opt.value"
+    [name]="name"
+    [checked]="selectedValue === opt.value"
+    [radioColorClass]="radioColorClass"
+    [labelColorClass]="labelColorClass"
+    (onChange)="change($event)"
+  />
+</div>

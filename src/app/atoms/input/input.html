@@ -1,0 +1,34 @@
+<div class="mb-4 w-full" [ngClass]="className">
+  <label class="block text-sm font-medium mb-1">{{label}}
+    <span *ngIf="required" class="text-red-500">*</span>
+  </label>
+
+  <div class="relative flex items-center">
+   <input
+  [type]="showToggleIcon && isMasked ? 'password' : type"
+  [placeholder]="placeholder"
+  [disabled]="disabled"
+  [maxlength]="maxLength"
+  [(ngModel)]="value"
+  (ngModelChange)="onInput($event)"
+  [ngClass]="getBackgroundClass()"
+  [ngStyle]="getBackgroundStyle()"
+  class="w-full px-3 py-2 border focus:ring-2 outline-none transition
+    {{rounded}} {{borderColorClass}}
+    focus:border-blue-600 focus:ring-blue-300
+    disabled:bg-gray-200 disabled:cursor-not-allowed
+    {{currentError ? 'border-red-500' : ''}}" />
+
+    <!-- password eye toggle -->
+    <button *ngIf="showToggleIcon" type="button"
+      (click)="toggleVisibility()"
+      class="absolute right-2 text-gray-500">
+      {{ isMasked ? '👁️' : '🙈' }}
+    </button>
+
+    <!-- verified icon -->
+    <span *ngIf="showVerifiedStatus && isVerified" class="absolute right-2 text-green-600">✔</span>
+  </div>
+
+  <p *ngIf="currentError" class="text-red-600 text-xs mt-1">{{currentError}}</p>
+</div>

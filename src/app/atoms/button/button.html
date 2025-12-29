@@ -1,0 +1,23 @@
+<button [ngClass]="classes" (click)="handleClick()">
+  
+  <!-- Left Icon -->
+  <ng-container *ngIf="icon && !iconOnly">
+    <img [src]="icon" [style.width.px]="iconConfig.width" [style.height.px]="iconConfig.height" />
+  </ng-container>
+
+  <!-- Label -->
+  <span *ngIf="!iconOnly">
+     {{ loading ? 'Loading...' : label }}
+  </span>
+
+  <!-- Icon-only button -->
+  <ng-container *ngIf="iconOnly && icon">
+    <img [src]="icon" [style.width.px]="iconConfig.width" [style.height.px]="iconConfig.height" />
+  </ng-container>
+
+  <!-- Right Icon -->
+  <ng-container *ngIf="iconRight && !iconOnly">
+    <img [src]="iconRight" [style.width.px]="iconConfig.width" [style.height.px]="iconConfig.height" />
+  </ng-container>
+
+</button>

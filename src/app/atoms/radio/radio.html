@@ -1,0 +1,39 @@
+<!-- 🟦 Default Radio Button -->
+<div *ngIf="shape === 'default'" 
+     class="flex items-start gap-2 cursor-pointer select-none"
+     [class.opacity-50]="disabled">
+
+  <input
+    type="radio"
+    [name]="name"
+    [value]="value"
+    [checked]="checked"
+    [disabled]="disabled"
+    (change)="handleChange($event)"
+    class="h-4 w-4 {{radioColorClass}}"
+  />
+
+  <div>
+    <label class="{{labelColorClass}} text-sm font-medium">{{label}}</label>
+    <p *ngIf="subLabel" class="text-xs text-gray-500">{{subLabel}}</p>
+  </div>
+</div>
+
+
+<!-- 🟥 Box Mode Radio -->
+<div *ngIf="shape === 'box'" 
+     (click)="!disabled && handleChange({target:{checked:true}})"
+     class="{{boxClasses}} select-none">
+
+  <div class="flex flex-col w-full">
+    <span class="font-medium">{{label}}</span>
+    <span *ngIf="subLabel" class="text-xs text-gray-500 mt-1">{{subLabel}}</span>
+  </div>
+
+  <input
+    type="radio"
+    hidden
+    [checked]="checked"
+    [disabled]="disabled"
+  />
+</div>

@@ -1,0 +1,57 @@
+<div class="w-full" [ngClass]="customClass">
+  
+  <label *ngIf="label" class="block mb-1 text-sm font-medium">{{label}}</label>
+
+  <div class="relative">
+    <button 
+      type="button"
+      (click)="toggleDropdown()"
+      [class.border-red-500]="error"
+      [disabled]="disabled"
+      class="border w-full flex justify-between items-center px-3 py-2 rounded-lg bg-white
+             focus:ring-2 focus:ring-blue-300 disabled:bg-gray-200 disabled:cursor-not-allowed">
+
+      <div class="flex items-center gap-2">
+        <img *ngIf="showIcons && selectedIcon" [src]="selectedIcon" class="w-4 h-4" />
+        <span class="{{value?'text-gray-900':'text-gray-400'}}">{{selectedLabel}}</span>
+      </div>
+
+      <span>▾</span>
+    </button>
+
+    <!-- Dropdown -->
+    <div *ngIf="dropdownOpen" 
+         class="absolute z-20 w-full mt-1 bg-white rounded-lg border shadow animate-fade-in">
+
+      <!-- Live Search -->
+      <input
+        *ngIf="liveSearch"
+        type="text"
+        [(ngModel)]="searchText"
+        class="border-b w-full px-3 py-2 outline-none"
+        placeholder="Search..."
+      />
+
+      <div class="max-h-52 overflow-y-auto">
+        <div *ngFor="let opt of filteredOptions"
+             (click)="selectOption(opt)"
+             class="px-3 py-2 flex justify-between items-center cursor-pointer 
+                    hover:bg-gray-100"
+             [class.opacity-50]="opt.disabled">
+
+          <div class="flex gap-2 items-center">
+            <img *ngIf="showIcons && opt.icon && opt.iconPosition!='right'" [src]="opt.icon" class="w-4 h-4" />
+            <span>{{opt.label}}</span>
+          </div>
+
+          <img *ngIf="showIcons && opt.icon && opt.iconPosition=='right'" [src]="opt.icon" class="w-4 h-4" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Errors -->
+  <p *ngIf="error" class="text-red-600 text-xs mt-1">{{error}}</p>
+  <p *ngIf="helperText && !error" class="text-gray-600 text-xs mt-1">{{helperText}}</p>
+
+</div>

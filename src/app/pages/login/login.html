@@ -1,0 +1,42 @@
+<div class="flex items-center justify-center h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+
+  <div class="bg-white shadow-2xl rounded-2xl p-10 w-[430px] space-y-6 flex flex-col items-center">
+
+    <!-- 🔥 Logo -->
+    <img src="assets/logo/keenable.png" alt="Keenable Logo" class="h-16 object-contain mb-2" />
+
+    <!-- 🔥 Heading -->
+    <h1 class="text-xl font-bold text-gray-900 text-center leading-tight">
+      Resource Allocation &<br/>Management System
+    </h1>
+
+    <p class="text-sm text-gray-500 -mt-1 mb-4">Sign in to continue</p>
+
+    <!-- 🔥 Login Form using ATOMS -->
+    <div class="w-full space-y-4">
+
+      <atom-input 
+        label="Email" 
+        [(value)]="email">
+      </atom-input>
+
+      <atom-input 
+        label="Password" 
+        type="password" 
+        [(value)]="password">
+      </atom-input>
+
+      <atom-button 
+        label="Login" 
+        variant="primary" 
+        (onClick)="login()">
+      </atom-button>
+
+    </div>
+
+    <p class="text-xs text-gray-500 text-center mt-4 pt-4 border-t border-gray-200 w-full">
+      © 2025 Keenable – All Rights Reserved
+    </p>
+
+  </div>
+</div>

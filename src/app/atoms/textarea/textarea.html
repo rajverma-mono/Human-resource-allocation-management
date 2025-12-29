@@ -1,0 +1,21 @@
+<div class="w-full mb-3" [ngClass]="containerClass">
+  <label *ngIf="label" class="block text-sm font-medium mb-1">
+    {{ label }}
+  </label>
+
+  <textarea
+    [rows]="rows"
+    [disabled]="disabled"
+    [attr.aria-label]="ariaLabel"
+    [(ngModel)]="value"
+    (ngModelChange)="onInput($event)"
+    [placeholder]="placeholder"
+    class="w-full border rounded-lg outline-none focus:ring-2 focus:ring-blue-400
+           disabled:bg-gray-200 disabled:cursor-not-allowed
+           {{ sizeClasses }} {{className}}">
+  </textarea>
+
+  <div class="text-xs text-gray-500 text-right mt-1" *ngIf="maxLength">
+    {{ value.length }}/{{ maxLength }}
+  </div>
+</div>

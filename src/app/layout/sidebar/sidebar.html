@@ -1,0 +1,53 @@
+<div class="sidebar-container">
+  
+  <!-- MENU LIST -->
+  <div class="menu-wrapper">
+    <ng-container *ngIf="menu && menu.length > 0; else noMenu">
+      <a *ngFor="let item of menu"
+         [routerLink]="item.route"
+         routerLinkActive="active-sidebar"
+         [routerLinkActiveOptions]="{exact:true}"
+         class="menu-item">
+         <i class="{{item.icon}}"></i>
+         <span>{{item.label}}</span>
+      </a>
+    </ng-container>
+  </div>
+
+  <!-- IF NO ACCESS MENU -->
+  <ng-template #noMenu>
+    <p class="no-menu">No menu configured</p>
+  </ng-template>
+
+</div>
+
+
+<style>
+/* Sidebar layout */
+.sidebar-container{
+  @apply w-64 bg-white border-r border-gray-200 h-[calc(100vh-200px)] flex flex-col p-4;
+}
+
+/* menu list */
+.menu-wrapper{
+  @apply flex flex-col gap-2;
+}
+
+/* Normal item */
+.menu-item{
+  @apply flex items-center gap-3 px-4 py-3 rounded-lg 
+         text-gray-700 font-medium cursor-pointer
+         hover:bg-red-50 hover:text-red-600 transition-all duration-200;
+}
+
+/* active state — same as RAMS */
+.active-sidebar{
+  @apply bg-red-600 text-white font-semibold;
+  border-left: 5px solid #b30000;
+}
+
+/* No menu text */
+.no-menu{
+  @apply text-gray-400 text-sm italic;
+}
+</style>
