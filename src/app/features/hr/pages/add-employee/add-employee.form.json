@@ -1,89 +1,118 @@
 {
-  "title": "Add Employee",
-  "layout": "two-column",
-  "fields": [
+  "title": "Add New Employee",
+  "subtitle": "Full record entry with Education & Experience Details",
+
+  "stepper": [
+    { "key": "personal" },
+    { "key": "professional" },
+    { "key": "education" },
+    { "key": "experience" },
+    { "key": "experience" }
+  ],
+
+  "sections": [
     {
-      "id": "employeeCode",
-      "type": "text",
-      "label": "Employee Code",
-      "required": true,
-      "validationType": "alphanumeric",  
-      "errorMessage": "Alphanumeric only",
-       "backgroundColor": ""
-    },
-    {
-      "id": "employeeName",
-      "type": "text",
-      "label": "Employee Name",
-      "required": true,
-      "validationType": "name",
-       "backgroundColor": ""  
-    },
-    {
-      "id": "email",
-      "type": "email",
-      "label": "Work Email",
-      "required": true,
-      "validationType": "email"  
-    },
-    {
-      "id": "mobile",
-      "type": "text", 
-      "label": "Mobile Number",
-      "required": true,
-      "validationType": "mobile"  
-    },
-    {
-      "id": "gender",
-      "type": "radio",
-      "label": "Gender",
-      "required": true,
-      "options": [
-        { "label": "Male", "value": "male" },
-        { "label": "Female", "value": "female" },
-        { "label": "Other", "value": "other" }
+      "title": "Personal Information",
+      "icon": "fas fa-id-card",
+      "layout": "two-column",
+      "fields": [
+        { "id": "employeeCode", "label": "Employee Code", "type": "text", "required": true },
+        { "id": "employeeName", "label": "Full Name", "type": "text", "required": true },
+        { "id": "workEmail", "label": "Work Email", "type": "email", "required": true },
+        { "id": "mobileNumber", "label": "Mobile Number", "type": "number", "required": true },
+
+        {
+          "id": "gender",
+          "label": "Gender",
+          "type": "select",
+          "options": [
+            { "label": "Male", "value": "male" },
+            { "label": "Female", "value": "female" },
+            { "label": "Other", "value": "other" }
+          ]
+        },
+
+        {
+          "id": "department",
+          "label": "Department",
+          "type": "select",
+          "options": ["HR", "IT", "Finance", "Sales", "Marketing", "Development"]
+        },
+
+        { "id": "dob", "label": "Date of Birth", "type": "date" },
+        { "id": "remarks", "label": "Remarks", "type": "textarea", "rows": 3 }
       ]
     },
+
     {
-      "id": "department",
-      "type": "select",
-      "label": "Department",
-      "required": true,
-      "options": [
-        { "label": "Development", "value": "dev" },
-        { "label": "QA", "value": "qa" },
-        { "label": "HR", "value": "hr" }
+      "title": "Professional Information",
+      "icon": "fas fa-briefcase",
+      "layout": "two-column",
+      "fields": [
+        { "id": "jobTitle", "label": "Job Title", "type": "text", "required": true },
+        { "id": "designation", "label": "Designation", "type": "text" },
+        { "id": "joinDate", "label": "Joining Date", "type": "date" },
+
+        {
+          "id": "employmentType",
+          "label": "Employee Status",
+          "type": "select",
+          "options": ["Full-Time", "Part-Time", "Contract", "Intern"]
+        },
+
+        {
+          "id": "isActive",
+          "label": "Active Status",
+          "type": "toggle",
+          "default": true
+        }
       ]
     },
+
     {
-      "id": "dateOfJoining",
-      "type": "date",
-      "label": "Joining Date",
-      "required": true
+      "title": "Education Details",
+      "icon": "fas fa-graduation-cap",
+      "layout": "two-column",
+      "fields": [
+        { "id": "tenthMarks", "label": "10th Marks (%)", "type": "number" },
+        { "id": "twelfthMarks", "label": "12th Marks (%)", "type": "number" },
+        { "id": "graduation", "label": "Graduation Degree", "type": "text" },
+        { "id": "university", "label": "University", "type": "text" },
+        { "id": "specialization", "label": "Specialization", "type": "text" }
+      ]
     },
+
     {
-      "id": "status",
-      "type": "toggle",
-      "label": "Active Status",
-      "default": true
-    },
-    {
-      "id": "remarks",
-      "type": "textarea",
-      "label": "Remarks",
-      "rows": 3
+      "title": "Work Experience",
+      "icon": "fas fa-history",
+
+      "fields": [
+        {
+          "id": "experienceType",
+          "label": "Prior Experience?",
+          "type": "select",
+          "options": ["Fresher", "Experienced"]
+        }
+      ],
+
+      "experienceForm": [
+        { "id": "companyName", "label": "Company Name", "type": "text" },
+        { "id": "role", "label": "Role", "type": "text" },
+        {
+          "id": "experienceCategory",
+          "label": "Experience Type",
+          "type": "select",
+          "options": ["Relevant", "Non-Relevant"]
+        },
+        { "id": "fromDate", "label": "From", "type": "date" },
+        { "id": "toDate", "label": "To", "type": "date" }
+      ]
     }
   ],
+
   "actions": [
-    {
-      "id": "save",
-      "label": "Save",
-      "variant": "primary"
-    },
-    {
-      "id": "cancel",
-      "label": "Cancel",
-      "variant": "secondary"
-    }
+    { "id": "save", "label": "Save Employee Record", "variant": "primary", "size": "md" },
+    { "id": "cancel", "label": "Cancel", "variant": "outlineDanger", "size": "md" },
+    { "id": "addExperience", "label": "+ Add Previous Company", "variant": "outlineSecondary", "fullWidth": true, "size": "md" }
   ]
 }

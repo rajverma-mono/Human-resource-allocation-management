@@ -1,27 +1,36 @@
 <div class="w-full" [ngClass]="className">
 
-  <div class="relative flex items-center">
+  <label *ngIf="label" class="block mb-1 text-sm font-medium">
+    {{label}} <span *ngIf="required" class="text-red-500">*</span>
+  </label>
 
-    <input 
+  <div class="relative w-full">
+
+    <input
+      #calendarInput
       type="date"
       [ngModel]="value"
       (ngModelChange)="onDateChange($event)"
-      [placeholder]="placeholder"
-      [disabled]="disabled"
       [min]="minDate"
       [max]="maxDate"
-      class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-400
-             disabled:bg-gray-200 disabled:cursor-not-allowed"
+      [disabled]="disabled"
+      [class.border-red-500]="hasError"
+      class="atom-date-base w-full block outline-none cursor-pointer"
     />
 
+    <!-- Calendar Icon -->
     <img *ngIf="icon"
       [src]="icon"
+      class="calendar-icon"
       [style.width.px]="iconWidth"
       [style.height.px]="iconHeight"
-      [style.color]="iconColor"
-      class="absolute right-3 cursor-pointer opacity-70 hover:opacity-100"
+      (click)="openCalendar(calendarInput)"
     />
+
   </div>
 
-  <p *ngIf="error" class="text-red-600 text-xs mt-1">{{error}}</p>
+  <!-- Error/Helper text -->
+  <p *ngIf="hasError" class="text-red-600 text-xs mt-1">{{finalError}}</p>
+  <p *ngIf="helperText && !hasError" class="text-gray-600 text-xs mt-1">{{helperText}}</p>
+
 </div>

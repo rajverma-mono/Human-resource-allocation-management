@@ -6,49 +6,57 @@ import { FormsModule } from '@angular/forms';
   selector: 'atom-date-picker',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './date-picker.html'
+  templateUrl: './date-picker.html',
+  styleUrls: ['./date-picker.scss']
 })
 export class DatePickerAtomComponent {
 
-  @Input() value: string = '';
+  @Input() value: string = "";
   @Output() valueChange = new EventEmitter<string>();
 
-  @Input() placeholder: string = 'Select date';
-  @Input() range: boolean = false;
-  @Input() label: string = '';
+  @Input() label: string = "";
+  @Input() placeholder: string = "Select date";
+  @Input() required: boolean = false;
+  @Input() helperText?: string;
+  @Input() className: string = "";
 
-  @Input() className: string = '';
   @Input() disabled: boolean = false;
-
-  @Input() opens: 'left' | 'right' | 'center' = 'left';
-  @Input() drop: 'down' | 'up' = 'down';
-
-  @Input() dateFormat: string = 'yyyy-MM-dd'; // frontend format use
   @Input() minDate?: string;
   @Input() maxDate?: string;
 
-  @Input() validate?: (val: string) => boolean;
+  @Input() validate?: (date: string) => boolean;     // optional custom validator
   @Output() onValidate = new EventEmitter<boolean>();
 
-  @Input() autoApply: boolean = true;
-
   @Input() icon?: string;
-  @Input() iconColor: string = 'gray';
-  @Input() iconWidth: number = 18;
-  @Input() iconHeight: number = 18;
+  @Input() iconWidth: number = 20;
+  @Input() iconHeight: number = 20;
+  @Input() iconColor: string = "gray";
 
-  error: string | null = null;
+  internalError: string | null = null;
+
 
   onDateChange(val: string) {
     this.value = val;
     this.valueChange.emit(val);
 
     if (this.validate) {
-      const valid = this.validate(val);
-      this.onValidate.emit(valid);
-      this.error = valid ? null : 'Invalid date';
-    } else {
-      this.error = null;
-    }
+      const ok = this.validate(val);
+      this.onValidate.emit(ok);
+      this.internalError = ok ? null : "Invalid date";
+    } else this.validateRequired();
+  }
+
+  validateRequired() {
+    if (this.required && !this.value) this.internalError = `${this.label || "Date"} is required`;
+    else this.internalError = null;
+  }
+
+  get finalError() { return this.internalError; }
+  get hasError() { return !!this.finalError; }
+
+  // FIX for showPicker error
+  openCalendar(input: HTMLInputElement) {
+    if ((input as any).showPicker) (input as any).showPicker();
+    else input.click();
   }
 }

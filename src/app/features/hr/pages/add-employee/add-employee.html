@@ -1,77 +1,142 @@
-<div class="p-8 max-w-6xl mx-auto bg-white shadow rounded">
+<div class="max-w-6xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden mt-8">
 
-  <h2 class="text-xl font-bold mb-6">{{ formConfig.title }}</h2>
+  <!-- Stepper -->
+  <div class="flex justify-center w-full pt-10 pb-6 bg-white">
+    <atom-stepper [steps]="stepperSteps" [active]="activeStep"></atom-stepper>
+  </div>
 
-  <div class="grid gap-5" [ngClass]="formConfig.layout === 'two-column' ? 'grid-cols-2' : 'grid-cols-1'">
+  <div class="px-10 pb-10 bg-white">
 
-    @for (field of formConfig.fields; track field.id) {
-      <!-- TEXT / EMAIL / NUMBER -->
-      @if (field.type === 'text' || field.type === 'email' || field.type === 'number') {
-        <atom-input 
-          [label]="field.label"
-          [type]="field.type"
-          [placeholder]="field.label"
-          [required]="field.required || false"
-          [validation]="field.validationType || 'none'"
-          [errorMessage]="field.errorMessage || ''"
-          [backgroundColor]="field.backgroundColor || 'bg-white'"
-          [(value)]="form[field.id]">
-        </atom-input>
+    @for(section of formConfig.sections; track section.title; let i=$index){
+
+    @if(i === activeStep){
+
+    <app-section-header [title]="section.title" [icon]="section.icon"></app-section-header>
+
+    <!-- Normal Sections -->
+    @if(section.title !== 'Work Experience') {
+    <div class="grid gap-6 mt-6"
+        [ngClass]="section.layout === 'two-column' ? 'grid-cols-2' : 'grid-cols-1'">
+
+      @for(field of section.fields; track field.id){
+
+      <div class="p-4 rounded-lg border bg-gray-50">
+
+        <label class="text-sm font-semibold block mb-1">
+          {{field.label}} <span *ngIf="field.required" class="text-red-500">*</span>
+        </label>
+
+        @switch(field.type){
+          @case('text'){     <atom-input [(value)]="form[field.id]" placeholder="{{field.label}}"/> }
+          @case('email'){    <atom-input [(value)]="form[field.id]" placeholder="{{field.label}}"/> }
+          @case('number'){   <atom-input [(value)]="form[field.id]" placeholder="{{field.label}}"/> }
+          @case('date'){     <atom-date-picker [(value)]="form[field.id]"/> }
+          @case('textarea'){ <atom-textarea [(value)]="form[field.id]" [rows]="field.rows||3"/> }
+          @case('radio'){    <atom-radio-group [options]="field.options" [(selectedValue)]="form[field.id]"/> }
+          @case('select'){   <atom-select [options]="field.options | selectOptions" [(value)]="form[field.id]"/> }
+          @case('toggle'){   <label class="flex items-center gap-2"><input type="checkbox" [(ngModel)]="form[field.id]"/> {{field.label}}</label> }
+        }
+
+      </div>
+
       }
 
-      <!-- RADIO -->
-      @if (field.type === 'radio') {
-        <atom-radio-group 
-          [options]="field.options ?? []"
-          [(selectedValue)]="form[field.id]">
-        </atom-radio-group>
-      }
+    </div>
+    }
 
-      <!-- SELECT -->
-      @if (field.type === 'select') {
-        <atom-select 
-          [label]="field.label"
-          [options]="field.options ?? []"
-          [(value)]="form[field.id]">
-        </atom-select>
-      }
+    <!-- Work Experience -->
+    @if(section.title === 'Work Experience'){
 
-      <!-- DATE -->
-      @if (field.type === 'date') {
-        <atom-date-picker 
-          [label]="field.label"
-          [(value)]="form[field.id]">
-        </atom-date-picker>
-      }
+    <atom-select class="mt-4" 
+      [options]="section.fields[0].options | selectOptions"
+      [(value)]="form.experienceType">
+    </atom-select>
 
-      <!-- TEXTAREA -->
-      @if (field.type === 'textarea') {
-        <atom-textarea 
-          [label]="field.label"
-          [rows]="field.rows || 3"
-          [(value)]="form[field.id]">
-        </atom-textarea>
-      }
+    @if(form.experienceType === 'Experienced'){
+    <div class="mt-6 space-y-6">
 
-      <!-- TOGGLE -->
-      @if (field.type === 'toggle') {
-        <div class="flex items-center gap-2">
-          <label>{{ field.label }}</label>
-          <span class="px-3 py-1 bg-yellow-200 rounded text-sm">TODO toggle atom</span>
+      @for(exp of experienceList; track exp; let i=$index){
+
+      <div class="p-6 border rounded bg-gray-50 relative">
+
+        <atom-button 
+          label="Remove Company" 
+          variant="outlineDanger" size="sm"
+          class="absolute top-2 right-2"
+          (onClick)="removeExperience(i)">
+        </atom-button>
+
+        <div class="grid grid-cols-2 gap-6 mt-4">
+          @for(f of section.experienceForm; track f.id){
+
+          <div>
+            <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
+
+            @switch(f.type){
+              @case('text'){   <atom-input [(value)]="exp[f.id]" placeholder="{{f.label}}"/> }
+              @case('date'){   <atom-date-picker [(value)]="exp[f.id]"/> }
+              @case('select'){ <atom-select [options]="f.options|selectOptions" [(value)]="exp[f.id]"/> }
+            }
+          </div>
+          }
         </div>
+
+      </div>
       }
-    }
-  </div>
 
-  <!-- ACTION BUTTONS -->
-  <div class="flex justify-end gap-3 mt-6">
-    @for (act of formConfig.actions; track act.id) {
-      <atom-button 
-        [label]="act.label"
-        [variant]="act.variant"
-        (onClick)="act.id === 'save' ? save() : cancel()">
+      <atom-button
+        [label]="formConfig.actions[2].label"
+        variant="outlineSecondary"
+        size="md"
+        [fullWidth]="true"
+        (onClick)="addExperience()">
       </atom-button>
-    }
-  </div>
 
+    </div>
+    }
+    }
+
+    }
+    }
+
+    <!-- Navigation Buttons -->
+    <div class="flex justify-between mt-12">
+
+      <atom-button 
+        *ngIf="activeStep>0"
+        label="Previous"
+        variant="outlineSecondary"
+        size="md"
+        (onClick)="prevStep()">
+      </atom-button>
+
+      <div class="ml-auto flex gap-4">
+
+        <atom-button 
+          *ngIf="activeStep < stepperSteps.length-1"
+          label="Next"
+          variant="primary"
+          size="md"
+          (onClick)="nextStep()">
+        </atom-button>
+
+        <atom-button 
+          *ngIf="activeStep === stepperSteps.length-1"
+          [label]="formConfig.actions[0].label"
+          variant="primary"
+          size="md"
+          (onClick)="save()">
+        </atom-button>
+
+        <atom-button 
+          [label]="formConfig.actions[1].label"
+          variant="outlineDanger"
+          size="md"
+          (onClick)="cancel()">
+        </atom-button>
+
+      </div>
+    </div>
+
+  </div>
 </div>

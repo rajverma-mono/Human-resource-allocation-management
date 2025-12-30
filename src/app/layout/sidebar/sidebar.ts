@@ -9,7 +9,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './sidebar.html'
 })
 export class SidebarComponent {
-
-  @Input() menu: any[] = [];   // <-- FIX HERE
-
+  @Input() modules:any[] = []; // earlier menu → now modules
 }
+

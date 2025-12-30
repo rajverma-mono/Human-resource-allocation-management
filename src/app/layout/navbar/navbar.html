@@ -1,16 +1,12 @@
-<nav class="bg-[#f8f9fa] border-b">
-  <div class="flex gap-8 px-10">
+<nav class="bg-[#451111] h-[55px] flex items-center px-10">
+  <div class="flex gap-3 items-center">
 
-    <a *ngFor="let m of modules"
-       [routerLink]="m.route"
+    <a *ngFor="let item of menu"
+       [routerLink]="item.route"
        routerLinkActive="active-tab"
-       class="py-4 font-semibold text-gray-600 border-b-4 border-transparent hover:text-red-600 transition">
-      {{m.name}}
+       class="px-6 py-2.5 font-semibold text-[#e8d4d4] rounded-[20px] transition-all duration-300 hover:bg-[#af9a9a] hover:text-[#451111]">
+      <i class="{{item.icon}}"></i> {{item.label}}
     </a>
 
   </div>
 </nav>
-
-<style>
-.active-tab { @apply text-red-600 border-red-600 }
-</style>

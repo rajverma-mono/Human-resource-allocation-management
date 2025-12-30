@@ -11,13 +11,23 @@
   [maxlength]="maxLength"
   [(ngModel)]="value"
   (ngModelChange)="onInput($event)"
-  [ngClass]="getBackgroundClass()"
+  [ngClass]="[
+      getBackgroundClass(),
+      rounded,
+      borderColorClass,
+      currentError ? 'border-red-500' : '',
+      className
+  ]"
   [ngStyle]="getBackgroundStyle()"
-  class="w-full px-3 py-2 border focus:ring-2 outline-none transition
-    {{rounded}} {{borderColorClass}}
-    focus:border-blue-600 focus:ring-blue-300
-    disabled:bg-gray-200 disabled:cursor-not-allowed
-    {{currentError ? 'border-red-500' : ''}}" />
+
+  class="atom-input-base 
+    w-full
+    outline-none
+    transition
+    focus:border-[#7a1c1c] focus:ring-2 focus:ring-[#f3d9d9]
+    disabled:bg-gray-100 disabled:cursor-not-allowed"
+/>
+
 
     <!-- password eye toggle -->
     <button *ngIf="showToggleIcon" type="button"

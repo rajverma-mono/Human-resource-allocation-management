@@ -1,0 +1,11 @@
+<div class="flex items-center gap-3 mb-8 border-b border-gray-300 pb-3">
+
+  <div class="w-10 h-10 flex items-center justify-center rounded-full" [style.background-color]="borderColor">
+      <i *ngIf="icon" [class]="icon" class="text-xl" [style.color]="textColor"></i>
+  </div>
+
+  <h2 class="text-2xl font-semibold" [style.color]="textColor">
+    {{ title }}
+  </h2>
+
+</div>

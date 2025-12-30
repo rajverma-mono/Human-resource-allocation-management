@@ -1,14 +1,20 @@
 <!-- layout.html -->
 
 <app-header [config]="layout.header"></app-header>
-<app-navbar [modules]="visibleModules" [active]="activeModule" (select)="selectModule($event)"></app-navbar>
+
+<!-- NAVBAR SHOULD GET SIDEBAR MENU -->
+<app-navbar 
+    [menu]="activeModule?.sidebar" 
+    [active]="activeModule" 
+    (select)="selectModule($event)">
+</app-navbar>
 
 <div class="flex h-[calc(100vh-180px)] bg-gray-100">
 
-    <!-- sidebar placed here -->
-    <div class="w-64 min-w-64 border-r bg-white">
-        <app-sidebar [menu]="activeModule?.sidebar"></app-sidebar>
-    </div>
+    <!-- SIDEBAR SHOULD GET MODULES -->
+    <!-- <div class="w-64 min-w-64 border-r bg-white">
+        <app-sidebar [modules]="visibleModules"></app-sidebar>
+    </div> -->
 
     <main class="flex-1 p-10 overflow-auto">
         <router-outlet></router-outlet>

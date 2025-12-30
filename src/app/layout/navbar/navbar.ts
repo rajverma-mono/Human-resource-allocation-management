@@ -9,6 +9,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl:'./navbar.html'
 })
 export class NavbarComponent {
-  @Input() modules:any[]=[];
-  @Input() active:any;
+  @Input() menu:any[]=[];  
+  @Input() active:any;     // <-- ADD THIS BACK
 }

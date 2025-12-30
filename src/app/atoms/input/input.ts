@@ -17,6 +17,7 @@ export type ValidationType =
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './input.html',
+  styleUrls: ['./input.scss']
 })
 export class InputAtomComponent implements OnInit {
   @Input() label: string = '';
