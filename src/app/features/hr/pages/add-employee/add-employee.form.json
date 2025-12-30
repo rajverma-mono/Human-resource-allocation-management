@@ -1,6 +1,6 @@
 {
   "title": "Add New Employee",
-  "subtitle": "Full record entry with Education & Experience Details",
+  "subtitle": "Complete employee enrollment with personal, education & experience details.",
   "stepper": [
     {
       "key": "personal"
@@ -29,40 +29,44 @@
           "label": "Upload Employee Passport Size Photo",
           "type": "photo",
           "required": true,
-          "helperText": "Please upload a recent passport-size photograph. Max 2MB.",
+          "helperText": "Upload a recent passport-size photo (Max size 2MB).",
           "buttonText": {
             "choose": "Choose Photo",
             "upload": "Upload Photo",
-            "view": "Preview"
+            "view": "Preview Photo"
           }
         },
         {
           "id": "employeeCode",
-          "label": "Employee Code",
+          "label": "Enter Employee Code",
           "type": "text",
           "required": true
         },
         {
           "id": "employeeName",
-          "label": "Full Name",
           "type": "text",
+          "label": "Enter Full Employee Name",
+          "bgColor": "",
+          "wrapperBg": "#f3f4f6",
+          "borderColor": "border-[#e66]",
+          "rounded": "rounded-xl",
           "required": true
         },
         {
           "id": "workEmail",
-          "label": "Work Email",
+          "label": "Enter Work Email Address",
           "type": "email",
           "required": true
         },
         {
           "id": "mobileNumber",
-          "label": "Mobile Number",
+          "label": "Enter Mobile Number",
           "type": "number",
           "required": true
         },
         {
           "id": "gender",
-          "label": "Gender",
+          "label": "Select Gender",
           "type": "select",
           "options": [
             {
@@ -81,11 +85,11 @@
         },
         {
           "id": "department",
-          "label": "Department",
+          "label": "Select Department",
           "type": "select",
           "options": [
-            "HR",
-            "IT",
+            "Human Resource (HR)",
+            "Information Technology (IT)",
             "Finance",
             "Sales",
             "Marketing",
@@ -94,12 +98,12 @@
         },
         {
           "id": "dob",
-          "label": "Date of Birth",
+          "label": "Select Date of Birth",
           "type": "date"
         },
         {
           "id": "remarks",
-          "label": "Remarks",
+          "label": "Additional Remarks (Optional)",
           "type": "textarea",
           "rows": 3
         }
@@ -112,12 +116,12 @@
       "fields": [
         {
           "id": "tenthMarks",
-          "label": "10th Marks (%)",
+          "label": "10th Percentage (%)",
           "type": "number"
         },
         {
           "id": "twelfthMarks",
-          "label": "12th Marks (%)",
+          "label": "12th Percentage (%)",
           "type": "number"
         },
         {
@@ -127,12 +131,12 @@
         },
         {
           "id": "university",
-          "label": "University",
+          "label": "University / College Name",
           "type": "text"
         },
         {
           "id": "specialization",
-          "label": "Specialization",
+          "label": "Specialization / Major Subject",
           "type": "text"
         }
       ]
@@ -143,7 +147,7 @@
       "fields": [
         {
           "id": "experienceType",
-          "label": "Prior Experience?",
+          "label": "Do You Have Prior Experience?",
           "type": "select",
           "options": [
             "Fresher",
@@ -154,12 +158,12 @@
       "experienceForm": [
         {
           "id": "companyName",
-          "label": "Company Name",
+          "label": "Previous Company Name",
           "type": "text"
         },
         {
           "id": "role",
-          "label": "Role",
+          "label": "Role / Position",
           "type": "text"
         },
         {
@@ -173,12 +177,12 @@
         },
         {
           "id": "fromDate",
-          "label": "From",
+          "label": "Working From (Date)",
           "type": "date"
         },
         {
           "id": "toDate",
-          "label": "To",
+          "label": "Working Till (Date)",
           "type": "date"
         }
       ]
@@ -193,21 +197,21 @@
     },
     {
       "id": "next",
-      "label": "Next",
+      "label": "Next →",
       "variant": "primary",
       "size": "md",
       "bgColor": "#451111"
     },
     {
       "id": "save",
-      "label": "Save Employee",
+      "label": "Save Employee Record",
       "bgColor": "#451111",
       "textColor": "#fff",
       "size": "md"
     },
     {
       "id": "cancel",
-      "label": "Cancel",
+      "label": "Cancel Entry",
       "borderColor": "#B11212",
       "textColor": "#B11212",
       "bgColor": "#fff",
@@ -215,7 +219,7 @@
     },
     {
       "id": "addExperience",
-      "label": "+ Add Previous Company",
+      "label": "+ Add Previous Experience",
       "variant": "outlineSecondary",
       "size": "md",
       "fullWidth": true,
@@ -224,36 +228,35 @@
       "borderColor": "#999"
     },
     {
-  "id": "photoSelect",
-  "label": "Choose Photo",
-  "variant": "outlineSecondary",
-  "size": "sm",
-  "bgColor": "#fff",
-  "textColor": "#333",
-  "borderColor": "#999"
-},
-{
-  "id": "photoUpload",
-  "label": "Upload Photo",
-  "variant": "primary",
-  "size": "sm",
-  "bgColor": "#451111",
-  "textColor": "#fff"
-},
-{
-  "id": "photoView",
-  "label": "View Photo",
-  "variant": "secondary",
-  "size": "sm",
-  "bgColor": "#e5e5e5",
-  "textColor": "#111"
-},
-{
-  "id": "removeCompany",
-  "label": "Remove Company",
-  "variant": "outlineDanger",
-  "size": "sm"
-}
-
+      "id": "photoSelect",
+      "label": "Select Photo",
+      "variant": "outlineSecondary",
+      "size": "sm",
+      "bgColor": "#fff",
+      "textColor": "#333",
+      "borderColor": "#999"
+    },
+    {
+      "id": "photoUpload",
+      "label": "Upload Photo",
+      "variant": "primary",
+      "size": "sm",
+      "bgColor": "#451111",
+      "textColor": "#fff"
+    },
+    {
+      "id": "photoView",
+      "label": "View Photo",
+      "variant": "secondary",
+      "size": "sm",
+      "bgColor": "#e5e5e5",
+      "textColor": "#111"
+    },
+    {
+      "id": "removeCompany",
+      "label": "Remove This Experience",
+      "variant": "outlineDanger",
+      "size": "sm"
+    }
   ]
 }

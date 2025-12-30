@@ -48,7 +48,7 @@ export class InputAtomComponent implements OnInit {
   @Input() isVerified: boolean = false;
   @Input() showToggleIcon: boolean = false;
   @Input() backgroundColor: string = 'bg-white'; // Set default
-
+  @Input() borderColor: string = 'border-gray-300';
   @Output() valueChange = new EventEmitter<string>();
   @Output() onErrorChange = new EventEmitter<string | null>();
   @Output() onVerifiedChange = new EventEmitter<boolean>();

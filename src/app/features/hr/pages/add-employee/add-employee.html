@@ -9,181 +9,215 @@
 
     @for(section of formConfig.sections; track section.title; let i = $index) {
 
-      @if(i === activeStep) {
+    @if(i === activeStep) {
 
-        <app-section-header 
-          [title]="section.title" 
-          [icon]="section.icon">
-        </app-section-header>
+    <app-section-header [title]="section.title" [icon]="section.icon">
+    </app-section-header>
 
-        <!-- ================= NORMAL SECTIONS ================= -->
-        @if(section.title !== 'Work Experience') {
+    <!-- ================= NORMAL SECTIONS ================= -->
+    @if(section.title !== 'Work Experience') {
 
-          <div class="grid gap-6 mt-6"
-            [ngClass]="section.layout === 'two-column' ? 'grid-cols-2' : 'grid-cols-1'">
+    <div class="grid gap-6 mt-6" [ngClass]="section.layout === 'two-column' ? 'grid-cols-2' : 'grid-cols-1'">
 
-            @for(field of section.fields; track field.id) {
+      @for(field of section.fields; track field.id) {
 
-              <div class="p-4 rounded-lg border bg-gray-50">
+      <div class="p-4 rounded-lg border bg-gray-50">
 
-                <label class="text-sm font-semibold block mb-1">
-                  {{field.label}}
-                  <span *ngIf="field.required" class="text-red-500">*</span>
-                </label>
 
-                @switch(field.type) {
 
-                  @case('photo') {
-                    <atom-photo-upload 
-                      [formActions]="formConfig.actions"
-                      (fileChange)="form.photo=$event"
-                      (upload)="uploadPhoto()"
-                      (view)="viewPhoto()">
-                    </atom-photo-upload>
-                  }
+        @switch(field.type) {
 
-                  @case('text')     { <atom-input [(value)]="form[field.id]" placeholder="{{field.label}}"/> }
-                  @case('email')    { <atom-input [(value)]="form[field.id]" placeholder="{{field.label}}"/> }
-                  @case('number')   { <atom-input [(value)]="form[field.id]" placeholder="{{field.label}}"/> }
-                  @case('date')     { <atom-date-picker [(value)]="form[field.id]"/> }
-                  @case('textarea') { <atom-textarea [(value)]="form[field.id]" [rows]="field.rows||3"/> }
-                  @case('radio')    { <atom-radio-group [options]="field.options" [(selectedValue)]="form[field.id]"/> }
-                  @case('select')   { <atom-select [options]="field.options|selectOptions" [(value)]="form[field.id]"/> }
-
-                  @case('toggle') {
-                    <label class="flex items-center gap-2">
-                      <input type="checkbox" [(ngModel)]="form[field.id]"/>
-                      {{field.label}}
-                    </label>
-                  }
-
-                }
-
-              </div>
-
-            }
-
-          </div>
-
+        @case('photo') {
+           <label class="text-sm font-semibold mb-1">
+            {{field.label}}
+            <span *ngIf="field.required" class="text-red-500">*</span>
+          </label>
+        <atom-photo-upload [formActions]="formConfig.actions" (fileChange)="form.photo=$event" (upload)="uploadPhoto()"
+          (view)="viewPhoto()">
+        </atom-photo-upload>
         }
 
+        @case('textarea') {
+        <atom-textarea [(value)]="form[field.id]" [label]="field.label" [rows]="field.rows || 3"
+          [maxLength]="field.maxLength || 500" [placeholder]="field.placeholder || field.label"
+          [disabled]="field.disabled || false" [ariaLabel]="field.ariaLabel || field.label"
+          [className]="field.className || ''" [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+          [borderColor]="field.borderColor || ''" [rounded]="field.rounded || 'rounded-lg'"
+          [containerClass]="field.containerClass || ''" [sanitize]="field.sanitize || false"
+          [removeChars]="field.removeChars || ''" [removeEmojis]="field.removeEmojis || false"
+          [normalizeAccents]="field.normalizeAccents || false" [toCase]="field.toCase || ''">
+        </atom-textarea>
+        }
 
-        <!-- ================= WORK EXPERIENCE ================= -->
-        @if(section.title === 'Work Experience') {
+        @case('email') {
+        <atom-input [(value)]="form[field.id]" [label]="field.label" type="email" [validation]="'email'"
+          [placeholder]="field.placeholder || field.label" [required]="field.required || false"
+          [maxLength]="field.maxLength || null" [disabled]="field.disabled || false"
+          [errorMessage]="field.errorMessage || ''" [className]="field.className || ''"
+          [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+          [borderColor]="field.borderColor || 'border-gray-300'" [rounded]="field.rounded || 'rounded-lg'"
+          [fullWidth]="field.fullWidth !== false" [showVerifiedStatus]="field.showVerifiedStatus || false"
+          [isVerified]="field.isVerified || false" [pattern]="field.pattern || undefined" />
+        }
 
-          <atom-select class="mt-4"
-            [options]="section.fields[0].options | selectOptions"
-            [(value)]="form.experienceType">
-          </atom-select>
+        @case('number') {
+        <atom-input [(value)]="form[field.id]" [label]="field.label" type="number"
+          [validation]="field.validation || 'numeric'" [placeholder]="field.placeholder || field.label"
+          [required]="field.required || false" [maxLength]="field.maxLength || null"
+          [disabled]="field.disabled || false" [errorMessage]="field.errorMessage || ''"
+          [className]="field.className || ''" [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+          [borderColor]="field.borderColor || 'border-gray-300'" [rounded]="field.rounded || 'rounded-lg'"
+          [fullWidth]="field.fullWidth !== false" />
+        }
 
-          @if(form.experienceType === 'Experienced') {
+        @case('text') {
+        <atom-input [(value)]="form[field.id]" [label]="field.label" type="text"
+          [validation]="field.validation || 'none'" [placeholder]="field.placeholder || field.label"
+          [required]="field.required || false" [maxLength]="field.maxLength || null"
+          [disabled]="field.disabled || false" [errorMessage]="field.errorMessage || ''"
+          [className]="field.className || ''" [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+          [borderColor]="field.borderColor || 'border-gray-300'" [rounded]="field.rounded || 'rounded-lg'"
+          [fullWidth]="field.fullWidth !== false" [pattern]="field.pattern || undefined"
+          [showToggleIcon]="field.showToggleIcon || false" />
+        }
 
-            <div class="mt-6 space-y-6">
+        @case('date') {
+        <atom-date-picker [(value)]="form[field.id]" [label]="field.label" [required]="field.required || false"
+          [disabled]="field.disabled || false" />
+        }
 
-              @for(exp of experienceList; track exp; let i = $index) {
+        @case('radio') {
+        <!-- Check what properties your atom-radio-group actually supports -->
+        <atom-radio-group [options]="field.options" [(selectedValue)]="form[field.id]" />
+        <!-- If you need to show label, add it separately -->
+        @if(field.label) {
+        <div class="text-sm text-gray-600 mt-1">{{field.label}}</div>
+        }
+        }
 
-                <div class="p-6 border rounded bg-gray-50 relative">
+        @case('select') {
+        <div class="flex flex-col">
 
-                  <!-- ❗REMOVE COMPANY button (JSON driven) -->
-                  <atom-button
-                    class="absolute top-2 right-2"
-                    [label]="getAction('removeCompany').label"
-                    [variant]="getAction('removeCompany').variant"
-                    [size]="getAction('removeCompany').size"
-                    [bgColor]="getAction('removeCompany').bgColor"
-                    [textColor]="getAction('removeCompany').textColor"
-                    [borderColor]="getAction('removeCompany').borderColor"
-                    (onClick)="removeExperience(i)">
-                  </atom-button>
+          <label class="text-sm font-semibold mb-1">
+            {{field.label}}
+            <span *ngIf="field.required" class="text-red-500">*</span>
+          </label>
 
-                  <div class="grid grid-cols-2 gap-6 mt-4">
+          <atom-select [options]="field.options | selectOptions" [(value)]="form[field.id]"
+            [placeholder]="field.placeholder || 'Select ' + field.label" [disabled]="field.disabled || false"
+            class="w-full" />
 
-                    @for(f of section.experienceForm; track f.id) {
-                      <div>
-                        <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
-
-                        @switch(f.type) {
-                          @case('text')   { <atom-input [(value)]="exp[f.id]" placeholder="{{f.label}}"/> }
-                          @case('date')   { <atom-date-picker [(value)]="exp[f.id]"/> }
-                          @case('select'){ <atom-select [options]="f.options | selectOptions" [(value)]="exp[f.id]"/> }
-                        }
-                      </div>
-                    }
-
-                  </div>
-
-                </div>
-              }
-
-              <!-- ADD EXPERIENCE button (JSON driven) -->
-              <atom-button
-                [label]="getAction('addExperience').label"
-                [variant]="getAction('addExperience').variant"
-                [size]="getAction('addExperience').size"
-                [fullWidth]="getAction('addExperience').fullWidth"
-                [bgColor]="getAction('addExperience').bgColor"
-                [textColor]="getAction('addExperience').textColor"
-                [borderColor]="getAction('addExperience').borderColor"
-                (onClick)="addExperience()">
-              </atom-button>
-
-            </div>
-
+          @if(field.required) {
+          <span class="text-xs text-red-500 mt-1">* Required</span>
           }
+        </div>
+        }
+
+
+        @case('toggle') {
+        <label class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="form[field.id]" />
+          {{field.label}}
+        </label>
+        }
 
         }
+
+      </div>
 
       }
+
+    </div>
+
+    }
+
+    <!-- ================= WORK EXPERIENCE ================= -->
+    @if(section.title === 'Work Experience') {
+
+    <atom-select class="mt-4" [options]="section.fields[0].options | selectOptions" [(value)]="form.experienceType" />
+
+    @if(form.experienceType === 'Experienced') {
+
+    <div class="mt-6 space-y-6">
+
+      @for(exp of experienceList; track exp; let i = $index) {
+
+      <div class="p-6 border rounded bg-gray-50 relative">
+
+        <!-- ❗REMOVE COMPANY button (JSON driven) -->
+        <atom-button class="absolute top-2 right-2" [label]="getAction('removeCompany').label"
+          [variant]="getAction('removeCompany').variant" [size]="getAction('removeCompany').size"
+          [bgColor]="getAction('removeCompany').bgColor" [textColor]="getAction('removeCompany').textColor"
+          [borderColor]="getAction('removeCompany').borderColor" (onClick)="removeExperience(i)" />
+
+        <div class="grid grid-cols-2 gap-6 mt-4">
+
+          @for(f of section.experienceForm; track f.id) {
+          <div>
+            <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
+
+            @switch(f.type) {
+            @case('text') {
+            <atom-input [(value)]="exp[f.id]" [label]="f.label" [placeholder]="f.placeholder || f.label"
+              [required]="f.required || false" [backgroundColor]="f.bgColor || ''"
+              [borderColor]="f.borderColor || 'border-gray-300'" [rounded]="f.rounded || 'rounded-lg'" />
+            }
+
+            @case('date') {
+            <atom-date-picker [(value)]="exp[f.id]" [label]="f.label" [required]="f.required || false" />
+            }
+
+            @case('select') {
+            <atom-select [options]="f.options | selectOptions" [(value)]="exp[f.id]" />
+            }
+            }
+          </div>
+          }
+
+        </div>
+
+      </div>
+      }
+
+      <!-- ADD EXPERIENCE button (JSON driven) -->
+      <atom-button [label]="getAction('addExperience').label" [variant]="getAction('addExperience').variant"
+        [size]="getAction('addExperience').size" [fullWidth]="getAction('addExperience').fullWidth"
+        [bgColor]="getAction('addExperience').bgColor" [textColor]="getAction('addExperience').textColor"
+        [borderColor]="getAction('addExperience').borderColor" (onClick)="addExperience()" />
+
+    </div>
+
+    }
+
+    }
+
+    }
 
     }
 
     <!-- ================= NAVIGATION BUTTONS ================= -->
     <div class="flex justify-between mt-12">
 
-      <atom-button
-        *ngIf="activeStep>0"
-        [label]="getAction('previous').label"
-        [variant]="getAction('previous').variant"
-        [size]="getAction('previous').size"
-        [bgColor]="getAction('previous').bgColor"
-        [textColor]="getAction('previous').textColor"
-        [borderColor]="getAction('previous').borderColor"
-        (onClick)="prevStep()">
-      </atom-button>
+      <atom-button *ngIf="activeStep>0" [label]="getAction('previous').label" [variant]="getAction('previous').variant"
+        [size]="getAction('previous').size" [bgColor]="getAction('previous').bgColor"
+        [textColor]="getAction('previous').textColor" [borderColor]="getAction('previous').borderColor"
+        (onClick)="prevStep()" />
 
       <div class="ml-auto flex gap-4">
 
-        <atom-button
-          *ngIf="activeStep < stepperSteps.length-1"
-          [label]="getAction('next').label"
-          [variant]="getAction('next').variant"
-          [size]="getAction('next').size"
-          [bgColor]="getAction('next').bgColor"
-          [textColor]="getAction('next').textColor"
-          [borderColor]="getAction('next').borderColor"
-          (onClick)="nextStep()">
-        </atom-button>
+        <atom-button *ngIf="activeStep < stepperSteps.length-1" [label]="getAction('next').label"
+          [variant]="getAction('next').variant" [size]="getAction('next').size" [bgColor]="getAction('next').bgColor"
+          [textColor]="getAction('next').textColor" [borderColor]="getAction('next').borderColor"
+          (onClick)="nextStep()" />
 
-        <atom-button
-          *ngIf="activeStep === stepperSteps.length-1"
-          [label]="getAction('save').label"
-          [variant]="getAction('save').variant"
-          [size]="getAction('save').size"
-          [bgColor]="getAction('save').bgColor"
-          [textColor]="getAction('save').textColor"
-          [borderColor]="getAction('save').borderColor"
-          (onClick)="save()">
-        </atom-button>
+        <atom-button *ngIf="activeStep === stepperSteps.length-1" [label]="getAction('save').label"
+          [variant]="getAction('save').variant" [size]="getAction('save').size" [bgColor]="getAction('save').bgColor"
+          [textColor]="getAction('save').textColor" [borderColor]="getAction('save').borderColor" (onClick)="save()" />
 
-        <atom-button
-          [label]="getAction('cancel').label"
-          [variant]="getAction('cancel').variant"
-          [size]="getAction('cancel').size"
-          [bgColor]="getAction('cancel').bgColor"
-          [textColor]="getAction('cancel').textColor"
-          [borderColor]="getAction('cancel').borderColor"
-          (onClick)="cancel()">
-        </atom-button>
+        <atom-button [label]="getAction('cancel').label" [variant]="getAction('cancel').variant"
+          [size]="getAction('cancel').size" [bgColor]="getAction('cancel').bgColor"
+          [textColor]="getAction('cancel').textColor" [borderColor]="getAction('cancel').borderColor"
+          (onClick)="cancel()" />
 
       </div>
     </div>

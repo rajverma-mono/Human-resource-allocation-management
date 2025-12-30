@@ -31,6 +31,10 @@ export class TextAreaAtomComponent {
   @Input() disabled: boolean = false;
   @Input() ariaLabel: string = '';
   @Input() className: string = '';
+  // ---------- NEW Styling Inputs ----------
+  @Input() backgroundColor: string = '';       // Tailwind or HEX/RGB color
+  @Input() borderColor: string = 'border-gray-300';
+  @Input() rounded: string = 'rounded-lg';
 
   get sizeClasses() {
     return {
@@ -62,6 +66,12 @@ export class TextAreaAtomComponent {
 
     return newVal.slice(0, this.maxLength);
   }
+isCss(color: string): boolean {
+  return color?.startsWith('#') ||      // #fff or #121212
+         color?.startsWith('rgb') ||    // rgb(), rgba()
+         color?.startsWith('hsl') ||    // hsl(), hsla()
+         /^[a-z]+$/i.test(color);       // css names like red/blue/black
+}
 
   onInput(val: string) {
     const finalVal = this.processValue(val);
