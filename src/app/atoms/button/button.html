@@ -1,23 +1,29 @@
-<button [ngClass]="classes" (click)="handleClick()">
-  
+<button
+  [ngClass]="classes"
+  [ngStyle]="styleObject"
+  [disabled]="disabled || loading"
+  (click)="handleClick()">
+
   <!-- Left Icon -->
-  <ng-container *ngIf="icon && !iconOnly">
-    <img [src]="icon" [style.width.px]="iconConfig.width" [style.height.px]="iconConfig.height" />
-  </ng-container>
+  <img *ngIf="icon && !iconOnly" 
+       [src]="icon" 
+       [style.width.px]="iconConfig.width" 
+       [style.height.px]="iconConfig.height"/>
 
   <!-- Label -->
   <span *ngIf="!iconOnly">
-     {{ loading ? 'Loading...' : label }}
+    {{loading ? 'Loading...' : label}}
   </span>
 
-  <!-- Icon-only button -->
-  <ng-container *ngIf="iconOnly && icon">
-    <img [src]="icon" [style.width.px]="iconConfig.width" [style.height.px]="iconConfig.height" />
-  </ng-container>
+  <!-- Single Icon Button -->
+  <img *ngIf="iconOnly && icon" 
+       [src]="icon" 
+       [style.width.px]="iconConfig.width" 
+       [style.height.px]="iconConfig.height"/>
 
   <!-- Right Icon -->
-  <ng-container *ngIf="iconRight && !iconOnly">
-    <img [src]="iconRight" [style.width.px]="iconConfig.width" [style.height.px]="iconConfig.height" />
-  </ng-container>
-
+  <img *ngIf="iconRight && !iconOnly"
+       [src]="iconRight" 
+       [style.width.px]="iconConfig.width" 
+       [style.height.px]="iconConfig.height"/>
 </button>

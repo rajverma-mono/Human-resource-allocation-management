@@ -1,118 +1,259 @@
 {
   "title": "Add New Employee",
   "subtitle": "Full record entry with Education & Experience Details",
-
   "stepper": [
-    { "key": "personal" },
-    { "key": "professional" },
-    { "key": "education" },
-    { "key": "experience" },
-    { "key": "experience" }
+    {
+      "key": "personal"
+    },
+    {
+      "key": "professional"
+    },
+    {
+      "key": "education"
+    },
+    {
+      "key": "experience"
+    },
+    {
+      "key": "experience"
+    }
   ],
-
   "sections": [
     {
       "title": "Personal Information",
       "icon": "fas fa-id-card",
       "layout": "two-column",
       "fields": [
-        { "id": "employeeCode", "label": "Employee Code", "type": "text", "required": true },
-        { "id": "employeeName", "label": "Full Name", "type": "text", "required": true },
-        { "id": "workEmail", "label": "Work Email", "type": "email", "required": true },
-        { "id": "mobileNumber", "label": "Mobile Number", "type": "number", "required": true },
-
+        {
+          "id": "photo",
+          "label": "Upload Employee Passport Size Photo",
+          "type": "photo",
+          "required": true,
+          "helperText": "Please upload a recent passport-size photograph. Max 2MB.",
+          "buttonText": {
+            "choose": "Choose Photo",
+            "upload": "Upload Photo",
+            "view": "Preview"
+          }
+        },
+        {
+          "id": "employeeCode",
+          "label": "Employee Code",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "employeeName",
+          "label": "Full Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "workEmail",
+          "label": "Work Email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "id": "mobileNumber",
+          "label": "Mobile Number",
+          "type": "number",
+          "required": true
+        },
         {
           "id": "gender",
           "label": "Gender",
           "type": "select",
           "options": [
-            { "label": "Male", "value": "male" },
-            { "label": "Female", "value": "female" },
-            { "label": "Other", "value": "other" }
+            {
+              "label": "Male",
+              "value": "male"
+            },
+            {
+              "label": "Female",
+              "value": "female"
+            },
+            {
+              "label": "Other",
+              "value": "other"
+            }
           ]
         },
-
         {
           "id": "department",
           "label": "Department",
           "type": "select",
-          "options": ["HR", "IT", "Finance", "Sales", "Marketing", "Development"]
+          "options": [
+            "HR",
+            "IT",
+            "Finance",
+            "Sales",
+            "Marketing",
+            "Development"
+          ]
         },
-
-        { "id": "dob", "label": "Date of Birth", "type": "date" },
-        { "id": "remarks", "label": "Remarks", "type": "textarea", "rows": 3 }
-      ]
-    },
-
-    {
-      "title": "Professional Information",
-      "icon": "fas fa-briefcase",
-      "layout": "two-column",
-      "fields": [
-        { "id": "jobTitle", "label": "Job Title", "type": "text", "required": true },
-        { "id": "designation", "label": "Designation", "type": "text" },
-        { "id": "joinDate", "label": "Joining Date", "type": "date" },
-
         {
-          "id": "employmentType",
-          "label": "Employee Status",
-          "type": "select",
-          "options": ["Full-Time", "Part-Time", "Contract", "Intern"]
+          "id": "dob",
+          "label": "Date of Birth",
+          "type": "date"
         },
-
         {
-          "id": "isActive",
-          "label": "Active Status",
-          "type": "toggle",
-          "default": true
+          "id": "remarks",
+          "label": "Remarks",
+          "type": "textarea",
+          "rows": 3
         }
       ]
     },
-
     {
       "title": "Education Details",
       "icon": "fas fa-graduation-cap",
       "layout": "two-column",
       "fields": [
-        { "id": "tenthMarks", "label": "10th Marks (%)", "type": "number" },
-        { "id": "twelfthMarks", "label": "12th Marks (%)", "type": "number" },
-        { "id": "graduation", "label": "Graduation Degree", "type": "text" },
-        { "id": "university", "label": "University", "type": "text" },
-        { "id": "specialization", "label": "Specialization", "type": "text" }
+        {
+          "id": "tenthMarks",
+          "label": "10th Marks (%)",
+          "type": "number"
+        },
+        {
+          "id": "twelfthMarks",
+          "label": "12th Marks (%)",
+          "type": "number"
+        },
+        {
+          "id": "graduation",
+          "label": "Graduation Degree",
+          "type": "text"
+        },
+        {
+          "id": "university",
+          "label": "University",
+          "type": "text"
+        },
+        {
+          "id": "specialization",
+          "label": "Specialization",
+          "type": "text"
+        }
       ]
     },
-
     {
       "title": "Work Experience",
       "icon": "fas fa-history",
-
       "fields": [
         {
           "id": "experienceType",
           "label": "Prior Experience?",
           "type": "select",
-          "options": ["Fresher", "Experienced"]
+          "options": [
+            "Fresher",
+            "Experienced"
+          ]
         }
       ],
-
       "experienceForm": [
-        { "id": "companyName", "label": "Company Name", "type": "text" },
-        { "id": "role", "label": "Role", "type": "text" },
+        {
+          "id": "companyName",
+          "label": "Company Name",
+          "type": "text"
+        },
+        {
+          "id": "role",
+          "label": "Role",
+          "type": "text"
+        },
         {
           "id": "experienceCategory",
           "label": "Experience Type",
           "type": "select",
-          "options": ["Relevant", "Non-Relevant"]
+          "options": [
+            "Relevant",
+            "Non-Relevant"
+          ]
         },
-        { "id": "fromDate", "label": "From", "type": "date" },
-        { "id": "toDate", "label": "To", "type": "date" }
+        {
+          "id": "fromDate",
+          "label": "From",
+          "type": "date"
+        },
+        {
+          "id": "toDate",
+          "label": "To",
+          "type": "date"
+        }
       ]
     }
   ],
-
   "actions": [
-    { "id": "save", "label": "Save Employee Record", "variant": "primary", "size": "md" },
-    { "id": "cancel", "label": "Cancel", "variant": "outlineDanger", "size": "md" },
-    { "id": "addExperience", "label": "+ Add Previous Company", "variant": "outlineSecondary", "fullWidth": true, "size": "md" }
+    {
+      "id": "previous",
+      "label": "Previous",
+      "variant": "outlineSecondary",
+      "size": "md"
+    },
+    {
+      "id": "next",
+      "label": "Next",
+      "variant": "primary",
+      "size": "md",
+      "bgColor": "#451111"
+    },
+    {
+      "id": "save",
+      "label": "Save Employee",
+      "bgColor": "#451111",
+      "textColor": "#fff",
+      "size": "md"
+    },
+    {
+      "id": "cancel",
+      "label": "Cancel",
+      "borderColor": "#B11212",
+      "textColor": "#B11212",
+      "bgColor": "#fff",
+      "size": "md"
+    },
+    {
+      "id": "addExperience",
+      "label": "+ Add Previous Company",
+      "variant": "outlineSecondary",
+      "size": "md",
+      "fullWidth": true,
+      "bgColor": "#ffffff",
+      "textColor": "#333",
+      "borderColor": "#999"
+    },
+    {
+  "id": "photoSelect",
+  "label": "Choose Photo",
+  "variant": "outlineSecondary",
+  "size": "sm",
+  "bgColor": "#fff",
+  "textColor": "#333",
+  "borderColor": "#999"
+},
+{
+  "id": "photoUpload",
+  "label": "Upload Photo",
+  "variant": "primary",
+  "size": "sm",
+  "bgColor": "#451111",
+  "textColor": "#fff"
+},
+{
+  "id": "photoView",
+  "label": "View Photo",
+  "variant": "secondary",
+  "size": "sm",
+  "bgColor": "#e5e5e5",
+  "textColor": "#111"
+},
+{
+  "id": "removeCompany",
+  "label": "Remove Company",
+  "variant": "outlineDanger",
+  "size": "sm"
+}
+
   ]
 }

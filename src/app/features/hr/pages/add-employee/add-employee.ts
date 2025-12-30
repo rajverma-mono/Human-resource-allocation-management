@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import formJson from './add-employee.form.json';
+import Swal from 'sweetalert2';
 
 // HEADER COMPONENTS
 import { PageHeaderComponent } from '../../../../atoms/page-header/page-header';
@@ -21,7 +22,7 @@ import { SelectOptionsPipe } from '../../../../pipes/select-options.pipe';
 
 // NEW
 import { StepperUIComponent } from '../../../../atoms/stepper/stepper.component';
-
+import { PhotoUploadAtomComponent } from '../../../../atoms/atom-photo-upload/photo-upload.component';
 @Component({
   selector: 'app-add-employee',
   standalone: true,
@@ -40,6 +41,7 @@ import { StepperUIComponent } from '../../../../atoms/stepper/stepper.component'
     DatePickerAtomComponent,
     TextAreaAtomComponent,
     ButtonAtomComponent,
+    PhotoUploadAtomComponent,
 
     // pipe
     SelectOptionsPipe,
@@ -54,9 +56,39 @@ export class AddEmployeeComponent {
   formConfig: any = formJson;
   form: any = {};
   experienceList: any[] = [];
+showPhotoModal: boolean = false;
+previewImageURL: string | null = null;
 
   activeStep = 0;
   stepperSteps:any[] = [];
+
+
+onPhotoSelect(file:File|null){
+  this.form.photo = file;
+  console.log("📷 Employee Photo Selected:", file);
+}
+
+viewPhoto(){
+  if(!this.form.photo) return;
+  
+  const url = URL.createObjectURL(this.form.photo);
+
+  Swal.fire({
+    imageUrl: url,
+    imageAlt: 'Employee Photo',
+    width: 400,
+    confirmButtonText: "Close",
+    background: '#fff',
+    showCloseButton: true,
+    customClass:{ popup:'rounded-xl' }
+  });
+}
+
+uploadPhoto(){
+  console.log("Upload to API =>", this.form.photo);
+  Swal.fire("Uploaded!", "Photo stored successfully", "success");
+}
+
 
   constructor() {
     console.log("🟢 JSON Loaded:", this.formConfig);
@@ -78,6 +110,10 @@ this.stepperSteps = this.formConfig.stepper?.length
     });
     this.experienceList.push(this.createExperienceBlock());
   }
+getAction(id: string) {
+  if (!this.formConfig || !this.formConfig.actions) return {};
+  return this.formConfig.actions.find((a: any) => a.id === id) || {};
+}
 
   createExperienceBlock(){
     const block:any = {};

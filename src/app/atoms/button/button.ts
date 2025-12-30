@@ -25,12 +25,6 @@ export const variantClassMap: Record<string, string> = {
   link: "text-blue-600 underline hover:text-blue-800"
 };
 
-export const iconOnlyVariantClassMap: Record<string, string> = {
-  iconDefault: "p-2 bg-gray-200 hover:bg-gray-300",
-  iconPrimary: "p-2 bg-blue-600 text-white hover:bg-blue-700",
-  iconOutline: "p-2 border border-gray-400 hover:bg-gray-100"
-};
-
 export const sizeClassMap: Record<string, string> = {
   sm: "text-sm px-3 py-1",
   md: "text-md px-4 py-2",
@@ -47,44 +41,63 @@ export interface IconConfig {
   selector: 'atom-button',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './button.html'
+  templateUrl: './button.html',
 })
 export class ButtonAtomComponent {
+
   @Input() label: string = '';
   @Input() variant: keyof typeof variantClassMap = 'primary';
   @Input() size: keyof typeof sizeClassMap = 'md';
   @Input() fullWidth: boolean = false;
-  @Input() icon?: string;         
-  @Input() iconRight?: string;    
+
+  @Input() icon?: string;
+  @Input() iconRight?: string;
   @Input() iconOnly: boolean = false;
   @Input() iconConfig: IconConfig = { width: 16, height: 16, color: 'currentColor' };
+
   @Input() disabled: boolean = false;
   @Input() loading: boolean = false;
 
+  // 🔥 Custom styling support
+  @Input() bgColor?: string;
+  @Input() textColor?: string;
+  @Input() borderColor?: string;
+
   @Output() onClick = new EventEmitter<void>();
 
+
  get classes() {
-  if (this.iconOnly) {
-    const iconVariant = iconOnlyVariantClassMap[this.variant] 
-                      ?? iconOnlyVariantClassMap['iconDefault'];
+
+  // 🔥 If custom bgColor is provided -> skip variant background classes
+  if (this.bgColor) {
     return `
-      ${iconVariant}
+      ${sizeClassMap[this.size]}
       ${this.fullWidth ? 'w-full block' : ''}
-      rounded-md p-2 flex items-center justify-center
-      disabled:opacity-50 disabled:cursor-not-allowed
+      rounded-md font-medium flex items-center gap-2 justify-center
+      transition disabled:opacity-50 disabled:cursor-not-allowed
+      border
     `;
   }
 
+  // Default behavior (variant theme)
   const variantClass = variantClassMap[this.variant] ?? variantClassMap['primary'];
   return `
     ${variantClass}
     ${sizeClassMap[this.size]}
     ${this.fullWidth ? 'w-full block' : ''}
-    rounded-md font-medium transition flex items-center gap-2 justify-center
-    disabled:opacity-50 disabled:cursor-not-allowed
+    rounded-md font-medium flex items-center gap-2 justify-center
+    transition disabled:opacity-50 disabled:cursor-not-allowed
   `;
 }
 
+
+  get styleObject() {
+    return {
+      backgroundColor: this.bgColor ? this.bgColor : null,
+      color: this.textColor ? this.textColor : null,
+      borderColor: this.borderColor ? this.borderColor : null,
+    };
+  }
 
   handleClick() {
     if (!this.disabled && !this.loading) this.onClick.emit();
