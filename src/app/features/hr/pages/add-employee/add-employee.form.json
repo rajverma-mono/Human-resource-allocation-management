@@ -15,7 +15,7 @@
       "key": "experience"
     },
     {
-      "key": "experience"
+      "key": "certifications"
     }
   ],
   "sections": [
@@ -28,13 +28,7 @@
           "id": "photo",
           "label": "Upload Employee Passport Size Photo",
           "type": "photo",
-          "required": true,
-          "helperText": "Upload a recent passport-size photo (Max size 2MB).",
-          "buttonText": {
-            "choose": "Choose Photo",
-            "upload": "Upload Photo",
-            "view": "Preview Photo"
-          }
+          "required": true
         },
         {
           "id": "employeeCode",
@@ -109,6 +103,43 @@
         }
       ]
     },
+
+
+    {
+      "title": "Professional Information",
+      "icon": "fas fa-briefcase",
+      "layout": "two-column",
+      "fields": [
+        {
+          "id": "jobTitle",
+          "label": "Job Title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "departmentName",
+          "label": "Department",
+          "type": "text"
+        },
+        {
+          "id": "joiningDate",
+          "label": "Joining Date",
+          "type": "date"
+        },
+        {
+          "id": "employeeStatus",
+          "label": "Employee Status",
+          "type": "select",
+          "options": [
+            "Full-Time",
+            "Contract",
+            "Intern"
+          ]
+        }
+      ]
+    },
+
+
     {
       "title": "Education Details",
       "icon": "fas fa-graduation-cap",
@@ -186,7 +217,73 @@
           "type": "date"
         }
       ]
+    },
+   {
+  "title": "Certifications",
+  "icon": "fas fa-certificate",
+  "fields": [
+    {
+      "id": "hasCertification",
+      "label": "Do You Have Any Professional Certifications?",
+      "type": "select",
+      "options": [
+        {
+          "label": "No Certification",
+          "value": "none"
+        },
+        {
+          "label": "Yes (Have Certifications)",
+          "value": "yes"
+        }
+      ]
     }
+  ],
+  "certificationForm": [
+    {
+      "id": "certificateMaster",
+      "label": "Select Certification",
+      "type": "select",
+      "options": [
+        "AWS Solutions Architect",
+        "RedHat RHCE",
+        "Microsoft Azure",
+        "Google Cloud",
+        "Oracle DBA",
+        "Cyber Security",
+        "DevOps Engineer",
+        "Other"
+      ]
+    },
+    {
+      "id": "certificateName",
+      "label": "If Other, Enter Certification Name",
+      "type": "text",
+      "showIf": {
+        "field": "certificateMaster",
+        "value": "Other"
+      }
+    },
+    {
+      "id": "certificateId",
+      "label": "Certificate ID / License Number",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "uploadCertificate",
+      "label": "Upload Certificate File",
+      "type": "photo",
+      "buttonText": {
+        "choose": "Choose File",
+        "upload": "Upload Certificate",
+        "view": "Preview"
+      },
+      "required": true
+    }
+  ]
+}
+
+
   ],
   "actions": [
     {
@@ -257,6 +354,22 @@
       "label": "Remove This Experience",
       "variant": "outlineDanger",
       "size": "sm"
-    }
+    },
+    {
+    "id": "addCertification",
+    "label": "+ Add Professional Certification",
+    "variant": "outlineSecondary",
+    "size": "md",
+    "fullWidth": true,
+    "bgColor": "#ffffff",
+    "textColor": "#333",
+    "borderColor": "#999"
+  },
+  {
+    "id": "removeCertification",
+    "label": "Remove Certification",
+    "variant": "outlineDanger",
+    "size": "sm"
+  }
   ]
 }

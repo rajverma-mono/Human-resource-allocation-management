@@ -15,15 +15,13 @@
     </app-section-header>
 
     <!-- ================= NORMAL SECTIONS ================= -->
-    @if(section.title !== 'Work Experience') {
+    @if(section.title !== 'Work Experience' && section.title !== 'Certifications') {
 
     <div class="grid gap-6 mt-6" [ngClass]="section.layout === 'two-column' ? 'grid-cols-2' : 'grid-cols-1'">
 
       @for(field of section.fields; track field.id) {
 
       <div class="p-4 rounded-lg border bg-gray-50">
-
-
 
         @switch(field.type) {
 
@@ -91,7 +89,6 @@
         <atom-radio-group [options]="field.options" [(selectedValue)]="form[field.id]" />
         <!-- If you need to show label, add it separately -->
         @if(field.label) {
-        <div class="text-sm text-gray-600 mt-1">{{field.label}}</div>
         }
         }
 
@@ -154,7 +151,6 @@
 
           @for(f of section.experienceForm; track f.id) {
           <div>
-            <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
 
             @switch(f.type) {
             @case('text') {
@@ -168,6 +164,8 @@
             }
 
             @case('select') {
+          <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
+
             <atom-select [options]="f.options | selectOptions" [(value)]="exp[f.id]" />
             }
             }
@@ -190,6 +188,80 @@
     }
 
     }
+
+    <!-- ================= CERTIFICATIONS ================= -->
+  @if(section.title === 'Certifications') {
+
+  <atom-select 
+    class="mt-4" 
+    [options]="section.fields[0].options | selectOptions" 
+    [(value)]="form.hasCertification"
+    (valueChange)="onCertificationChange($event)" />
+
+  @if(form.hasCertification === 'yes') {
+
+    <div class="mt-6 space-y-6">
+
+      @for(cert of certificationList; track cert; let i = $index) {
+
+        <div class="p-6 border rounded bg-gray-50 relative">
+
+          <atom-button 
+            class="absolute top-2 right-2" 
+            [label]="getAction('removeCertification').label"
+            [variant]="getAction('removeCertification').variant" 
+            [size]="getAction('removeCertification').size"
+            [bgColor]="getAction('removeCertification').bgColor" 
+            [textColor]="getAction('removeCertification').textColor"
+            [borderColor]="getAction('removeCertification').borderColor" 
+            (onClick)="removeCertification(i)" />
+
+          <div class="grid grid-cols-2 gap-6 mt-4">
+            @for(f of section.certificationForm; track f.id) {
+              @if(!f.showIf || (f.showIf && cert[f.showIf.field] === f.showIf.value)) {
+                <div>
+                  @switch(f.type) {
+                    @case('text') {
+                      <atom-input [(value)]="cert[f.id]" [label]="f.label" [placeholder]="f.placeholder || f.label" />
+                    }
+                    @case('select') {
+                      <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
+                      <atom-select [options]="f.options | selectOptions" [(value)]="cert[f.id]" />
+                    }
+                   @case('photo') {
+  <label class="text-sm font-semibold mb-1">
+      {{ f.label }}
+      <span *ngIf="f.required" class="text-red-500">*</span>
+  </label>
+
+  <atom-photo-upload 
+      [buttonText]="f.buttonText"
+      (fileChange)="cert[f.id]=$event"
+      (upload)="uploadCertificate(i, f.id)"
+      (view)="viewCertificate(i)" />
+}
+
+                  }
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+
+      <atom-button 
+        [label]="getAction('addCertification').label" 
+        [variant]="getAction('addCertification').variant"
+        [size]="getAction('addCertification').size" 
+        [fullWidth]="getAction('addCertification').fullWidth"
+        [bgColor]="getAction('addCertification').bgColor" 
+        [textColor]="getAction('addCertification').textColor"
+        [borderColor]="getAction('addCertification').borderColor" 
+        (onClick)="addCertification()" />
+
+    </div>
+  }
+}
 
     }
 
