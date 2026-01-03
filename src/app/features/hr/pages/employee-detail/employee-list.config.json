@@ -1,0 +1,37 @@
+{
+  "cardClass": "bg-white border border-red-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition",
+
+  "header": {
+    "showAvatar": true,
+    "avatarIcon": "fas fa-user",
+    "avatarClass": "w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl",
+
+    "showStatus": true,
+    "statusKey": "status",
+    "statusClassMap": {
+      "Active": "bg-green-100 text-green-700",
+      "Inactive": "bg-red-100 text-red-600"
+    }
+  },
+
+  "fields": [
+    {
+      "key": "email",
+      "icon": "fas fa-envelope",
+      "class": "text-gray-600"
+    },
+    {
+      "key": "experience",
+      "icon": "fas fa-briefcase",
+      "class": "text-gray-600"
+    },
+    {
+      "key": "location",
+      "icon": "fas fa-map-marker-alt",
+      "class": "text-gray-600"
+    }
+  ],
+
+  "skillsKey": "skills",
+  "maxSkills": 4
+}

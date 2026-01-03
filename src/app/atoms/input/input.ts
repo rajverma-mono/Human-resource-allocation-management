@@ -24,7 +24,6 @@ export class InputAtomComponent implements OnInit {
   @Input() type: string = 'text';
   @Input() placeholder: string = '';
   
-  // Accept string or ValidationType
   @Input() set validation(value: string | ValidationType) {
     const validTypes: ValidationType[] = ['name', 'email', 'mobile', 'alphanumeric', 'numeric', 'pincode', 'custom', 'none'];
     this._validation = validTypes.includes(value as ValidationType) ? value as ValidationType : 'none';
@@ -47,7 +46,7 @@ export class InputAtomComponent implements OnInit {
   @Input() showVerifiedStatus: boolean = false;
   @Input() isVerified: boolean = false;
   @Input() showToggleIcon: boolean = false;
-  @Input() backgroundColor: string = 'bg-white'; // Set default
+  @Input() backgroundColor: string = 'bg-white'; 
   @Input() borderColor: string = 'border-gray-300';
   @Output() valueChange = new EventEmitter<string>();
   @Output() onErrorChange = new EventEmitter<string | null>();
@@ -66,7 +65,6 @@ export class InputAtomComponent implements OnInit {
   }
   
   ngOnChanges(changes: SimpleChanges) {
-    // Debug: log when backgroundColor changes
     if (changes['backgroundColor']) {
       console.log('🔍 backgroundColor changed:', {
         previous: changes['backgroundColor'].previousValue,
@@ -74,7 +72,6 @@ export class InputAtomComponent implements OnInit {
       });
     }
     
-    // Validate when value changes
     if (changes['value'] && this.value) {
       this.validate(this.value);
     }
@@ -97,7 +94,7 @@ getInputClasses(): { [key: string]: boolean } {
     : 'bg-white';
   
   classes[bgClass] = true;
-  classes['test-highlight'] = true; // Add test class
+  classes['test-highlight'] = true; 
   
   console.log('🎨 getInputClasses() - bgClass:', bgClass);
   return classes;
@@ -110,46 +107,39 @@ getInputClasses(): { [key: string]: boolean } {
   validate(val: string) {
     let error: string | null = null;
 
-    // Required validation
     if (this.required && !val.trim()) {
       error = `${this.label} is required`;
     }
-    // Email validation
     else if (this.validation === 'email') {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (val && !emailRegex.test(val)) {
         error = this.errorMessage || 'Invalid email address';
       }
     }
-    // Mobile validation
     else if (this.validation === 'mobile') {
       const mobileRegex = /^[0-9]{10}$/;
       if (val && !mobileRegex.test(val)) {
         error = this.errorMessage || 'Mobile number must be 10 digits';
       }
     }
-    // Numeric validation
     else if (this.validation === 'numeric') {
       const numericRegex = /^[0-9]+$/;
       if (val && !numericRegex.test(val)) {
         error = this.errorMessage || 'Only numbers allowed';
       }
     }
-    // Alphanumeric validation
     else if (this.validation === 'alphanumeric') {
       const alphanumericRegex = /^[a-zA-Z0-9]+$/;
       if (val && !alphanumericRegex.test(val)) {
         error = this.errorMessage || 'Only alphanumeric characters allowed';
       }
     }
-    // Name validation
     else if (this.validation === 'name') {
       const nameRegex = /^[a-zA-Z\s]+$/;
       if (val && !nameRegex.test(val)) {
         error = this.errorMessage || 'Only letters and spaces allowed';
       }
     }
-    // Custom pattern validation
     else if (this.pattern && val) {
       if (!this.pattern.test(val)) {
         error = this.errorMessage || 'Invalid format';
@@ -163,34 +153,29 @@ getInputClasses(): { [key: string]: boolean } {
    getBackgroundStyle() {
     if (!this.backgroundColor) return {};
     
-    // Check if it's a CSS color (red, #ff0000, rgb(255,0,0))
     if (this.isCssColor(this.backgroundColor)) {
       return { 'background-color': this.backgroundColor };
     }
     
-    // Otherwise, it's a Tailwind class
     return {};
   }
   
   getBackgroundClass() {
     if (!this.backgroundColor) return 'bg-white';
     
-    // If it's a CSS color, return empty (we'll use inline style)
     if (this.isCssColor(this.backgroundColor)) {
       return '';
     }
     
-    // Otherwise, it's a Tailwind class
     return this.backgroundColor;
   }
   
   private isCssColor(color: string): boolean {
-    // Check for CSS color formats
     return (
-      color.startsWith('#') || // Hex: #ff0000
-      color.startsWith('rgb') || // rgb/rgba
-      color.startsWith('hsl') || // hsl/hsla
-      /^(red|green|blue|yellow|purple|orange|pink|black|white|gray)$/i.test(color) // Named colors
+      color.startsWith('#') || 
+      color.startsWith('rgb') || 
+      color.startsWith('hsl') || 
+      /^(red|green|blue|yellow|purple|orange|pink|black|white|gray)$/i.test(color) 
     );
   }
 }

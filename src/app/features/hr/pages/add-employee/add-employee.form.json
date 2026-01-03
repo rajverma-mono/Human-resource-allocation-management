@@ -1,6 +1,13 @@
 {
   "title": "Add New Employee",
+  "apiEndpoints": {
+  "create": "{{API_BASE}}/employees",
+  "list": "{{API_BASE}}/employees",
+  "update": "{{API_BASE}}/employees",
+  "delete": "{{API_BASE}}/employees"
+},
   "subtitle": "Complete employee enrollment with personal, education & experience details.",
+  
   "stepper": [
     {
       "key": "personal"
@@ -66,34 +73,51 @@
           "id": "employeeCode",
           "label": "Enter Employee Code",
           "type": "text",
-          "required": true
+          "required": true,
+          "validation": "alphanumeric",
+          "maxLength": 20,
+          "errorMessage": "Employee code must be alphanumeric",
+          "placeholder": "E.g., EMP00123"
         },
         {
           "id": "employeeName",
           "type": "text",
           "label": "Enter Full Employee Name",
+          "required": true,
+          "validation": "name",
+          "maxLength": 100,
+          "errorMessage": "Name should contain only letters and spaces",
+          "placeholder": "John Doe",
           "bgColor": "",
           "wrapperBg": "#f3f4f6",
           "borderColor": "border-[#e66]",
-          "rounded": "rounded-xl",
-          "required": true
+          "rounded": "rounded-xl"
         },
         {
           "id": "workEmail",
           "label": "Enter Work Email Address",
           "type": "email",
-          "required": true
+          "required": true,
+          "validation": "email",
+          "errorMessage": "Please enter a valid email address",
+          "placeholder": "john.doe@company.com",
+          "showVerifiedStatus": true
         },
         {
           "id": "mobileNumber",
           "label": "Enter Mobile Number",
-          "type": "number",
-          "required": true
+          "type": "text",
+          "required": true,
+          "validation": "mobile",
+          "maxLength": 10,
+          "errorMessage": "Mobile number must be 10 digits",
+          "placeholder": "9876543210"
         },
         {
           "id": "gender",
           "label": "Select Gender",
           "type": "select",
+          "required": true,
           "options": [
             {
               "label": "Male",
@@ -110,9 +134,53 @@
           ]
         },
         {
+          "id": "passport",
+          "type": "text",
+          "label": "Enter Passport Number",
+          "required": true,
+          "validation": "alphanumeric",
+          "maxLength": 15,
+          "errorMessage": "Passport number must be alphanumeric",
+          "placeholder": "A1234567",
+          "bgColor": "",
+          "wrapperBg": "#f3f4f6",
+          "borderColor": "border-[#e66]",
+          "rounded": "rounded-xl"
+        },
+        {
+          "id": "adhaar",
+          "type": "text",
+          "label": "Enter Aadhaar Number",
+          "required": true,
+          "validation": "adhaar",
+          "maxLength": 12,
+          "errorMessage": "Aadhaar must be 12 digits",
+          "placeholder": "123456789012",
+          "bgColor": "",
+          "wrapperBg": "#f3f4f6",
+          "borderColor": "border-[#e66]",
+          "rounded": "rounded-xl"
+        },
+        {
+          "id": "pan",
+          "type": "text",
+          "label": "Enter PAN Number",
+          "required": true,
+          "validation": "alphanumeric",
+          "maxLength": 10,
+          "errorMessage": "PAN must be 10 characters (e.g., ABCDE1234F)",
+          "placeholder": "ABCDE1234F",
+          "pattern": "^[A-Z]{5}[0-9]{4}[A-Z]{1}$",
+          "bgColor": "",
+          "wrapperBg": "#f3f4f6",
+          "borderColor": "border-[#e66]",
+          "rounded": "rounded-xl"
+        },
+        {
           "id": "department",
           "label": "Select Department",
           "type": "select",
+          "required": true,
           "options": [
             "Human Resource (HR)",
             "Information Technology (IT)",
@@ -125,13 +193,16 @@
         {
           "id": "dob",
           "label": "Select Date of Birth",
-          "type": "date"
+          "type": "date",
+          "required": true
         },
         {
           "id": "remarks",
           "label": "Additional Remarks (Optional)",
-          "type": "textarea",
-          "rows": 3
+          "type": "text",
+          "rows": 3,
+          "maxLength": 500,
+          "placeholder": "Any additional information..."
         }
       ]
     },
@@ -144,22 +215,33 @@
           "id": "jobTitle",
           "label": "Job Title",
           "type": "text",
-          "required": true
+          "required": true,
+          "validation": "name",
+          "maxLength": 50,
+          "errorMessage": "Job title should contain only letters and spaces",
+          "placeholder": "Software Engineer"
         },
         {
           "id": "departmentName",
           "label": "Department",
-          "type": "text"
+          "type": "text",
+          "required": true,
+          "validation": "name",
+          "maxLength": 50,
+          "errorMessage": "Department name should contain only letters and spaces",
+          "placeholder": "Information Technology"
         },
         {
           "id": "joiningDate",
           "label": "Joining Date",
-          "type": "date"
+          "type": "date",
+          "required": true
         },
         {
           "id": "employeeStatus",
           "label": "Employee Status",
           "type": "select",
+          "required": true,
           "options": [
             "Full-Time",
             "Contract",
@@ -176,27 +258,47 @@
         {
           "id": "tenthMarks",
           "label": "10th Percentage (%)",
-          "type": "number"
+          "type": "text",
+          "validation": "numeric",
+          "maxLength": 5,
+          "errorMessage": "Percentage must be a number",
+          "placeholder": "85.5"
         },
         {
           "id": "twelfthMarks",
           "label": "12th Percentage (%)",
-          "type": "number"
+          "type": "text",
+          "validation": "numeric",
+          "maxLength": 5,
+          "errorMessage": "Percentage must be a number",
+          "placeholder": "78.2"
         },
         {
           "id": "graduation",
           "label": "Graduation Degree",
-          "type": "text"
+          "type": "text",
+          "validation": "name",
+          "maxLength": 100,
+          "errorMessage": "Degree name should contain only letters and spaces",
+          "placeholder": "Bachelor of Technology"
         },
         {
           "id": "university",
           "label": "University / College Name",
-          "type": "text"
+          "type": "text",
+          "validation": "name",
+          "maxLength": 150,
+          "errorMessage": "University name should contain only letters and spaces",
+          "placeholder": "University of Example"
         },
         {
           "id": "specialization",
           "label": "Specialization / Major Subject",
-          "type": "text"
+          "type": "text",
+          "validation": "name",
+          "maxLength": 100,
+          "errorMessage": "Specialization should contain only letters and spaces",
+          "placeholder": "Computer Science"
         }
       ]
     },
@@ -208,6 +310,7 @@
           "id": "experienceType",
           "label": "Do You Have Prior Experience?",
           "type": "select",
+          "required": true,
           "options": [
             "Fresher",
             "Experienced"
@@ -218,17 +321,28 @@
         {
           "id": "companyName",
           "label": "Previous Company Name",
-          "type": "text"
+          "type": "text",
+          "required": true,
+          "validation": "name",
+          "maxLength": 100,
+          "errorMessage": "Company name should contain only letters and spaces",
+          "placeholder": "Previous Company Inc."
         },
         {
           "id": "role",
           "label": "Role / Position",
-          "type": "text"
+          "type": "text",
+          "required": true,
+          "validation": "name",
+          "maxLength": 50,
+          "errorMessage": "Role should contain only letters and spaces",
+          "placeholder": "Senior Developer"
         },
         {
           "id": "experienceCategory",
           "label": "Experience Type",
           "type": "select",
+          "required": true,
           "options": [
             "Relevant",
             "Non-Relevant"
@@ -237,12 +351,14 @@
         {
           "id": "fromDate",
           "label": "Working From (Date)",
-          "type": "date"
+          "type": "date",
+          "required": true
         },
         {
           "id": "toDate",
           "label": "Working Till (Date)",
-          "type": "date"
+          "type": "date",
+          "required": true
         }
       ]
     },
@@ -254,6 +370,7 @@
           "id": "hasCertification",
           "label": "Do You Have Any Professional Certifications?",
           "type": "select",
+          "required": true,
           "options": [
             {
               "label": "No Certification",
@@ -271,6 +388,7 @@
           "id": "certificateMaster",
           "label": "Select Certification",
           "type": "select",
+          "required": true,
           "options": [
             "AWS Solutions Architect",
             "RedHat RHCE",
@@ -286,6 +404,10 @@
           "id": "certificateName",
           "label": "If Other, Enter Certification Name",
           "type": "text",
+          "validation": "name",
+          "maxLength": 100,
+          "errorMessage": "Certification name should contain only letters and spaces",
+          "placeholder": "Custom Certification Name",
           "showIf": {
             "field": "certificateMaster",
             "value": "Other"
@@ -295,12 +417,17 @@
           "id": "certificateId",
           "label": "Certificate ID / License Number",
           "type": "text",
-          "required": true
+          "required": true,
+          "validation": "alphanumeric",
+          "maxLength": 50,
+          "errorMessage": "Certificate ID must be alphanumeric",
+          "placeholder": "CERT-12345-ABC"
         },
         {
           "id": "uploadCertificate",
           "label": "Upload Certificate File",
           "type": "photo",
+          "required": true,
           "buttonText": {
             "choose": "Choose File",
             "upload": "Upload Certificate",
@@ -332,8 +459,7 @@
               "bgColor": "#e5e5e5",
               "textColor": "#111"
             }
-          ],
-          "required": true
+          ]
         }
       ]
     }

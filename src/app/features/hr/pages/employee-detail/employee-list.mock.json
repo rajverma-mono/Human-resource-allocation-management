@@ -1,0 +1,83 @@
+[
+  {
+    "id": "1",
+    "name": "Aryan Bhat",
+    "code": "EMP001",
+    "email": "john.doe@company.com",
+    "experience": "6.8 years experience",
+    "location": "Bangalore",
+    "status": "Active",
+    "skills": ["React", "Node.js", "Python"]
+    
+  },
+  {
+    "id": "2",
+    "name": "Jane Smith",
+    "code": "EMP002",
+    "email": "jane.smith@company.com",
+    "experience": "8.5 years experience",
+    "location": "Mumbai",
+    "status": "Active",
+    "skills": ["Python", "ML", "TensorFlow"]
+  },
+  {
+    "id": "3",
+    "name": "Sarah Williams",
+    "code": "EMP004",
+    "email": "sarah.williams@company.com",
+    "experience": "10.1 years experience",
+    "location": "Pune",
+    "status": "Inactive",
+    "skills": ["Agile", "Jira"]
+  },
+  {
+    "id": "3",
+    "name": "Sarah Williams",
+    "code": "EMP004",
+    "email": "sarah.williams@company.com",
+    "experience": "10.1 years experience",
+    "location": "Pune",
+    "status": "Inactive",
+    "skills": ["Agile", "Jira"]
+  },
+  {
+    "id": "1",
+    "name": "John Doe",
+    "code": "EMP001",
+    "email": "john.doe@company.com",
+    "experience": "6.8 years experience",
+    "location": "Bangalore",
+    "status": "Active",
+    "skills": ["React", "Node.js", "Python"]
+  },
+  {
+    "id": "2",
+    "name": "Jane Smith",
+    "code": "EMP002",
+    "email": "jane.smith@company.com",
+    "experience": "8.5 years experience",
+    "location": "Mumbai",
+    "status": "Active",
+    "skills": ["Python", "ML", "TensorFlow"]
+  },
+  {
+    "id": "3",
+    "name": "Sarah Williams",
+    "code": "EMP004",
+    "email": "sarah.williams@company.com",
+    "experience": "10.1 years experience",
+    "location": "Pune",
+    "status": "Inactive",
+    "skills": ["Agile", "Jira"]
+  },
+  {
+    "id": "3",
+    "name": "Sarah Williams",
+    "code": "EMP004",
+    "email": "sarah.williams@company.com",
+    "experience": "10.1 years experience",
+    "location": "Pune",
+    "status": "Inactive",
+    "skills": ["Agile", "Jira"]
+  }
+]

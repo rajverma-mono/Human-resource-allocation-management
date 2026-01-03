@@ -1,0 +1,83 @@
+{
+  "employees": [
+    {
+      "id": "4251",
+      "photo": {},
+      "employeeCode": "sss",
+      "employeeName": "raj",
+      "workEmail": "raj@ex.com",
+      "mobileNumber": "9876543567",
+      "gender": "male",
+      "passport": "kjhfg8765467896",
+      "adhaar": "894530657865",
+      "pan": "kljhg98765",
+      "department": "Human Resource (HR)",
+      "dob": "2026-01-03",
+      "remarks": "frge",
+      "jobTitle": "software developer",
+      "departmentName": "it",
+      "joiningDate": "2026-01-03",
+      "employeeStatus": "Full-Time",
+      "tenthMarks": "76",
+      "twelfthMarks": "87",
+      "graduation": "btech",
+      "university": "galgotiasuniversity",
+      "specialization": "cse",
+      "experienceType": "Fresher",
+      "hasCertification": "none",
+      "experience": [
+        {
+          "companyName": "",
+          "role": "",
+          "experienceCategory": "",
+          "fromDate": "",
+          "toDate": ""
+        }
+      ],
+      "certifications": []
+    },
+    {
+      "id": "d676",
+      "photo": {},
+      "employeeCode": "hggch",
+      "employeeName": "oiyutrtyu",
+      "workEmail": "raj@exm.com",
+      "mobileNumber": "0987657765",
+      "gender": "male",
+      "passport": "753406453769873",
+      "adhaar": "984325890865",
+      "pan": "kjfdew4567",
+      "department": "Human Resource (HR)",
+      "dob": "2026-01-03",
+      "remarks": "lksa",
+      "jobTitle": "dyjfyu",
+      "departmentName": "ytfvu",
+      "joiningDate": "2026-01-03",
+      "employeeStatus": "Full-Time",
+      "tenthMarks": "76",
+      "twelfthMarks": "78",
+      "graduation": "btech",
+      "university": "galgotias university",
+      "specialization": "cse",
+      "experienceType": "Experienced",
+      "hasCertification": "yes",
+      "experience": [
+        {
+          "companyName": "uiytresdfgh",
+          "role": "oiuytredfc",
+          "experienceCategory": "Relevant",
+          "fromDate": "2025-01-03",
+          "toDate": "2026-01-03"
+        }
+      ],
+      "certifications": [
+        {
+          "certificateMaster": "RedHat RHCE",
+          "certificateName": "",
+          "certificateId": "kjreasyu",
+          "uploadCertificate": {}
+        }
+      ]
+    }
+  ]
+}
