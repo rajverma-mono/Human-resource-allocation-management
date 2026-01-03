@@ -28,7 +28,39 @@
           "id": "photo",
           "label": "Upload Employee Passport Size Photo",
           "type": "photo",
-          "required": true
+          "required": true,
+          "buttonText": {
+            "choose": "Select Photo",
+            "upload": "Upload Photo",
+            "view": "View Photo"
+          },
+          "buttons": [
+            {
+              "id": "photoSelect",
+              "label": "Select Photo",
+              "variant": "outlineSecondary",
+              "size": "sm",
+              "bgColor": "#fff",
+              "textColor": "#333",
+              "borderColor": "#999"
+            },
+            {
+              "id": "photoUpload",
+              "label": "Upload Photo",
+              "variant": "primary",
+              "size": "sm",
+              "bgColor": "#451111",
+              "textColor": "#fff"
+            },
+            {
+              "id": "photoView",
+              "label": "View Photo",
+              "variant": "secondary",
+              "size": "sm",
+              "bgColor": "#e5e5e5",
+              "textColor": "#111"
+            }
+          ]
         },
         {
           "id": "employeeCode",
@@ -103,8 +135,6 @@
         }
       ]
     },
-
-
     {
       "title": "Professional Information",
       "icon": "fas fa-briefcase",
@@ -138,8 +168,6 @@
         }
       ]
     },
-
-
     {
       "title": "Education Details",
       "icon": "fas fa-graduation-cap",
@@ -218,72 +246,97 @@
         }
       ]
     },
-   {
-  "title": "Certifications",
-  "icon": "fas fa-certificate",
-  "fields": [
     {
-      "id": "hasCertification",
-      "label": "Do You Have Any Professional Certifications?",
-      "type": "select",
-      "options": [
+      "title": "Certifications",
+      "icon": "fas fa-certificate",
+      "fields": [
         {
-          "label": "No Certification",
-          "value": "none"
+          "id": "hasCertification",
+          "label": "Do You Have Any Professional Certifications?",
+          "type": "select",
+          "options": [
+            {
+              "label": "No Certification",
+              "value": "none"
+            },
+            {
+              "label": "Yes (Have Certifications)",
+              "value": "yes"
+            }
+          ]
+        }
+      ],
+      "certificationForm": [
+        {
+          "id": "certificateMaster",
+          "label": "Select Certification",
+          "type": "select",
+          "options": [
+            "AWS Solutions Architect",
+            "RedHat RHCE",
+            "Microsoft Azure",
+            "Google Cloud",
+            "Oracle DBA",
+            "Cyber Security",
+            "DevOps Engineer",
+            "Other"
+          ]
         },
         {
-          "label": "Yes (Have Certifications)",
-          "value": "yes"
+          "id": "certificateName",
+          "label": "If Other, Enter Certification Name",
+          "type": "text",
+          "showIf": {
+            "field": "certificateMaster",
+            "value": "Other"
+          }
+        },
+        {
+          "id": "certificateId",
+          "label": "Certificate ID / License Number",
+          "type": "text",
+          "required": true
+        },
+        {
+          "id": "uploadCertificate",
+          "label": "Upload Certificate File",
+          "type": "photo",
+          "buttonText": {
+            "choose": "Choose File",
+            "upload": "Upload Certificate",
+            "view": "Preview"
+          },
+          "buttons": [
+            {
+              "id": "photoSelect",
+              "label": "Choose File",
+              "variant": "outlineSecondary",
+              "size": "sm",
+              "bgColor": "#fff",
+              "textColor": "#333",
+              "borderColor": "#999"
+            },
+            {
+              "id": "photoUpload",
+              "label": "Upload Certificate",
+              "variant": "primary",
+              "size": "sm",
+              "bgColor": "#451111",
+              "textColor": "#fff"
+            },
+            {
+              "id": "photoView",
+              "label": "Preview",
+              "variant": "secondary",
+              "size": "sm",
+              "bgColor": "#e5e5e5",
+              "textColor": "#111"
+            }
+          ],
+          "required": true
         }
       ]
     }
-  ],
-  "certificationForm": [
-    {
-      "id": "certificateMaster",
-      "label": "Select Certification",
-      "type": "select",
-      "options": [
-        "AWS Solutions Architect",
-        "RedHat RHCE",
-        "Microsoft Azure",
-        "Google Cloud",
-        "Oracle DBA",
-        "Cyber Security",
-        "DevOps Engineer",
-        "Other"
-      ]
-    },
-    {
-      "id": "certificateName",
-      "label": "If Other, Enter Certification Name",
-      "type": "text",
-      "showIf": {
-        "field": "certificateMaster",
-        "value": "Other"
-      }
-    },
-    {
-      "id": "certificateId",
-      "label": "Certificate ID / License Number",
-      "type": "text",
-      "required": true
-    },
-    {
-      "id": "uploadCertificate",
-      "label": "Upload Certificate File",
-      "type": "photo",
-      "buttonText": {
-        "choose": "Choose File",
-        "upload": "Upload Certificate",
-        "view": "Preview"
-      },
-      "required": true
-    }
-  ]
-}
-
-
   ],
   "actions": [
     {
@@ -325,51 +378,26 @@
       "borderColor": "#999"
     },
     {
-      "id": "photoSelect",
-      "label": "Select Photo",
-      "variant": "outlineSecondary",
-      "size": "sm",
-      "bgColor": "#fff",
-      "textColor": "#333",
-      "borderColor": "#999"
-    },
-    {
-      "id": "photoUpload",
-      "label": "Upload Photo",
-      "variant": "primary",
-      "size": "sm",
-      "bgColor": "#451111",
-      "textColor": "#fff"
-    },
-    {
-      "id": "photoView",
-      "label": "View Photo",
-      "variant": "secondary",
-      "size": "sm",
-      "bgColor": "#e5e5e5",
-      "textColor": "#111"
-    },
-    {
       "id": "removeCompany",
       "label": "Remove This Experience",
       "variant": "outlineDanger",
       "size": "sm"
     },
     {
-    "id": "addCertification",
-    "label": "+ Add Professional Certification",
-    "variant": "outlineSecondary",
-    "size": "md",
-    "fullWidth": true,
-    "bgColor": "#ffffff",
-    "textColor": "#333",
-    "borderColor": "#999"
-  },
-  {
-    "id": "removeCertification",
-    "label": "Remove Certification",
-    "variant": "outlineDanger",
-    "size": "sm"
-  }
+      "id": "addCertification",
+      "label": "+ Add Professional Certification",
+      "variant": "outlineSecondary",
+      "size": "md",
+      "fullWidth": true,
+      "bgColor": "#ffffff",
+      "textColor": "#333",
+      "borderColor": "#999"
+    },
+    {
+      "id": "removeCertification",
+      "label": "Remove Certification",
+      "variant": "outlineDanger",
+      "size": "sm"
+    }
   ]
 }

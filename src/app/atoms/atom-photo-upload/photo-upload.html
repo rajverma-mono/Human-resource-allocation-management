@@ -9,12 +9,12 @@
   <div class="space-y-3">
     <!-- Select Photo Button -->
     <atom-button
-      [label]="getAction('photoSelect').label"
-      [variant]="getAction('photoSelect').variant"
-      [size]="getAction('photoSelect').size"
-      [bgColor]="getAction('photoSelect').bgColor"
-      [textColor]="getAction('photoSelect').textColor"
-      [borderColor]="getAction('photoSelect').borderColor"
+      [label]="getButtonConfig('photoSelect').label"
+      [variant]="getButtonConfig('photoSelect').variant"
+      [size]="getButtonConfig('photoSelect').size"
+      [bgColor]="getButtonConfig('photoSelect').bgColor"
+      [textColor]="getButtonConfig('photoSelect').textColor"
+      [borderColor]="getButtonConfig('photoSelect').borderColor"
       (onClick)="selectFile(fileInput)">
     </atom-button>
 
@@ -23,22 +23,22 @@
     <!-- Upload / View Buttons -->
     <div *ngIf="previewUrl" class="flex gap-3">
       <atom-button
-        [label]="getAction('photoUpload').label"
-        [variant]="getAction('photoUpload').variant"
-        [size]="getAction('photoUpload').size"
-        [bgColor]="getAction('photoUpload').bgColor"
-        [textColor]="getAction('photoUpload').textColor"
-        [borderColor]="getAction('photoUpload').borderColor"
+        [label]="getButtonConfig('photoUpload').label"
+        [variant]="getButtonConfig('photoUpload').variant"
+        [size]="getButtonConfig('photoUpload').size"
+        [bgColor]="getButtonConfig('photoUpload').bgColor"
+        [textColor]="getButtonConfig('photoUpload').textColor"
+        [borderColor]="getButtonConfig('photoUpload').borderColor"
         (onClick)="upload.emit()">
       </atom-button>
 
       <atom-button
-        [label]="getAction('photoView').label"
-        [variant]="getAction('photoView').variant"
-        [size]="getAction('photoView').size"
-        [bgColor]="getAction('photoView').bgColor"
-        [textColor]="getAction('photoView').textColor"
-        [borderColor]="getAction('photoView').borderColor"
+        [label]="getButtonConfig('photoView').label"
+        [variant]="getButtonConfig('photoView').variant"
+        [size]="getButtonConfig('photoView').size"
+        [bgColor]="getButtonConfig('photoView').bgColor"
+        [textColor]="getButtonConfig('photoView').textColor"
+        [borderColor]="getButtonConfig('photoView').borderColor"
         (onClick)="view.emit()">
       </atom-button>
     </div>
