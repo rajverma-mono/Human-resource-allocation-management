@@ -26,12 +26,12 @@
         @switch(field.type) {
 
         @case('photo') {
-           <label class="text-sm font-semibold mb-1">
-            {{field.label}}
-            <span *ngIf="field.required" class="text-red-500">*</span>
-          </label>
-        <atom-photo-upload [formActions]="formConfig.actions" (fileChange)="form.photo=$event" (upload)="uploadPhoto()"
-          (view)="viewPhoto()">
+
+        <atom-photo-upload [label]="field.label" [required]="field.required || false" [helperText]="field.helperText"
+          [maxSizeMB]="field.maxSizeMB || 2" [buttons]="field.buttons || []"
+          [buttonText]="field.buttonText || { choose: 'Select Photo', upload: 'Upload Photo', view: 'View Photo' }"
+          (fileChange)="form[field.id] = $event" (upload)="onPhotoAction(field, 'upload')"
+          (view)="onPhotoAction(field, 'view')">
         </atom-photo-upload>
         }
 
@@ -164,7 +164,7 @@
             }
 
             @case('select') {
-          <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
+            <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
 
             <atom-select [options]="f.options | selectOptions" [(value)]="exp[f.id]" />
             }
@@ -190,86 +190,63 @@
     }
 
     <!-- ================= CERTIFICATIONS ================= -->
-  @if(section.title === 'Certifications') {
+    @if(section.title === 'Certifications') {
 
-  <atom-select 
-    class="mt-4" 
-    [options]="section.fields[0].options | selectOptions" 
-    [(value)]="form.hasCertification"
-    (valueChange)="onCertificationChange($event)" />
+    <atom-select class="mt-4" [options]="section.fields[0].options | selectOptions" [(value)]="form.hasCertification"
+      (valueChange)="onCertificationChange($event)" />
 
-  @if(form.hasCertification === 'yes') {
+    @if(form.hasCertification === 'yes') {
 
     <div class="mt-6 space-y-6">
 
       @for(cert of certificationList; track cert; let i = $index) {
 
-        <div class="p-6 border rounded bg-gray-50 relative">
+      <div class="p-6 border rounded bg-gray-50 relative">
 
-          <atom-button 
-            class="absolute top-2 right-2" 
-            [label]="getAction('removeCertification').label"
-            [variant]="getAction('removeCertification').variant" 
-            [size]="getAction('removeCertification').size"
-            [bgColor]="getAction('removeCertification').bgColor" 
-            [textColor]="getAction('removeCertification').textColor"
-            [borderColor]="getAction('removeCertification').borderColor" 
-            (onClick)="removeCertification(i)" />
+        <atom-button class="absolute top-2 right-2" [label]="getAction('removeCertification').label"
+          [variant]="getAction('removeCertification').variant" [size]="getAction('removeCertification').size"
+          [bgColor]="getAction('removeCertification').bgColor" [textColor]="getAction('removeCertification').textColor"
+          [borderColor]="getAction('removeCertification').borderColor" (onClick)="removeCertification(i)" />
 
-          <div class="grid grid-cols-2 gap-6 mt-4">
-            @for(f of section.certificationForm; track f.id) {
-              @if(!f.showIf || (f.showIf && cert[f.showIf.field] === f.showIf.value)) {
-                <div>
-                  @switch(f.type) {
-                    @case('text') {
-                      <atom-input [(value)]="cert[f.id]" [label]="f.label" [placeholder]="f.placeholder || f.label" />
-                    }
-                    @case('select') {
-                      <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
-                      <atom-select [options]="f.options | selectOptions" [(value)]="cert[f.id]" />
-                    }
-                  @case('photo') {
-  <label class="text-sm font-semibold mb-1">
-    {{ f.label }}
-    <span *ngIf="f.required" class="text-red-500">*</span>
-  </label>
+        <div class="grid grid-cols-2 gap-6 mt-4">
+          @for(f of section.certificationForm; track f.id) {
+          @if(!f.showIf || (f.showIf && cert[f.showIf.field] === f.showIf.value)) {
+          <div>
+            @switch(f.type) {
+            @case('text') {
+            <atom-input [(value)]="cert[f.id]" [label]="f.label" [placeholder]="f.placeholder || f.label" />
+            }
+            @case('select') {
+            <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
+            <atom-select [options]="f.options | selectOptions" [(value)]="cert[f.id]" />
+            }
+            @case('photo') {
 
-  <atom-photo-upload
-  [label]="f.label"
-  [required]="f.required || false"
-  [helperText]="f.helperText"
-  [maxSizeMB]="f.maxSizeMB || 2"
-  [formActions]="f.actions || formConfig.actions"
-  [buttonText]="f.buttonText || { choose: 'Select Photo', upload: 'Upload Photo', view: 'View Photo' }"
-  (fileChange)="cert[f.id] = $event"
-  (upload)="onPhotoAction(f, 'upload')"
-  (view)="onPhotoAction(f, 'view')">
-</atom-photo-upload>
-
-}
+            <atom-photo-upload [label]="f.label" [required]="f.required || false" [helperText]="f.helperText"
+              [maxSizeMB]="f.maxSizeMB || 2" [buttons]="f.buttons || []"
+              [buttonText]="f.buttonText || { choose: 'Select Photo', upload: 'Upload Photo', view: 'View Photo' }"
+              (fileChange)="cert[f.id] = $event" (upload)="onPhotoAction(f, 'upload')"
+              (view)="onPhotoAction(f, 'view')">
+            </atom-photo-upload>
+            }
 
 
-                  }
-                </div>
-              }
             }
           </div>
+          }
+          }
         </div>
+      </div>
       }
 
-      <atom-button 
-        [label]="getAction('addCertification').label" 
-        [variant]="getAction('addCertification').variant"
-        [size]="getAction('addCertification').size" 
-        [fullWidth]="getAction('addCertification').fullWidth"
-        [bgColor]="getAction('addCertification').bgColor" 
-        [textColor]="getAction('addCertification').textColor"
-        [borderColor]="getAction('addCertification').borderColor" 
-        (onClick)="addCertification()" />
+      <atom-button [label]="getAction('addCertification').label" [variant]="getAction('addCertification').variant"
+        [size]="getAction('addCertification').size" [fullWidth]="getAction('addCertification').fullWidth"
+        [bgColor]="getAction('addCertification').bgColor" [textColor]="getAction('addCertification').textColor"
+        [borderColor]="getAction('addCertification').borderColor" (onClick)="addCertification()" />
 
     </div>
-  }
-}
+    }
+    }
 
     }
 
