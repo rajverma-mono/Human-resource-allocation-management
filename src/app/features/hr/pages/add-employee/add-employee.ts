@@ -124,6 +124,19 @@ export class AddEmployeeComponent {
 
   return this.formConfig.actions.find((a: any) => a.id === id) || {};
 }
+onPhotoAction(field: any, action: 'upload' | 'view' | 'remove') {
+  switch (action) {
+    case 'upload':
+      this.uploadPhoto();
+      break;
+    case 'view':
+      this.viewPhoto();
+      break;
+    case 'remove':
+      this.form[field.id] = null;
+      break;
+  }
+}
 
   createExperienceBlock() {
     const block: any = {};

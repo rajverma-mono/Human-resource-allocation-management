@@ -228,18 +228,26 @@
                       <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
                       <atom-select [options]="f.options | selectOptions" [(value)]="cert[f.id]" />
                     }
-                   @case('photo') {
+                  @case('photo') {
   <label class="text-sm font-semibold mb-1">
-      {{ f.label }}
-      <span *ngIf="f.required" class="text-red-500">*</span>
+    {{ f.label }}
+    <span *ngIf="f.required" class="text-red-500">*</span>
   </label>
 
-  <atom-photo-upload 
-      [buttonText]="f.buttonText"
-      (fileChange)="cert[f.id]=$event"
-      (upload)="uploadCertificate(i, f.id)"
-      (view)="viewCertificate(i)" />
+  <atom-photo-upload
+  [label]="f.label"
+  [required]="f.required || false"
+  [helperText]="f.helperText"
+  [maxSizeMB]="f.maxSizeMB || 2"
+  [formActions]="f.actions || formConfig.actions"
+  [buttonText]="f.buttonText || { choose: 'Select Photo', upload: 'Upload Photo', view: 'View Photo' }"
+  (fileChange)="cert[f.id] = $event"
+  (upload)="onPhotoAction(f, 'upload')"
+  (view)="onPhotoAction(f, 'view')">
+</atom-photo-upload>
+
 }
+
 
                   }
                 </div>
