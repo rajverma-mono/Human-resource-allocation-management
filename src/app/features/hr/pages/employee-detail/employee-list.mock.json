@@ -1,83 +1,44 @@
-[
-  {
-    "id": "1",
-    "name": "Aryan Bhat",
-    "code": "EMP001",
-    "email": "john.doe@company.com",
-    "experience": "6.8 years experience",
-    "location": "Bangalore",
-    "status": "Active",
-    "skills": ["React", "Node.js", "Python"]
-    
+{
+  "title": "Employees",
+  "subtitle": "All employees currently in the system",
+
+  "apiEndpoints": {
+    "list": "{{API_BASE}}/employees"
   },
-  {
-    "id": "2",
-    "name": "Jane Smith",
-    "code": "EMP002",
-    "email": "jane.smith@company.com",
-    "experience": "8.5 years experience",
-    "location": "Mumbai",
-    "status": "Active",
-    "skills": ["Python", "ML", "TensorFlow"]
-  },
-  {
-    "id": "3",
-    "name": "Sarah Williams",
-    "code": "EMP004",
-    "email": "sarah.williams@company.com",
-    "experience": "10.1 years experience",
-    "location": "Pune",
-    "status": "Inactive",
-    "skills": ["Agile", "Jira"]
-  },
-  {
-    "id": "3",
-    "name": "Sarah Williams",
-    "code": "EMP004",
-    "email": "sarah.williams@company.com",
-    "experience": "10.1 years experience",
-    "location": "Pune",
-    "status": "Inactive",
-    "skills": ["Agile", "Jira"]
-  },
-  {
-    "id": "1",
-    "name": "John Doe",
-    "code": "EMP001",
-    "email": "john.doe@company.com",
-    "experience": "6.8 years experience",
-    "location": "Bangalore",
-    "status": "Active",
-    "skills": ["React", "Node.js", "Python"]
-  },
-  {
-    "id": "2",
-    "name": "Jane Smith",
-    "code": "EMP002",
-    "email": "jane.smith@company.com",
-    "experience": "8.5 years experience",
-    "location": "Mumbai",
-    "status": "Active",
-    "skills": ["Python", "ML", "TensorFlow"]
-  },
-  {
-    "id": "3",
-    "name": "Sarah Williams",
-    "code": "EMP004",
-    "email": "sarah.williams@company.com",
-    "experience": "10.1 years experience",
-    "location": "Pune",
-    "status": "Inactive",
-    "skills": ["Agile", "Jira"]
-  },
-  {
-    "id": "3",
-    "name": "Sarah Williams",
-    "code": "EMP004",
-    "email": "sarah.williams@company.com",
-    "experience": "10.1 years experience",
-    "location": "Pune",
-    "status": "Inactive",
-    "skills": ["Agile", "Jira"]
+
+  "card": {
+    "cardClass": "bg-white border border-red-100 rounded-2xl p-6 shadow-sm",
+
+    "header": {
+      "showAvatar": true,
+      "avatarIcon": "fas fa-user",
+      "avatarClass": "w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl",
+
+      "showStatus": true,
+      "statusKey": "employeeStatus",
+      "statusClassMap": {
+        "Full-Time": "bg-green-100 text-green-700",
+        "Contract": "bg-yellow-100 text-yellow-700",
+        "Intern": "bg-blue-100 text-blue-700"
+      }
+    },
+
+    "fields": [
+      {
+        "key": "workEmail",
+        "icon": "fas fa-envelope text-red-600"
+      },
+      {
+        "key": "jobTitle",
+        "icon": "fas fa-briefcase text-red-600"
+      },
+      {
+        "key": "department",
+        "icon": "fas fa-building text-red-600"
+      }
+    ],
+
+    "skillsKey": "specialization",
+    "skillsClass": "px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs font-bold"
   }
-]
+}

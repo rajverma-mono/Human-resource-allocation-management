@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginPageComponent } from './pages/login/login';
 import { LayoutComponent } from './layout/layout';
 import { AddEmployeeComponent } from './features/hr/pages/add-employee/add-employee';
-import { EmployeeListComponent } from './features/hr/pages/employee-detail/employee-detail.component';
+import { EmployeeListComponent } from './features/hr/pages/employee-detail/employee-list.component';
 
 export const routes: Routes = [
 

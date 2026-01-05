@@ -1,18 +1,28 @@
-<div class="max-w-7xl mx-auto p-8">
+<app-page-header
+  [title]="config.title"
+  [subtitle]="config.subtitle">
+</app-page-header>
 
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold text-gray-900">Employees</h1>
-    <p class="text-gray-500">All employees currently in the system</p>
-  </div>
+<!-- Loader -->
+<div *ngIf="loading" class="text-center py-10 text-gray-500">
+  Loading employees...
+</div>
+<p class="text-sm text-gray-500">
+  Employees loaded: {{ employees.length }}
+</p>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+<div *ngIf="!loading && employees.length === 0"
+     class="text-center py-10 text-gray-500">
+  No employees found.
+</div>
 
-    <atom-employee-card
-      *ngFor="let emp of employees"
-      [data]="emp"
-      [config]="employeeCardConfig">
-    </atom-employee-card>
+<div *ngIf="!loading && employees.length"
+     class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
+<atom-employee-card
+  *ngFor="let emp of employees; trackBy: trackByEmployeeId"
+  [data]="emp"
+  [config]="config.card">
+</atom-employee-card>
 
-  </div>
 
 </div>
