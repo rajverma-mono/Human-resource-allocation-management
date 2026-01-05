@@ -24,15 +24,27 @@
 
         @switch(field.type) {
 
-        @case('photo') {
+      @case('photo') {
 
-        <atom-photo-upload [label]="field.label" [required]="field.required || false" [helperText]="field.helperText"
-          [maxSizeMB]="field.maxSizeMB || 2" [buttons]="field.buttons || []"
-          [buttonText]="field.buttonText || { choose: 'Select Photo', upload: 'Upload Photo', view: 'View Photo' }"
-          (fileChange)="form[field.id] = $event" (upload)="onPhotoAction(field, 'upload')"
-          (view)="onPhotoAction(field, 'view')">
-        </atom-photo-upload>
-        }
+  <atom-photo-upload
+    [label]="field.label"
+    [required]="field.required || false"
+    [helperText]="field.helperText"
+    [maxSizeMB]="field.maxSizeMB || 2"
+    [buttons]="field.buttons || []"
+    [buttonText]="field.buttonText || {
+      choose: 'Select Photo',
+      upload: 'Upload Photo',
+      view: 'View Photo'
+    }"
+
+    (fileChange)="onPhotoSelect($event)"
+    (upload)="onPhotoAction('upload')"
+    (view)="onPhotoAction('view')">
+  </atom-photo-upload>
+
+}
+
 
         @case('textarea') {
         <atom-textarea [(value)]="form[field.id]" [label]="field.label" [rows]="field.rows || 3"
@@ -219,15 +231,23 @@
             <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
             <atom-select [options]="f.options | selectOptions" [(value)]="cert[f.id]" />
             }
-            @case('photo') {
+           @case('photo') {
 
-            <atom-photo-upload [label]="f.label" [required]="f.required || false" [helperText]="f.helperText"
-              [maxSizeMB]="f.maxSizeMB || 2" [buttons]="f.buttons || []"
-              [buttonText]="f.buttonText || { choose: 'Select Photo', upload: 'Upload Photo', view: 'View Photo' }"
-              (fileChange)="cert[f.id] = $event" (upload)="onPhotoAction(f, 'upload')"
-              (view)="onPhotoAction(f, 'view')">
-            </atom-photo-upload>
-            }
+ <atom-photo-upload
+  [label]="f.label"
+  [required]="f.required || false"
+  [helperText]="f.helperText"
+  [maxSizeMB]="f.maxSizeMB || 2"
+  [buttons]="f.buttons || []"
+
+  (fileChange)="cert[f.id] = $event"
+  (upload)="onCertificateUpload(i)"
+  (view)="onCertificateView(cert)">
+</atom-photo-upload>
+
+
+}
+
 
 
             }

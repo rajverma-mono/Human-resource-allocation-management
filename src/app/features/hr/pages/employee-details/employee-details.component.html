@@ -1,0 +1,167 @@
+<div class="min-h-screen bg-gray-50/50 p-4 lg:p-8" *ngIf="!loading && employee">
+  
+  <div class="max-w-7xl mx-auto mb-6 flex items-center justify-between">
+    <button
+  (click)="goBack()"
+  class="text-sm font-bold text-gray-500 hover:text-[#801519] transition-colors">
+  <i class="fas fa-chevron-left mr-2"></i> BACK
+</button>
+
+    <div class="flex gap-3">
+      <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold shadow-sm hover:bg-gray-50">
+        <i class="fas fa-print mr-2"></i> Print PDF
+      </button>
+     <button
+  (click)="editProfile()"
+  class="flex items-center px-5 py-2 bg-[#801519] text-white rounded-full text-xs font-bold shadow-lg hover:bg-[#600e11] transition-all">
+  <i class="fas fa-pen mr-2"></i> EDIT PROFILE
+</button>
+
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <div class="lg:col-span-4 space-y-6">
+      <div class="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden">
+        <div class="h-24 bg-[#801519] relative">
+          <div class="absolute -bottom-12 left-1/2 -translate-x-1/2">
+            <div class="w-24 h-24 rounded-2xl bg-white p-1 shadow-lg">
+              <img *ngIf="employee.photoBase64" [src]="employee.photoBase64" class="w-full h-full object-cover rounded-xl" />
+              <div *ngIf="!employee.photoBase64" class="w-full h-full bg-gray-100 rounded-xl flex items-center justify-center text-[#801519] text-3xl font-black">
+                {{ employee.employeeName?.charAt(0) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-16 pb-8 px-6 text-center">
+          <h2 class="text-2xl font-black text-gray-900 leading-tight">{{ employee.employeeName }}</h2>
+          <p class="text-[#801519] font-bold text-sm tracking-widest uppercase mt-1">{{ employee.employeeCode }}</p>
+          
+          <div class="mt-4 flex flex-wrap justify-center gap-2">
+            <span class="px-3 py-1 bg-red-50 text-[#801519] text-[10px] font-black rounded-full uppercase border border-red-100">
+              {{ employee.department }}
+            </span>
+            <span class="px-3 py-1 bg-green-50 text-green-700 text-[10px] font-black rounded-full uppercase border border-green-100">
+              {{ employee.employeeStatus }}
+            </span>
+          </div>
+
+          <div class="mt-8 space-y-3 border-t border-gray-50 pt-6 text-left">
+            <div class="flex items-center gap-4 text-gray-600">
+              <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-[#801519]">
+                <i class="fas fa-envelope text-xs"></i>
+              </div>
+              <span class="text-sm font-medium">{{ employee.workEmail }}</span>
+            </div>
+            <div class="flex items-center gap-4 text-gray-600">
+              <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-[#801519]">
+                <i class="fas fa-phone text-xs"></i>
+              </div>
+              <span class="text-sm font-medium">{{ employee.mobileNumber }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
+        <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Official Identification</h4>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-gray-500 uppercase">Aadhaar</span>
+            <span class="text-sm font-mono font-bold text-gray-800">{{ employee.adhaar }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-gray-500 uppercase">PAN Card</span>
+            <span class="text-sm font-mono font-bold text-gray-800">{{ employee.pan }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-gray-500 uppercase">Passport</span>
+            <span class="text-sm font-mono font-bold text-gray-800">{{ employee.passport }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-8 space-y-6">
+      
+      <div class="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-[#801519]">
+            <i class="fas fa-briefcase"></i>
+          </div>
+          <h3 class="text-xl font-black text-gray-900">Professional Journey</h3>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Current Job Title</label>
+            <p class="text-lg font-bold text-gray-800">{{ employee.jobTitle }}</p>
+          </div>
+          <div>
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Date of Joining</label>
+            <p class="text-lg font-bold text-gray-800">{{ employee.joiningDate | date:'dd MMM, yyyy' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <h3 class="text-xl font-black text-gray-900">Education Details</h3>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
+          <div class="col-span-full border-b border-gray-50 pb-4">
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Highest Qualification</label>
+            <p class="text-lg font-bold text-gray-800">{{ employee.graduation }} in {{ employee.specialization }}</p>
+            <p class="text-sm text-gray-500 font-medium">{{ employee.university }}</p>
+          </div>
+          <div>
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">12th Percentage</label>
+            <p class="text-lg font-extrabold text-[#801519]">{{ employee.twelfthMarks }}%</p>
+          </div>
+          <div>
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">10th Percentage</label>
+            <p class="text-lg font-extrabold text-[#801519]">{{ employee.tenthMarks }}%</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
+            <i class="fas fa-certificate"></i>
+          </div>
+          <h3 class="text-xl font-black text-gray-900">Professional Certifications</h3>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-xl text-amber-500">
+                <i class="fas fa-award"></i>
+              </div>
+              <div>
+                <p class="font-bold text-gray-800">{{ employee.certificateMaster }}</p>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-tighter">ID: {{ employee.certificateId }}</p>
+              </div>
+            </div>
+            <button class="px-4 py-2 bg-white border border-gray-200 text-[#801519] text-xs font-black rounded-lg hover:shadow-md transition-all">
+              VIEW DOCUMENT
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading" class="h-screen flex flex-col items-center justify-center gap-4">
+  <div class="w-12 h-12 border-4 border-[#801519]/20 border-t-[#801519] rounded-full animate-spin"></div>
+  <p class="text-sm font-bold text-gray-500 uppercase tracking-widest">Loading Employee Data...</p>
+</div>

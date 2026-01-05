@@ -11,6 +11,10 @@
 
     "header": {
       "showAvatar": true,
+
+      "avatarSourceKey": "photoBase64", 
+      "avatarFallback": "initial",     
+
       "avatarIcon": "fas fa-user",
       "avatarClass": "w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl",
 

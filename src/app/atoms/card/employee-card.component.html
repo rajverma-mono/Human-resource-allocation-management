@@ -1,60 +1,110 @@
+<!-- 🔥 CLICK CAPTURE WRAPPER (GUARANTEED) -->
 <div
-  [class]="
-    config.cardClass ||
-    'bg-white border border-red-100 rounded-xl p-5 shadow-sm'
-  "
-  class="hover:shadow-md transition cursor-pointer"
+  class="cursor-pointer"
+  (click)="cardClick.emit(data)"
 >
 
-  <!-- ================= HEADER ================= -->
-  <div class="flex items-start justify-between gap-4">
+  <!-- ================= CARD ================= -->
+  <div
+    [class]="config.cardClass || 'bg-white border border-gray-100 rounded-2xl shadow-sm'"
+    class="relative flex hover:shadow-2xl hover:border-red-100 transition-all duration-300 group overflow-hidden min-h-[180px]"
+  >
 
-    <div class="flex items-center gap-4">
-      <!-- Avatar -->
-      <div
-        *ngIf="config.header?.showAvatar"
-        [class]="
-          config.header?.avatarClass ||
-          'w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-lg font-bold'
-        "
+    <!-- ================= LEFT / AVATAR ================= -->
+    <div class="w-1/3 bg-gray-50/50 flex flex-col items-center justify-center p-4 border-r border-gray-50">
+
+      <div class="relative">
+        <div class="w-20 h-20 rounded-full p-1 bg-white shadow-md group-hover:scale-105 transition-transform duration-300">
+          <div class="w-full h-full rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+
+            <!-- IMAGE -->
+            <img
+              *ngIf="data['photoBase64']"
+              [src]="data['photoBase64']"
+              class="w-full h-full object-cover pointer-events-none"
+              alt="Employee"
+            />
+
+            <!-- INITIAL -->
+            <span
+              *ngIf="!data['photoBase64']"
+              class="text-2xl font-black text-[#801519] pointer-events-none"
+            >
+              {{ data['employeeName']?.charAt(0) }}
+            </span>
+
+          </div>
+        </div>
+
+        <!-- STATUS DOT -->
+        <div
+          class="absolute bottom-1 right-1 w-5 h-5 rounded-full border-4 border-white shadow-sm pointer-events-none"
+          [ngClass]="
+            data[config.header?.statusKey || 'status'] === 'Full-Time'
+              ? 'bg-green-500'
+              : 'bg-amber-500'
+          "
+        ></div>
+      </div>
+
+      <!-- EMP CODE -->
+      <span
+        class="mt-4 px-2 py-0.5 bg-gray-200 text-gray-600 text-[10px] font-bold rounded uppercase tracking-tighter pointer-events-none"
       >
-        <i [class]="config.header?.avatarIcon || 'fas fa-user'"></i>
-      </div>
+        {{ data['employeeCode'] || data['code'] || 'N/A' }}
+      </span>
+    </div>
 
-      <!-- Primary Identity -->
+    <!-- ================= RIGHT / DETAILS ================= -->
+    <div class="w-2/3 p-5 flex flex-col justify-between">
+
       <div>
-        <div class="text-base font-semibold text-gray-900">
-          {{ data['employeeName'] || data['name'] || '-' }}
-        </div>
+        <h3
+          class="text-xl font-extrabold text-gray-900 group-hover:text-[#801519] transition-colors line-clamp-1 pointer-events-none"
+        >
+          {{ data['employeeName'] || data['name'] }}
+        </h3>
 
-        <div class="text-xs font-medium text-red-600">
-          {{ data['employeeCode'] || data['code'] || '' }}
+        <!-- STATUS BADGE -->
+        <div
+          class="absolute top-4 right-4 uppercase text-[9px] font-black tracking-widest px-2 py-1 rounded border pointer-events-none"
+          [ngClass]="getStatusClass()"
+        >
+          {{ data[config.header?.statusKey || 'status'] }}
         </div>
       </div>
+
+      <!-- DETAILS -->
+      <div class="grid grid-cols-1 gap-y-3 mt-4">
+        <div
+          *ngFor="let field of config.fields"
+          class="flex items-center gap-3 pointer-events-none"
+        >
+          <i
+            *ngIf="field.icon"
+            [class]="field.icon"
+            class="text-xs text-[#801519] opacity-40"
+          ></i>
+
+          <span class="text-sm font-semibold text-gray-700 truncate">
+            {{ data[field.key] || '-' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="mt-4 flex items-center justify-between pointer-events-none">
+        <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">
+          Employee Profile
+        </span>
+
+        <div
+          class="h-6 w-6 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-[#801519] group-hover:text-white transition-all"
+        >
+          <i class="fas fa-chevron-right text-[10px]"></i>
+        </div>
+      </div>
+
     </div>
-
-    <!-- Status -->
-    <span
-      *ngIf="config.header?.showStatus"
-      class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
-      [ngClass]="getStatusClass()"
-    >
-      {{ data[config.header?.statusKey || 'status'] }}
-    </span>
   </div>
-
-  <!-- ================= DIVIDER ================= -->
-  <div class="my-4 border-t border-gray-100"></div>
-
-  <!-- ================= DETAILS ================= -->
-  <div class="space-y-2 text-sm text-gray-600">
-    <div
-      *ngFor="let field of config.fields"
-      class="flex items-center gap-2"
-    >
-      <i *ngIf="field.icon" [class]="field.icon"></i>
-      <span>{{ data[field.key] || '-' }}</span>
-    </div>
-  </div>
-
 </div>

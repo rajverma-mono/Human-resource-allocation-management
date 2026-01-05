@@ -7,6 +7,7 @@ import listConfig from './employee-list.config.json';
 
 import { EmployeeCardComponent } from '../../../../atoms/card/atom-employee-card.component';
 import { PageHeaderComponent } from '../../../../atoms/page-header/page-header';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-employee-list',
@@ -25,7 +26,10 @@ export class EmployeeListComponent implements OnInit {
   employees: any[] = [];
   loading = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+  private http: HttpClient,
+  private router: Router
+) {}
 
   ngOnInit() {
     this.loadEmployees();
@@ -33,29 +37,41 @@ export class EmployeeListComponent implements OnInit {
 trackByEmployeeId(index: number, emp: any) {
   return emp.id;
 }
-
-  loadEmployees() {
+openEmployee(emp: any) {
+  console.log('CARD CLICKED →', emp.id);
+  this.router.navigate(['/hr/employees', emp.id]);
+}
+loadEmployees() {
   this.loading = true;
 
   const url = this.config.apiEndpoints.list
     .replace('{{API_BASE}}', environment.API_BASE);
 
-  console.log('📥 GET →', url);
-
   this.http.get<any[]>(url).subscribe({
     next: (res) => {
-      console.log('✅ API RESPONSE:', res);
+      this.employees = res.map(emp => {
+        const photoBase64 =
+          emp.photoBase64 && emp.photoBase64.startsWith('data:image')
+            ? emp.photoBase64
+            : typeof emp.photo === 'string' && emp.photo.startsWith('data:image')
+              ? emp.photo
+              : null;
 
-      this.employees = [...res];   
+        return {
+          ...emp,
+          photoBase64
+        };
+      });
 
       this.loading = false;
     },
-    error: (err) => {
-      console.error('❌ API ERROR', err);
-      this.loading = false;
-    }
+    error: () => (this.loading = false)
   });
 }
 
-  }
+}
+
+
+
+  
 

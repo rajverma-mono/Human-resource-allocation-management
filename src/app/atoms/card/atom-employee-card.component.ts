@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Output, EventEmitter } from '@angular/core';
 
 export interface CardField {
   key: string;
   label?: string;
   icon?: string;
-  class?: string;       // Tailwind class
+  class?: string;
 }
 
 export interface CardHeader {
@@ -19,13 +20,21 @@ export interface CardHeader {
 }
 
 export interface EmployeeCardConfig {
-  cardClass?: string;        // Tailwind
+  cardClass?: string;
   header?: CardHeader;
   fields: CardField[];
   skillsKey?: string;
   skillsClass?: string;
   maxSkills?: number;
 }
+export interface EmployeeCardData {
+  employeeName?: string;
+  employeeCode?: string;
+  photoBase64?: string;
+  status?: string;
+  [key: string]: any;
+}
+
 
 @Component({
   selector: 'atom-employee-card',
@@ -37,8 +46,10 @@ export class EmployeeCardComponent {
 
   @Input() data: Record<string, any> = {};
   @Input() config!: EmployeeCardConfig;
+  @Output() cardClick = new EventEmitter<any>();
 
-  getStatusClass() {
+
+  getStatusClass(): string {
     const key = this.config.header?.statusKey || 'status';
     return this.config.header?.statusClassMap?.[this.data[key]] || '';
   }

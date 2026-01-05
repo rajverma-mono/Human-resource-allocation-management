@@ -18,7 +18,8 @@ export class PhotoUploadAtomComponent {
   // New input for button configuration
   @Input() buttons: any[] = [];
   
-  @Output() fileChange = new EventEmitter<File|null>();
+  @Output() fileChange = new EventEmitter<string | null>(); 
+
   @Output() upload = new EventEmitter<void>();
   @Output() view = new EventEmitter<void>();
   @Input() helperText?: string;
@@ -47,19 +48,23 @@ export class PhotoUploadAtomComponent {
   selectFile(i: HTMLInputElement) { i.click(); }
 
   onFileSelect(e: any) {
-    const file = e.target.files[0];
-    if (!file) return;
+  const file = e.target.files[0];
+  if (!file) return;
 
-    if (file.size > this.maxSizeMB * 1024 * 1024) {
-      this.error = `Max ${this.maxSizeMB}MB allowed`; 
-      return;
-    }
-
-    this.error = null;
-    this.fileChange.emit(file);
-
-    const reader = new FileReader();
-    reader.onload = () => this.previewUrl = reader.result as string;
-    reader.readAsDataURL(file);
+  if (file.size > this.maxSizeMB * 1024 * 1024) {
+    this.error = `Max ${this.maxSizeMB}MB allowed`;
+    return;
   }
+
+  this.error = null;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const base64 = reader.result as string;
+    this.previewUrl = base64;
+    this.fileChange.emit(base64); // ✅ BASE64 ONLY
+  };
+  reader.readAsDataURL(file);
+}
+
 }

@@ -20,10 +20,8 @@ import { TextAreaAtomComponent } from '../../../../atoms/textarea/textarea';
 import { ButtonAtomComponent } from '../../../../atoms/button/button';
 import { PhotoUploadAtomComponent } from '../../../../atoms/atom-photo-upload/photo-upload.component';
 
-// PIPE
 import { SelectOptionsPipe } from '../../../../pipes/select-options.pipe';
 
-// STEPPER
 import { StepperUIComponent } from '../../../../atoms/stepper/stepper.component';
 
 @Component({
@@ -51,11 +49,10 @@ import { StepperUIComponent } from '../../../../atoms/stepper/stepper.component'
 })
 export class AddEmployeeComponent {
 
-  /* ================= CONFIG ================= */
 
   formConfig: any = formJson;
 
-  /* ================= STATE ================= */
+photoBase64: string | null = null;
 
   form: any = {};
   experienceList: any[] = [];
@@ -107,29 +104,52 @@ export class AddEmployeeComponent {
 
   /* ================= PHOTO ================= */
 
-  onPhotoSelect(file: File | null) {
-    this.form.photo = file;
+ onPhotoSelect(base64: string | null) {
+  this.form.photoBase64 = base64;
+  this.form.photoUploaded = false; // reset until upload is clicked
+}
+
+
+
+ viewPhoto() {
+  console.log('VIEW CLICKED', this.form.photoBase64);
+
+  if (!this.form.photoBase64) {
+    console.warn('No photoBase64 to view');
+    return;
   }
 
-  viewPhoto() {
-    if (!this.form.photo) return;
+  Swal.fire({
+    imageUrl: this.form.photoBase64, // ✅ Base64 DIRECT
+    width: 400,
+    showCloseButton: true
+  });
+}
 
-    Swal.fire({
-      imageUrl: URL.createObjectURL(this.form.photo),
-      width: 400,
-      showCloseButton: true
-    });
+
+ uploadPhoto() {
+  if (!this.form.photoBase64) {
+    Swal.fire('No photo selected', 'Please select a photo first', 'warning');
+    return;
   }
 
-  uploadPhoto() {
-    Swal.fire('Uploaded!', 'Photo stored successfully', 'success');
-  }
+  // ✅ MARK AS UPLOADED
+  this.form.photoUploaded = true;
 
-  onPhotoAction(field: any, action: 'upload' | 'view' | 'remove') {
-    if (action === 'upload') this.uploadPhoto();
-    if (action === 'view') this.viewPhoto();
-    if (action === 'remove') this.form[field.id] = null;
+  Swal.fire('Uploaded!', 'Photo stored successfully', 'success');
+}
+
+
+ onPhotoAction(action: 'upload' | 'view' | 'remove') {
+  if (action === 'upload') this.uploadPhoto();
+  if (action === 'view') this.viewPhoto();
+  if (action === 'remove') {
+    this.form.photoBase64 = null;
+    this.form.photoUploaded = false;
   }
+}
+
+
 
   /* ================= EXPERIENCE ================= */
 
@@ -161,6 +181,30 @@ export class AddEmployeeComponent {
   }
 
   /* ================= CERTIFICATIONS ================= */
+/* ================= CERTIFICATE PHOTO ACTIONS ================= */
+
+onCertificateUpload(index: number) {
+  Swal.fire(
+    'Uploaded!',
+    `Certificate ${index + 1} stored successfully`,
+    'success'
+  );
+}
+
+onCertificateView(cert: any) {
+  const base64 = cert?.uploadCertificate;
+
+  if (!base64) {
+    Swal.fire('No certificate to view');
+    return;
+  }
+
+  Swal.fire({
+    imageUrl: base64, // Base64 preview
+    width: 400,
+    showCloseButton: true
+  });
+}
 
   createCertificationBlock() {
     const block: any = {};
@@ -199,18 +243,31 @@ export class AddEmployeeComponent {
 
   /* ================= VALIDATION ================= */
 
-  validateCurrentStep(): boolean {
-    const section = this.formConfig.sections[this.activeStep];
-    if (!section?.fields) return true;
+ validateCurrentStep(): boolean {
+  const section = this.formConfig.sections[this.activeStep];
+  if (!section?.fields) return true;
 
-    for (const field of section.fields.filter((f: any) => f.required)) {
-      if (!this.form[field.id]) {
-        Swal.fire(`${field.label} is required`);
+  for (const field of section.fields.filter((f: any) => f.required)) {
+
+    // 🔥 SPECIAL CASE: PHOTO
+    if (field.type === 'photo') {
+      if (!this.form.photoUploaded) {
+        Swal.fire('Please upload the photo');
         return false;
       }
+      continue;
     }
-    return true;
+
+    // 🔹 NORMAL FIELDS
+    if (!this.form[field.id]) {
+      Swal.fire(`${field.label} is required`);
+      return false;
+    }
   }
+
+  return true;
+}
+
 
   /* ================= SAVE (API) ================= */
 save() {
