@@ -1,0 +1,235 @@
+<!-- composite-employee-profile.component.html -->
+<div class="min-h-screen bg-gray-50/50 p-4 lg:p-8" *ngIf="!loading && data">
+  
+  <!-- ================= ACTION BAR ================= -->
+  <div class="max-w-7xl mx-auto mb-6 flex items-center justify-between">
+    <button 
+      class="flex items-center text-gray-500 hover:text-[#801519] transition-colors font-medium"
+      (click)="onAction('goBack')">
+    </button>
+    <div class="flex gap-3">
+      @for (act of config.actions; track act.action) {
+        <button 
+          class="px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors"
+          [ngClass]="{
+            'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50': act.variant === 'secondary',
+            'bg-[#801519] text-white hover:bg-[#600e11]': act.variant === 'primary',
+            'bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-50': act.variant === 'outline'
+          }"
+          (click)="onAction(act.action)">
+          @if (act.action === 'print') {
+            <i class="fas fa-print mr-2"></i>
+          }
+          @if (act.action === 'editProfile') {
+            <i class="fas fa-edit mr-2"></i>
+          }
+          {{ act.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- ================= LEFT SIDEBAR ================= -->
+    <div class="lg:col-span-4 space-y-6">
+      
+      <!-- PROFILE CARD -->
+      <div class="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden">
+        <div class="h-24 bg-[#801519] relative">
+          <div class="absolute -bottom-12 left-1/2 -translate-x-1/2">
+            <div class="w-24 h-24 rounded-2xl bg-white p-1 shadow-lg">
+              <img 
+                *ngIf="data.photoBase64" 
+                [src]="data.photoBase64" 
+                class="w-full h-full object-cover rounded-xl" 
+                alt="Profile" />
+              <div 
+                *ngIf="!data.photoBase64" 
+                class="w-full h-full bg-gray-100 rounded-xl flex items-center justify-center text-[#801519] text-3xl font-black">
+                {{ data.employeeName?.charAt(0) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-16 pb-8 px-6 text-center">
+          <h2 class="text-2xl font-black text-gray-900 leading-tight">{{ data.employeeName }}</h2>
+          <p class="text-[#801519] font-bold text-sm tracking-widest uppercase mt-1">{{ data.employeeCode }}</p>
+          
+          <div class="mt-4 flex flex-wrap justify-center gap-2">
+            <span class="px-3 py-1 bg-red-50 text-[#801519] text-[10px] font-black rounded-full uppercase border border-red-100">
+              {{ data.department }}
+            </span>
+            <span 
+              class="px-3 py-1 text-[10px] font-black rounded-full uppercase border"
+              [ngClass]="{
+                'bg-green-50 text-green-700 border-green-100': data.employeeStatus === 'Active',
+                'bg-yellow-50 text-yellow-700 border-yellow-100': data.employeeStatus === 'Inactive',
+                'bg-red-50 text-red-700 border-red-100': !data.employeeStatus || data.employeeStatus === 'Terminated'
+              }">
+              {{ data.employeeStatus || 'N/A' }}
+            </span>
+          </div>
+
+          <!-- Contact from config -->
+          @for (section of config.sections; track section.title) {
+            @if (section.title === 'Contact Details') {
+              <div class="mt-8 space-y-3 border-t border-gray-50 pt-6 text-left">
+                @for (field of section.fields; track field.key) {
+                  @if (shouldShowField(field, data)) {
+                    <div class="flex items-center gap-4 text-gray-600">
+                      <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-[#801519]">
+                        @if (field.key === 'workEmail') {
+                          <i class="fas fa-envelope text-xs"></i>
+                        }
+                        @if (field.key === 'mobileNumber') {
+                          <i class="fas fa-phone text-xs"></i>
+                        }
+                      </div>
+                      <span class="text-sm font-medium">
+                        {{ formatValue(getValue(data, field.key), field) }}
+                      </span>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- OFFICIAL IDENTIFICATION (Fixed section not in config) -->
+      <div class="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
+        <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
+          Official Identification
+        </h4>
+        <div class="space-y-4">
+          @if (data.adhaar) {
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-gray-500 uppercase">Aadhaar</span>
+              <span class="text-sm font-mono font-bold text-gray-800">{{ data.adhaar }}</span>
+            </div>
+          }
+          @if (data.pan) {
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-gray-500 uppercase">PAN Card</span>
+              <span class="text-sm font-mono font-bold text-gray-800">{{ data.pan }}</span>
+            </div>
+          }
+          @if (data.passport) {
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-gray-500 uppercase">Passport</span>
+              <span class="text-sm font-mono font-bold text-gray-800">{{ data.passport }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= RIGHT CONTENT ================= -->
+    <div class="lg:col-span-8 space-y-6">
+      
+      @for (section of config.sections; track section.title) {
+        @if (section.title !== 'Contact Details' && shouldShowSection(section, data)) {
+          
+          <div class="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
+            
+            <!-- SECTION HEADER -->
+            <div class="flex items-center gap-3 mb-8">
+              <div 
+                class="w-10 h-10 rounded-xl flex items-center justify-center"
+                [ngClass]="getSectionIconClass(section)">
+                <i class="fas" [ngClass]="getSectionIcon(section)"></i>
+              </div>
+              <h3 class="text-xl font-black text-gray-900">
+                {{ section.title }}
+              </h3>
+            </div>
+            
+            <!-- REPEAT SECTION (Experience, Certifications) -->
+            @if (section.type === 'repeat') {
+              <div class="space-y-4">
+                @for (item of getRepeatData(section, data); track item; let i = $index) {
+                  <div class="border border-gray-100 rounded-2xl p-6 bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                    <div class="grid gap-6" [ngClass]="section.layout === 'two-column' ? 'grid-cols-2' : 'grid-cols-1'">
+                      @for (field of section.fields; track field.key) {
+                        @if (shouldShowField(field, item)) {
+                          <div>
+                            <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
+                              {{ field.label }}
+                            </div>
+                            <div class="text-sm font-bold text-gray-800">
+                              {{ formatValue(getValue(item, field.key), field) }}
+                            </div>
+                          </div>
+                        }
+                      }
+                    </div>
+                    @if (section.hasAction) {
+                      <div class="mt-6 pt-6 border-t border-gray-100">
+                        <button 
+                          class="px-4 py-2 bg-white border border-gray-200 text-[#801519] text-xs font-black rounded-lg hover:shadow-md transition-all"
+                          (click)="onRepeatAction(section, item)">
+                          {{ section.actionLabel || 'VIEW DETAILS' }}
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+                @empty {
+                  <div class="text-center py-8 text-gray-400">
+                    <i class="fas fa-inbox text-3xl mb-2"></i>
+                    <p class="text-sm font-medium">No {{ section.title.toLowerCase() }} found</p>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- NORMAL SECTION -->
+            @if (!section.type || section.type !== 'repeat') {
+              <div class="grid gap-8" [ngClass]="section.layout === 'two-column' ? 'grid-cols-2' : 'grid-cols-1'">
+                @for (field of section.fields; track field.key) {
+                  @if (shouldShowField(field, data)) {
+                    <div>
+                      <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
+                        {{ field.label }}
+                      </div>
+                      <div class="text-lg font-bold text-gray-800">
+                        {{ formatValue(getValue(data, field.key), field) }}
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            }
+
+          </div>
+        }
+      }
+
+    </div>
+  </div>
+</div>
+
+<!-- LOADING STATE -->
+<div *ngIf="loading" class="h-screen flex flex-col items-center justify-center gap-4">
+  <div class="w-12 h-12 border-4 border-[#801519]/20 border-t-[#801519] rounded-full animate-spin"></div>
+  <p class="text-sm font-bold text-gray-500 uppercase tracking-widest">
+    Loading Employee Data...
+  </p>
+</div>
+
+<!-- EMPTY STATE -->
+<div *ngIf="!loading && !data" class="h-screen flex flex-col items-center justify-center gap-4">
+  <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">
+    <i class="fas fa-user-slash text-3xl text-gray-400"></i>
+  </div>
+  <p class="text-lg font-bold text-gray-500">No employee data found</p>
+  <button 
+    class="px-4 py-2 bg-[#801519] text-white rounded-lg text-sm font-bold hover:bg-[#600e11]"
+    (click)="onAction('goBack')">
+    Back to List
+  </button>
+</div>

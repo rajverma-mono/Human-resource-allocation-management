@@ -1,0 +1,88 @@
+{
+  "apiEndpoints": {
+    "list": "{{API_BASE}}/employees",
+    "getById": "{{API_BASE}}/employees/{id}",
+    "edit": {
+      "route": "/hr/add-employee",
+      "mode": "edit",
+      "idParam": "id"
+    }
+  },
+
+  "actions": [
+    {
+      "label": "Back",
+      "action": "goBack",
+      "variant": "secondary"
+    },
+    {
+      "label": "Print PDF",
+      "action": "print",
+      "variant": "secondary"
+    },
+    {
+      "label": "Edit Profile",
+      "action": "editProfile",
+      "variant": "primary"
+    }
+  ],
+
+  "sections": [
+    {
+      "title": "Contact Details",
+      "layout": "two-column",
+      "fields": [
+        { "label": "Official Email", "key": "workEmail", "hideIfEmpty": true },
+        { "label": "Mobile Number", "key": "mobileNumber", "hideIfEmpty": true }
+      ]
+    },
+
+    {
+      "title": "Professional Details",
+      "layout": "two-column",
+      "fields": [
+        { "label": "Job Title", "key": "jobTitle" },
+        { "label": "Joining Date", "key": "joiningDate", "format": "date" }
+      ]
+    },
+
+    {
+      "title": "Education",
+      "layout": "two-column",
+      "fields": [
+        { "label": "Qualification", "key": "graduation" },
+        { "label": "Specialization", "key": "specialization" },
+        { "label": "University", "key": "university" },
+        { "label": "12th %", "key": "twelfthMarks", "suffix": "%" },
+        { "label": "10th %", "key": "tenthMarks", "suffix": "%" }
+      ]
+    },
+
+    {
+      "title": "Experience",
+      "type": "repeat",
+      "source": "experience",
+      "layout": "two-column",
+      "hideIfAllEmpty": true,
+      "fields": [
+        { "label": "Company Name", "key": "companyName" },
+        { "label": "Role", "key": "role" },
+        { "label": "Category", "key": "experienceCategory" },
+        { "label": "From", "key": "fromDate", "format": "date" },
+        { "label": "To", "key": "toDate", "format": "date" }
+      ]
+    },
+
+    {
+      "title": "Certifications",
+      "type": "repeat",
+      "source": "certifications",
+      "layout": "two-column",
+      "hideIfAllEmpty": true,
+      "fields": [
+        { "label": "Certification", "key": "certificateMaster" },
+        { "label": "Certificate ID", "key": "certificateId" }
+      ]
+    }
+  ]
+}
