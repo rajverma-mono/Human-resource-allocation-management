@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { MatIconModule } from '@angular/material/icon';
 
 import formJson from './add-employee.form.json';
 import Swal from 'sweetalert2';
@@ -30,6 +31,7 @@ import { StepperUIComponent } from '../../../../atoms/stepper/stepper.component'
   imports: [
     CommonModule,
     FormsModule,
+    MatIconModule,
 
     PageHeaderComponent,
     SectionHeaderComponent,

@@ -1,34 +1,49 @@
 {
   "title": "Add New Employee",
   "apiEndpoints": {
-  "create": "{{API_BASE}}/employees",
-  "list": "{{API_BASE}}/employees",
-  "update": "{{API_BASE}}/employees",
-  "delete": "{{API_BASE}}/employees"
-},
+    "create": "{{API_BASE}}/employees",
+    "list": "{{API_BASE}}/employees",
+    "update": "{{API_BASE}}/employees",
+    "delete": "{{API_BASE}}/employees"
+  },
   "subtitle": "Complete employee enrollment with personal, education & experience details.",
   
-  "stepper": [
-    {
-      "key": "personal"
-    },
-    {
-      "key": "professional"
-    },
-    {
-      "key": "education"
-    },
-    {
-      "key": "experience"
-    },
-    {
-      "key": "certifications"
-    }
-  ],
+ "stepper": [
+  {
+    "key": "personal",
+    "label": "Personal",
+    "icon": "person"
+  },
+  {
+    "key": "professional",
+    "label": "Professional",
+    "icon": "work"
+  },
+  {
+    "key": "education",
+    "label": "Education",
+    "icon": "school"
+  },
+  {
+    "key": "experience",
+    "label": "Experience",
+    "icon": "history"
+  },
+  {
+    "key": "certifications",
+    "label": "Certifications",
+    "icon": "workspace_premium"
+  },
+  {
+    "key": "bankDetails",
+    "label": "Bank Details",
+    "icon": "account_balance"
+  }
+],
   "sections": [
     {
       "title": "Personal Information",
-      "icon": "fas fa-id-card",
+      "icon": "person",
       "layout": "two-column",
       "fields": [
         {
@@ -208,7 +223,7 @@
     },
     {
       "title": "Professional Information",
-      "icon": "fas fa-briefcase",
+      "icon": "work",
       "layout": "two-column",
       "fields": [
         {
@@ -243,7 +258,7 @@
           "type": "select",
           "required": true,
           "options": [
-            "Full-Time",
+            "Employee",
             "Contract",
             "Intern"
           ]
@@ -252,7 +267,7 @@
     },
     {
       "title": "Education Details",
-      "icon": "fas fa-graduation-cap",
+      "icon": "school",
       "layout": "two-column",
       "fields": [
         {
@@ -304,7 +319,7 @@
     },
     {
       "title": "Work Experience",
-      "icon": "fas fa-history",
+      "icon": "history",
       "fields": [
         {
           "id": "experienceType",
@@ -364,7 +379,7 @@
     },
     {
       "title": "Certifications",
-      "icon": "fas fa-certificate",
+      "icon": "workspace_premium",
       "fields": [
         {
           "id": "hasCertification",
@@ -460,6 +475,85 @@
               "textColor": "#111"
             }
           ]
+        }
+      ]
+    },
+    {
+      "title": "Bank Details",
+      "icon": "account_balance",
+      "layout": "two-column",
+      "fields": [
+        {
+          "id": "bankName",
+          "label": "Bank Name",
+          "type": "text",
+          "required": false,
+          "validation": "name",
+          "maxLength": 100,
+          "errorMessage": "Bank name should contain only letters and spaces",
+          "placeholder": "State Bank of India"
+        },
+        {
+          "id": "accountHolderName",
+          "label": "Account Holder Name",
+          "type": "text",
+          "required": false,
+          "validation": "name",
+          "maxLength": 100,
+          "errorMessage": "Name should contain only letters and spaces",
+          "placeholder": "John Doe",
+          "note": "Name as per bank records"
+        },
+        {
+          "id": "accountNumber",
+          "label": "Bank Account Number",
+          "type": "text",
+          "required": true,
+          "validation": "numeric",
+          "maxLength": 20,
+          "errorMessage": "Account number must be numeric",
+          "placeholder": "123456789012"
+        },
+        {
+          "id": "ifscCode",
+          "label": "IFSC Code",
+          "type": "text",
+          "required": false,
+          "validation": "alphanumeric",
+          "maxLength": 11,
+          "errorMessage": "IFSC must be 11 characters alphanumeric",
+          "placeholder": "SBIN0001234",
+          "pattern": "^[A-Z]{4}0[A-Z0-9]{6}$",
+          "note": "Format: ABCD0123456 (4 letters, 0, 6 alphanumeric)"
+        },
+        {
+          "id": "accountType",
+          "label": "Account Type",
+          "type": "select",
+          "required": false,
+          "options": [
+            {
+              "label": "Savings Account",
+              "value": "savings"
+            },
+            {
+              "label": "Current Account",
+              "value": "current"
+            },
+            {
+              "label": "Salary Account",
+              "value": "salary"
+            }
+          ],
+          "default": "savings"
+        },
+        {
+          "id": "bankRemarks",
+          "label": "Bank Details Remarks (Optional)",
+          "type": "text",
+          "rows": 2,
+          "maxLength": 200,
+          "placeholder": "Any special instructions or remarks about bank account"
         }
       ]
     }

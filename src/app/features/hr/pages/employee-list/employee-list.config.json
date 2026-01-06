@@ -1,47 +1,72 @@
 {
   "title": "Employees",
   "subtitle": "All employees currently in the system",
-
+  "icon": "people",
   "apiEndpoints": {
     "list": "{{API_BASE}}/employees"
   },
-
+  "search": {
+    "placeholder": "Search employees...",
+    "keys": [
+      "employeeName",
+      "workEmail",
+      "jobTitle",
+      "department"
+    ],
+    "filters": [
+      {
+        "key": "employeeStatus",
+        "label": "Status",
+        "type": "select",
+        "options": [
+          "Employee",
+          "Contract",
+          "Intern"
+        ]
+      },
+      {
+        "key": "department",
+        "label": "Department",
+        "type": "select",
+        "options": [
+          "Human Resource (HR)",
+          "Information Technology (IT)",
+          "Finance",
+          "Sales"
+        ]
+      }
+    ]
+  },
   "card": {
     "cardClass": "bg-white border border-red-100 rounded-2xl p-6 shadow-sm",
-
     "header": {
       "showAvatar": true,
-
-      "avatarSourceKey": "photoBase64", 
-      "avatarFallback": "initial",     
-
-      "avatarIcon": "fas fa-user",
-      "avatarClass": "w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl",
-
+      "avatarSourceKey": "photoBase64",
+      "avatarFallback": "icon",
+      "avatarIcon": "person",
+      "avatarClass": "w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center",
       "showStatus": true,
       "statusKey": "employeeStatus",
       "statusClassMap": {
-        "Full-Time": "bg-green-100 text-green-700",
+        "Employee": "bg-green-100 text-green-700",
         "Contract": "bg-yellow-100 text-yellow-700",
         "Intern": "bg-blue-100 text-blue-700"
       }
     },
-
     "fields": [
       {
         "key": "workEmail",
-        "icon": "fas fa-envelope text-red-600"
+        "icon": "email"
       },
       {
         "key": "jobTitle",
-        "icon": "fas fa-briefcase text-red-600"
+        "icon": "work"
       },
       {
         "key": "department",
-        "icon": "fas fa-building text-red-600"
+        "icon": "business"
       }
     ],
-
     "skillsKey": "specialization",
     "skillsClass": "px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs font-bold"
   }

@@ -1,6 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Output, EventEmitter } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+
 
 export interface CardField {
   key: string;
@@ -39,7 +41,7 @@ export interface EmployeeCardData {
 @Component({
   selector: 'atom-employee-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './employee-card.component.html',
 })
 export class EmployeeCardComponent {

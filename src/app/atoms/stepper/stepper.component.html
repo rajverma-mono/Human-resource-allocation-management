@@ -1,42 +1,57 @@
 <!-- MAIN STEPPER CONTAINER (Rounded capsule like Figma) -->
 <div class="flex justify-center w-full">
   <div class="bg-white w-[90%] h-[147px] rounded-[40px] shadow-[0_6px_20px_rgba(0,0,0,0.15)]
-              border border-[#e8e1e1] flex items-center justify-center px-10">
+           border border-[#e8e1e1] flex items-center justify-center px-10">
 
     <!-- INNER STEPPER THAT CONTROLS SPACING -->
     <div class="flex justify-center items-center gap-16">
 
-      <ng-container *ngFor="let step of steps; let i=index">
+      <ng-container *ngFor="let step of steps; let i = index">
 
         <div class="relative flex flex-col items-center">
 
           <!-- CIRCLE -->
-          <div 
-            class="w-[69px] h-[69px] rounded-full flex items-center justify-center text-lg font-semibold
-                   shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition-all duration-300"
-            [ngClass]="i===active 
-              ? 'bg-[#a88c8c] text-white scale-[1.06]' 
-              : 'bg-[#EADDD8] text-[#805b5b]'">
-            {{i+1}}
+          <div class="w-[69px] h-[69px] rounded-full flex items-center justify-center
+                   shadow-[0_4px_4px_rgba(0,0,0,0.25)]
+                   transition-all duration-300" [ngClass]="
+              i === active
+                ? 'bg-[#a88c8c] text-white scale-[1.06]'
+                : 'bg-[#EADDD8] text-[#805b5b]'
+            ">
+
+            <!-- MATERIAL ICON FROM JSON -->
+            <ng-container *ngIf="step?.icon; else numberFallback">
+              <mat-icon class="text-[30px] flex items-center justify-center leading-none"
+                style="width: 30px; height: 30px;">
+                {{ step.icon }}
+              </mat-icon>
+
+            </ng-container>
+
+            <!-- NUMBER FALLBACK -->
+            <ng-template #numberFallback>
+              <span class="text-lg font-semibold">
+                {{ i + 1 }}
+              </span>
+            </ng-template>
+
           </div>
 
           <!-- LABEL -->
           <p class="text-[11px] mt-2 text-center font-semibold leading-tight w-[110px]">
-            {{step.label}}
+            {{ step?.label || ('Step ' + (i + 1)) }}
           </p>
 
-          <!-- CONNECTOR BETWEEN STEPS -->
-          <div *ngIf="i < steps.length-1"
-               class="absolute top-[34px] left-[calc(50%+35px)] h-[15px] rounded-full"
-               [style.width]="'120px'"       
-               [ngClass]="i<active ? 'bg-[#a88c8c]' : 'bg-[#e2d4d4]'">
-          </div>
+          <!-- CONNECTOR -->
+          <div *ngIf="i < steps.length - 1" class="absolute top-[34px] left-[calc(50%+35px)]
+                   h-[15px] rounded-full" [style.width]="'120px'" [ngClass]="
+              i < active ? 'bg-[#a88c8c]' : 'bg-[#e2d4d4]'
+            "></div>
 
         </div>
 
       </ng-container>
 
     </div>
-
   </div>
 </div>

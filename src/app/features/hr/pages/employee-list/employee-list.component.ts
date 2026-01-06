@@ -9,6 +9,7 @@ import listConfig from './employee-list.config.json';
 
 import { EmployeeCardComponent } from '../../../../atoms/card/atom-employee-card.component';
 import { PageHeaderComponent } from '../../../../atoms/page-header/page-header';
+import { SearchFilterAtomComponent } from '../../../../atoms/atom-search/atom-search-filter.component';
 
 @Component({
   selector: 'app-employee-list',
@@ -18,30 +19,29 @@ import { PageHeaderComponent } from '../../../../atoms/page-header/page-header';
     HttpClientModule,
     PageHeaderComponent,
     EmployeeCardComponent,
+    SearchFilterAtomComponent
   ],
   templateUrl: './employee-list.component.html'
 })
 export class EmployeeListComponent implements OnInit {
   config: any = listConfig;
   employees: any[] = [];
+  filteredEmployees: any[] = [];
   loading = false;
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    private cdr: ChangeDetectorRef  // <-- Add this
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.loadEmployees();
-    
-    // Listen to router events
+
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
-        // Trigger change detection when navigation ends
-        this.cdr.detectChanges();
-        this.loadEmployees(); // Also reload data
+        this.loadEmployees();
       });
   }
 
@@ -50,15 +50,20 @@ export class EmployeeListComponent implements OnInit {
   }
 
   openEmployee(emp: any) {
-    console.log('CARD CLICKED →', emp.id);
     this.router.navigate(['/hr/employees', emp.id]);
+  }
+
+  onFiltered(data: any[]) {
+    this.filteredEmployees = data;
   }
 
   loadEmployees() {
     this.loading = true;
 
-    const url = this.config.apiEndpoints.list
-      .replace('{{API_BASE}}', environment.API_BASE);
+    const url = this.config.apiEndpoints.list.replace(
+      '{{API_BASE}}',
+      environment.API_BASE
+    );
 
     this.http.get<any[]>(url).subscribe({
       next: (res) => {
@@ -76,12 +81,13 @@ export class EmployeeListComponent implements OnInit {
           };
         });
 
+        this.filteredEmployees = [...this.employees];
         this.loading = false;
-        this.cdr.detectChanges(); // Force UI update
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loading = false;
-        this.cdr.detectChanges(); // Force UI update
+        this.cdr.detectChanges();
       }
     });
   }

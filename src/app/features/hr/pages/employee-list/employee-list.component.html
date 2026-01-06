@@ -1,6 +1,7 @@
 <app-page-header
   [title]="config.title"
-  [subtitle]="config.subtitle">
+  [subtitle]="config.subtitle"
+  [icon]="config.icon">
 </app-page-header>
 
 <!-- Loader -->
@@ -12,15 +13,21 @@
      class="text-center py-10 text-gray-500">
   No employees found.
 </div>
-
+<div style="margin-top: 16px;"></div>
+<atom-search-filter
+  [config]="config.search"
+  [data]="employees"
+  (filtered)="onFiltered($event)">
+</atom-search-filter>
 <div *ngIf="!loading && employees.length"
      class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
 <atom-employee-card
-  *ngFor="let emp of employees; trackBy: trackByEmployeeId"
+  *ngFor="let emp of filteredEmployees; trackBy: trackByEmployeeId"
   [data]="emp"
   [config]="config.card"
   (cardClick)="openEmployee(emp)">
 </atom-employee-card>
+
 
 
 

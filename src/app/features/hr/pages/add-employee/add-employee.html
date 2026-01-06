@@ -2,7 +2,10 @@
 
   <!-- Stepper -->
   <div class="flex justify-center w-full pt-10 pb-6 bg-white">
-    <atom-stepper [steps]="stepperSteps" [active]="activeStep"></atom-stepper>
+<atom-stepper
+  [steps]="formConfig.stepper"
+  [active]="activeStep">
+</atom-stepper>
   </div>
 
   <div class="px-10 pb-10 bg-white">
@@ -11,8 +14,12 @@
 
     @if(i === activeStep) {
 
-    <app-section-header [title]="section.title" [icon]="section.icon">
-    </app-section-header>
+  <app-page-header
+  [title]="section.title"
+  [icon]="section.icon">
+</app-page-header>
+
+
 
     <!-- ================= NORMAL SECTIONS ================= -->
     @if(section.title !== 'Work Experience' && section.title !== 'Certifications') {
