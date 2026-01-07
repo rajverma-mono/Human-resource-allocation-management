@@ -5,7 +5,8 @@
     "edit": {
       "route": "/hr/add-employee",
       "mode": "edit",
-      "idParam": "id"
+      "idParam": "id",
+      "passEmployeeData": true
     }
   },
 
@@ -23,7 +24,8 @@
     {
       "label": "Edit Profile",
       "action": "editProfile",
-      "variant": "primary"
+      "variant": "primary",
+      "mode": "edit"
     }
   ],
 

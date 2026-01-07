@@ -1,310 +1,429 @@
 <div class="max-w-6xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden mt-8">
 
+
+
   <!-- Stepper -->
   <div class="flex justify-center w-full pt-10 pb-6 bg-white">
-<atom-stepper
-  [steps]="formConfig.stepper"
-  [active]="activeStep">
-</atom-stepper>
+    @if (formConfig.stepper) {
+      <atom-stepper
+        [steps]="formConfig.stepper"
+        [active]="activeStep">
+      </atom-stepper>
+    }
   </div>
 
   <div class="px-10 pb-10 bg-white">
+    
+    <!-- CASE 1: Loading from API -->
+    @if (isLoading) {
+      <div class="flex flex-col items-center justify-center py-20">
+        <div class="w-12 h-12 border-4 border-[#801519]/20 border-t-[#801519] rounded-full animate-spin"></div>
+        <p class="mt-4 text-sm font-bold text-gray-500 uppercase tracking-widest">
+          Loading employee data...
+        </p>
+      </div>
+    }
+    
+    <!-- CASE 2: Edit mode but form not ready yet -->
+    @else if (mode === 'edit' && !form.employeeName) {
+      <div class="flex flex-col items-center justify-center py-20">
+        <div class="w-8 h-8 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <p class="mt-4 text-sm text-gray-500">Preparing edit form...</p>
+      </div>
+    }
+    
+    <!-- CASE 3: Show form (either add mode or edit mode with data) -->
+    @else {
+      
+      @for(section of formConfig.sections; track section.title; let i = $index) {
+        @if(i === activeStep) {
+          
+          <app-page-header
+            [title]="section.title"
+            [icon]="section.icon">
+          </app-page-header>
 
-    @for(section of formConfig.sections; track section.title; let i = $index) {
+          <!-- ================= NORMAL SECTIONS ================= -->
+          @if(section.title !== 'Work Experience' && section.title !== 'Certifications') {
+            
+            <div class="grid gap-6 mt-6" [ngClass]="section.layout === 'two-column' ? 'grid-cols-2' : 'grid-cols-1'">
 
-    @if(i === activeStep) {
+              @for(field of section.fields; track field.id) {
+                
+                @switch(field.type) {
 
-  <app-page-header
-  [title]="section.title"
-  [icon]="section.icon">
-</app-page-header>
+                  @case('photo') {
+                    <atom-photo-upload
+                      [label]="field.label"
+                      [required]="field.required || false"
+                      [helperText]="field.helperText"
+                      [maxSizeMB]="field.maxSizeMB || 2"
+                      [buttons]="field.buttons || []"
+                      [buttonText]="field.buttonText || {
+                        choose: 'Select Photo',
+                        upload: 'Upload Photo',
+                        view: 'View Photo'
+                      }"
+                      [defaultImage]="photoBase64 ?? undefined"
+                      (fileChange)="onPhotoSelect($event)"
+                      (upload)="onPhotoAction('upload')"
+                      (view)="onPhotoAction('view')">
+                    </atom-photo-upload>
+                  }
 
+                  @case('textarea') {
+                    <atom-textarea 
+                      [value]="form[field.id]"
+                      (valueChange)="form[field.id] = $event"
+                      [label]="field.label" 
+                      [rows]="field.rows || 3"
+                      [maxLength]="field.maxLength || 500" 
+                      [placeholder]="field.placeholder || field.label"
+                      [disabled]="field.disabled || false" 
+                      [ariaLabel]="field.ariaLabel || field.label"
+                      [className]="field.className || ''" 
+                      [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+                      [borderColor]="field.borderColor || ''" 
+                      [rounded]="field.rounded || 'rounded-lg'"
+                      [containerClass]="field.containerClass || ''" 
+                      [sanitize]="field.sanitize || false"
+                      [removeChars]="field.removeChars || ''" 
+                      [removeEmojis]="field.removeEmojis || false"
+                      [normalizeAccents]="field.normalizeAccents || false" 
+                      [toCase]="field.toCase || ''">
+                    </atom-textarea>
+                  }
 
+                  @case('email') {
+                    <atom-input 
+                      [value]="form[field.id]"
+                      (valueChange)="form[field.id] = $event"
+                      [label]="field.label" 
+                      type="email" 
+                      [validation]="'email'"
+                      [placeholder]="field.placeholder || field.label" 
+                      [required]="field.required || false"
+                      [maxLength]="field.maxLength || null" 
+                      [disabled]="field.disabled || false"
+                      [errorMessage]="field.errorMessage || ''" 
+                      [className]="field.className || ''"
+                      [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+                      [borderColor]="field.borderColor || 'border-gray-300'" 
+                      [rounded]="field.rounded || 'rounded-lg'"
+                      [fullWidth]="field.fullWidth !== false" 
+                      [showVerifiedStatus]="field.showVerifiedStatus || false"
+                      [isVerified]="field.isVerified || false" 
+                      [pattern]="field.pattern || undefined" />
+                  }
 
-    <!-- ================= NORMAL SECTIONS ================= -->
-    @if(section.title !== 'Work Experience' && section.title !== 'Certifications') {
+                  @case('number') {
+                    <atom-input 
+                      [value]="form[field.id]"
+                      (valueChange)="form[field.id] = $event"
+                      [label]="field.label" 
+                      type="number"
+                      [validation]="field.validation || 'numeric'" 
+                      [placeholder]="field.placeholder || field.label"
+                      [required]="field.required || false" 
+                      [maxLength]="field.maxLength || null"
+                      [disabled]="field.disabled || false" 
+                      [errorMessage]="field.errorMessage || ''"
+                      [className]="field.className || ''" 
+                      [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+                      [borderColor]="field.borderColor || 'border-gray-300'" 
+                      [rounded]="field.rounded || 'rounded-lg'"
+                      [fullWidth]="field.fullWidth !== false" />
+                  }
 
-    <div class="grid gap-6 mt-6" [ngClass]="section.layout === 'two-column' ? 'grid-cols-2' : 'grid-cols-1'">
+                  @case('text') {
+                    <atom-input 
+                      [value]="form[field.id]"
+                      (valueChange)="form[field.id] = $event"
+                      [label]="field.label" 
+                      type="text"
+                      [validation]="field.validation || 'none'" 
+                      [placeholder]="field.placeholder || field.label"
+                      [required]="field.required || false" 
+                      [maxLength]="field.maxLength || null"
+                      [disabled]="field.disabled || false" 
+                      [errorMessage]="field.errorMessage || ''"
+                      [className]="field.className || ''" 
+                      [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+                      [borderColor]="field.borderColor || 'border-gray-300'" 
+                      [rounded]="field.rounded || 'rounded-lg'"
+                      [fullWidth]="field.fullWidth !== false" 
+                      [pattern]="field.pattern || undefined"
+                      [showToggleIcon]="field.showToggleIcon || false" />
+                  }
 
-      @for(field of section.fields; track field.id) {
+                  @case('date') {
+                    <atom-date-picker 
+                      [value]="form[field.id]"
+                      (valueChange)="form[field.id] = $event"
+                      [label]="field.label" 
+                      [required]="field.required || false"
+                      [disabled]="field.disabled || false" />
+                  }
 
+                  @case('radio') {
+                    <div class="mb-4">
+                      @if(field.label) {
+                        <label class="block text-sm font-semibold mb-2">{{field.label}}</label>
+                      }
+                      <atom-radio-group 
+                        [options]="field.options" 
+                        [selectedValue]="form[field.id]"
+                        (selectedValueChange)="form[field.id] = $event" />
+                    </div>
+                  }
 
-        @switch(field.type) {
+                  @case('select') {
+                    <div class="flex flex-col">
+                      <label class="text-sm font-semibold mb-1">
+                        {{field.label}}
+                        @if(field.required) {
+                          <span class="text-red-500">*</span>
+                        }
+                      </label>
 
-      @case('photo') {
+                      <atom-select 
+                        [options]="field.options | selectOptions" 
+                        [value]="form[field.id]"
+                        (valueChange)="form[field.id] = $event"
+                        [placeholder]="field.placeholder || 'Select ' + field.label" 
+                        [disabled]="field.disabled || false"
+                        class="w-full" />
 
-  <atom-photo-upload
-    [label]="field.label"
-    [required]="field.required || false"
-    [helperText]="field.helperText"
-    [maxSizeMB]="field.maxSizeMB || 2"
-    [buttons]="field.buttons || []"
-    [buttonText]="field.buttonText || {
-      choose: 'Select Photo',
-      upload: 'Upload Photo',
-      view: 'View Photo'
-    }"
+                      @if(field.required && !form[field.id]) {
+                        <span class="text-xs text-red-500 mt-1">* Required</span>
+                      }
+                    </div>
+                  }
 
-    (fileChange)="onPhotoSelect($event)"
-    (upload)="onPhotoAction('upload')"
-    (view)="onPhotoAction('view')">
-  </atom-photo-upload>
+                  @case('toggle') {
+                    <label class="flex items-center gap-2">
+                      <input type="checkbox" 
+                             [checked]="form[field.id]"
+                             (change)="form[field.id] = $event.target.checked" />
+                      {{field.label}}
+                    </label>
+                  }
 
-}
-
-
-        @case('textarea') {
-        <atom-textarea [(value)]="form[field.id]" [label]="field.label" [rows]="field.rows || 3"
-          [maxLength]="field.maxLength || 500" [placeholder]="field.placeholder || field.label"
-          [disabled]="field.disabled || false" [ariaLabel]="field.ariaLabel || field.label"
-          [className]="field.className || ''" [backgroundColor]="field.bgColor || field.backgroundColor || ''"
-          [borderColor]="field.borderColor || ''" [rounded]="field.rounded || 'rounded-lg'"
-          [containerClass]="field.containerClass || ''" [sanitize]="field.sanitize || false"
-          [removeChars]="field.removeChars || ''" [removeEmojis]="field.removeEmojis || false"
-          [normalizeAccents]="field.normalizeAccents || false" [toCase]="field.toCase || ''">
-        </atom-textarea>
-        }
-
-        @case('email') {
-        <atom-input [(value)]="form[field.id]" [label]="field.label" type="email" [validation]="'email'"
-          [placeholder]="field.placeholder || field.label" [required]="field.required || false"
-          [maxLength]="field.maxLength || null" [disabled]="field.disabled || false"
-          [errorMessage]="field.errorMessage || ''" [className]="field.className || ''"
-          [backgroundColor]="field.bgColor || field.backgroundColor || ''"
-          [borderColor]="field.borderColor || 'border-gray-300'" [rounded]="field.rounded || 'rounded-lg'"
-          [fullWidth]="field.fullWidth !== false" [showVerifiedStatus]="field.showVerifiedStatus || false"
-          [isVerified]="field.isVerified || false" [pattern]="field.pattern || undefined" />
-        }
-
-        @case('number') {
-        <atom-input [(value)]="form[field.id]" [label]="field.label" type="number"
-          [validation]="field.validation || 'numeric'" [placeholder]="field.placeholder || field.label"
-          [required]="field.required || false" [maxLength]="field.maxLength || null"
-          [disabled]="field.disabled || false" [errorMessage]="field.errorMessage || ''"
-          [className]="field.className || ''" [backgroundColor]="field.bgColor || field.backgroundColor || ''"
-          [borderColor]="field.borderColor || 'border-gray-300'" [rounded]="field.rounded || 'rounded-lg'"
-          [fullWidth]="field.fullWidth !== false" />
-        }
-
-        @case('text') {
-        <atom-input [(value)]="form[field.id]" [label]="field.label" type="text"
-          [validation]="field.validation || 'none'" [placeholder]="field.placeholder || field.label"
-          [required]="field.required || false" [maxLength]="field.maxLength || null"
-          [disabled]="field.disabled || false" [errorMessage]="field.errorMessage || ''"
-          [className]="field.className || ''" [backgroundColor]="field.bgColor || field.backgroundColor || ''"
-          [borderColor]="field.borderColor || 'border-gray-300'" [rounded]="field.rounded || 'rounded-lg'"
-          [fullWidth]="field.fullWidth !== false" [pattern]="field.pattern || undefined"
-          [showToggleIcon]="field.showToggleIcon || false" />
-        }
-        
-
-        @case('date') {
-        <atom-date-picker [(value)]="form[field.id]" [label]="field.label" [required]="field.required || false"
-          [disabled]="field.disabled || false" />
-        }
-
-        @case('radio') {
-        <!-- Check what properties your atom-radio-group actually supports -->
-        <atom-radio-group [options]="field.options" [(selectedValue)]="form[field.id]" />
-        <!-- If you need to show label, add it separately -->
-        @if(field.label) {
-        }
-        }
-
-        @case('select') {
-        <div class="flex flex-col">
-
-          <label class="text-sm font-semibold mb-1">
-            {{field.label}}
-            <span *ngIf="field.required" class="text-red-500">*</span>
-          </label>
-
-          <atom-select [options]="field.options | selectOptions" [(value)]="form[field.id]"
-            [placeholder]="field.placeholder || 'Select ' + field.label" [disabled]="field.disabled || false"
-            class="w-full" />
-
-          @if(field.required) {
-          <span class="text-xs text-red-500 mt-1">* Required</span>
+                }
+              }
+            </div>
           }
-        </div>
+
+          <!-- ================= WORK EXPERIENCE ================= -->
+          @if(section.title === 'Work Experience') {
+            <div class="mt-6">
+              @for(field of section.fields; track field.id) {
+                @if(field.id === 'experienceType') {
+                  <atom-select 
+                    [options]="field.options | selectOptions" 
+                    [value]="form.experienceType"
+                    (valueChange)="onExperienceTypeChange($event)" />
+                }
+              }
+
+              @if(form.experienceType === 'Experienced') {
+                <div class="mt-6 space-y-6">
+                  @for(exp of experienceList; track exp; let i = $index) {
+                    <div class="p-6 border rounded bg-gray-50 relative">
+                      <atom-button 
+                        class="absolute top-2 right-2" 
+                        [label]="getAction('removeCompany', 'experience').label"
+                        [variant]="getAction('removeCompany', 'experience').variant" 
+                        [size]="getAction('removeCompany', 'experience').size"
+                        [bgColor]="getAction('removeCompany', 'experience').bgColor" 
+                        [textColor]="getAction('removeCompany', 'experience').textColor"
+                        [borderColor]="getAction('removeCompany', 'experience').borderColor" 
+                        (onClick)="removeExperience(i)" />
+
+                      <div class="grid grid-cols-2 gap-6 mt-4">
+                        @for(f of section.experienceForm; track f.id) {
+                          <div>
+                            @switch(f.type) {
+                              @case('text') {
+                                <atom-input 
+                                  [value]="exp[f.id]"
+                                  (valueChange)="exp[f.id] = $event"
+                                  [label]="f.label" 
+                                  [placeholder]="f.placeholder || f.label"
+                                  [required]="f.required || false" 
+                                  [backgroundColor]="f.bgColor || ''"
+                                  [borderColor]="f.borderColor || 'border-gray-300'" 
+                                  [rounded]="f.rounded || 'rounded-lg'" />
+                              }
+
+                              @case('date') {
+                                <atom-date-picker 
+                                  [value]="exp[f.id]"
+                                  (valueChange)="exp[f.id] = $event"
+                                  [label]="f.label" 
+                                  [required]="f.required || false" />
+                              }
+
+                              @case('select') {
+                                <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
+                                <atom-select 
+                                  [options]="f.options | selectOptions" 
+                                  [value]="exp[f.id]"
+                                  (valueChange)="exp[f.id] = $event" />
+                              }
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <atom-button 
+                    [label]="getAction('addExperience').label" 
+                    [variant]="getAction('addExperience').variant"
+                    [size]="getAction('addExperience').size" 
+                    [fullWidth]="getAction('addExperience').fullWidth"
+                    [bgColor]="getAction('addExperience').bgColor" 
+                    [textColor]="getAction('addExperience').textColor"
+                    [borderColor]="getAction('addExperience').borderColor" 
+                    (onClick)="addExperience()" />
+                </div>
+              }
+            </div>
+          }
+
+          <!-- ================= CERTIFICATIONS ================= -->
+          @if(section.title === 'Certifications') {
+            <div class="mt-6">
+              @for(field of section.fields; track field.id) {
+                @if(field.id === 'hasCertification') {
+                  <atom-select 
+                    [options]="field.options | selectOptions" 
+                    [value]="form.hasCertification"
+                    (valueChange)="onCertificationChange($event)" />
+                }
+              }
+
+              @if(form.hasCertification === 'yes') {
+                <div class="mt-6 space-y-6">
+                  @for(cert of certificationList; track cert; let i = $index) {
+                    <div class="p-6 border rounded bg-gray-50 relative">
+                      <atom-button 
+                        class="absolute top-2 right-2" 
+                        [label]="getAction('removeCertification', 'certification').label"
+                        [variant]="getAction('removeCertification', 'certification').variant" 
+                        [size]="getAction('removeCertification', 'certification').size"
+                        [bgColor]="getAction('removeCertification', 'certification').bgColor" 
+                        [textColor]="getAction('removeCertification', 'certification').textColor"
+                        [borderColor]="getAction('removeCertification', 'certification').borderColor" 
+                        (onClick)="removeCertification(i)" />
+
+                      <div class="grid grid-cols-2 gap-6 mt-4">
+                        @for(f of section.certificationForm; track f.id) {
+                          @if(!f.showIf || (f.showIf && cert[f.showIf.field] === f.showIf.value)) {
+                            <div>
+                              @switch(f.type) {
+                                @case('text') {
+                                  <atom-input 
+                                    [value]="cert[f.id]"
+                                    (valueChange)="cert[f.id] = $event"
+                                    [label]="f.label" 
+                                    [placeholder]="f.placeholder || f.label" />
+                                }
+                                
+                                @case('select') {
+                                  <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
+                                  <atom-select 
+                                    [options]="f.options | selectOptions" 
+                                    [value]="cert[f.id]"
+                                    (valueChange)="cert[f.id] = $event" />
+                                }
+                                
+                                @case('photo') {
+                                  <atom-photo-upload
+                                    [label]="f.label"
+                                    [required]="f.required || false"
+                                    [helperText]="f.helperText"
+                                    [maxSizeMB]="f.maxSizeMB || 2"
+                                    [buttons]="f.buttons || []"
+                                    [defaultImage]="cert[f.id] ?? undefined"
+                                    (fileChange)="cert[f.id] = $event"
+                                    (upload)="onCertificateUpload(i)"
+                                    (view)="onCertificateView(cert)">
+                                  </atom-photo-upload>
+                                }
+                              }
+                            </div>
+                          }
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <atom-button 
+                    [label]="getAction('addCertification').label" 
+                    [variant]="getAction('addCertification').variant"
+                    [size]="getAction('addCertification').size" 
+                    [fullWidth]="getAction('addCertification').fullWidth"
+                    [bgColor]="getAction('addCertification').bgColor" 
+                    [textColor]="getAction('addCertification').textColor"
+                    [borderColor]="getAction('addCertification').borderColor" 
+                    (onClick)="addCertification()" />
+                </div>
+              }
+            </div>
+          }
+
         }
-
-
-        @case('toggle') {
-        <label class="flex items-center gap-2">
-          <input type="checkbox" [(ngModel)]="form[field.id]" />
-          {{field.label}}
-        </label>
-        }
-
-        }
-
-
       }
 
-    </div>
+      <!-- ================= NAVIGATION BUTTONS ================= -->
+      <div class="flex justify-between mt-12">
+        @if(activeStep > 0) {
+          <atom-button 
+            [label]="getAction('previous').label" 
+            [variant]="getAction('previous').variant"
+            [size]="getAction('previous').size" 
+            [bgColor]="getAction('previous').bgColor"
+            [textColor]="getAction('previous').textColor" 
+            [borderColor]="getAction('previous').borderColor"
+            (onClick)="prevStep()" />
+        }
 
-    }
-
-    <!-- ================= WORK EXPERIENCE ================= -->
-    @if(section.title === 'Work Experience') {
-
-    <atom-select class="mt-4" [options]="section.fields[0].options | selectOptions" [(value)]="form.experienceType" />
-
-    @if(form.experienceType === 'Experienced') {
-
-    <div class="mt-6 space-y-6">
-
-      @for(exp of experienceList; track exp; let i = $index) {
-
-      <div class="p-6 border rounded bg-gray-50 relative">
-
-        <!-- ❗REMOVE COMPANY button (JSON driven) -->
-        <atom-button class="absolute top-2 right-2" [label]="getAction('removeCompany').label"
-          [variant]="getAction('removeCompany').variant" [size]="getAction('removeCompany').size"
-          [bgColor]="getAction('removeCompany').bgColor" [textColor]="getAction('removeCompany').textColor"
-          [borderColor]="getAction('removeCompany').borderColor" (onClick)="removeExperience(i)" />
-
-        <div class="grid grid-cols-2 gap-6 mt-4">
-
-          @for(f of section.experienceForm; track f.id) {
-          <div>
-
-            @switch(f.type) {
-            @case('text') {
-            <atom-input [(value)]="exp[f.id]" [label]="f.label" [placeholder]="f.placeholder || f.label"
-              [required]="f.required || false" [backgroundColor]="f.bgColor || ''"
-              [borderColor]="f.borderColor || 'border-gray-300'" [rounded]="f.rounded || 'rounded-lg'" />
-            }
-
-            @case('date') {
-            <atom-date-picker [(value)]="exp[f.id]" [label]="f.label" [required]="f.required || false" />
-            }
-
-            @case('select') {
-            <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
-
-            <atom-select [options]="f.options | selectOptions" [(value)]="exp[f.id]" />
-            }
-            }
-          </div>
+        <div class="ml-auto flex gap-4">
+          @if(activeStep < stepperSteps.length - 1) {
+            <atom-button 
+              [label]="getAction('next').label"
+              [variant]="getAction('next').variant" 
+              [size]="getAction('next').size" 
+              [bgColor]="getAction('next').bgColor"
+              [textColor]="getAction('next').textColor" 
+              [borderColor]="getAction('next').borderColor"
+              (onClick)="nextStep()" />
           }
 
-        </div>
-
-      </div>
-      }
-
-      <!-- ADD EXPERIENCE button (JSON driven) -->
-      <atom-button [label]="getAction('addExperience').label" [variant]="getAction('addExperience').variant"
-        [size]="getAction('addExperience').size" [fullWidth]="getAction('addExperience').fullWidth"
-        [bgColor]="getAction('addExperience').bgColor" [textColor]="getAction('addExperience').textColor"
-        [borderColor]="getAction('addExperience').borderColor" (onClick)="addExperience()" />
-
-    </div>
-
-    }
-
-    }
-
-    <!-- ================= CERTIFICATIONS ================= -->
-    @if(section.title === 'Certifications') {
-
-    <atom-select class="mt-4" [options]="section.fields[0].options | selectOptions" [(value)]="form.hasCertification"
-      (valueChange)="onCertificationChange($event)" />
-
-    @if(form.hasCertification === 'yes') {
-
-    <div class="mt-6 space-y-6">
-
-      @for(cert of certificationList; track cert; let i = $index) {
-
-      <div class="p-6 border rounded bg-gray-50 relative">
-
-        <atom-button class="absolute top-2 right-2" [label]="getAction('removeCertification').label"
-          [variant]="getAction('removeCertification').variant" [size]="getAction('removeCertification').size"
-          [bgColor]="getAction('removeCertification').bgColor" [textColor]="getAction('removeCertification').textColor"
-          [borderColor]="getAction('removeCertification').borderColor" (onClick)="removeCertification(i)" />
-
-        <div class="grid grid-cols-2 gap-6 mt-4">
-          @for(f of section.certificationForm; track f.id) {
-          @if(!f.showIf || (f.showIf && cert[f.showIf.field] === f.showIf.value)) {
-          <div>
-            @switch(f.type) {
-            @case('text') {
-            <atom-input [(value)]="cert[f.id]" [label]="f.label" [placeholder]="f.placeholder || f.label" />
-            }
-            @case('select') {
-            <label class="block text-sm font-semibold mb-1">{{f.label}}</label>
-            <atom-select [options]="f.options | selectOptions" [(value)]="cert[f.id]" />
-            }
-           @case('photo') {
-
- <atom-photo-upload
-  [label]="f.label"
-  [required]="f.required || false"
-  [helperText]="f.helperText"
-  [maxSizeMB]="f.maxSizeMB || 2"
-  [buttons]="f.buttons || []"
-
-  (fileChange)="cert[f.id] = $event"
-  (upload)="onCertificateUpload(i)"
-  (view)="onCertificateView(cert)">
-</atom-photo-upload>
-
-
-}
-
-
-
-            }
-          </div>
+          @if(activeStep === stepperSteps.length - 1) {
+            <atom-button 
+              [label]="getSaveButtonLabel()" 
+              [variant]="getAction('save').variant" 
+              [size]="getAction('save').size" 
+              [bgColor]="getAction('save').bgColor"
+              [textColor]="getAction('save').textColor" 
+              [borderColor]="getAction('save').borderColor" 
+              (onClick)="save()" />
           }
-          }
+
+          <atom-button 
+            [label]="getAction('cancel').label" 
+            [variant]="getAction('cancel').variant"
+            [size]="getAction('cancel').size" 
+            [bgColor]="getAction('cancel').bgColor"
+            [textColor]="getAction('cancel').textColor" 
+            [borderColor]="getAction('cancel').borderColor"
+            (onClick)="cancel()" />
         </div>
       </div>
-      }
-
-      <atom-button [label]="getAction('addCertification').label" [variant]="getAction('addCertification').variant"
-        [size]="getAction('addCertification').size" [fullWidth]="getAction('addCertification').fullWidth"
-        [bgColor]="getAction('addCertification').bgColor" [textColor]="getAction('addCertification').textColor"
-        [borderColor]="getAction('addCertification').borderColor" (onClick)="addCertification()" />
-
-    </div>
+      
     }
-    }
-
-    }
-
-    }
-
-    <!-- ================= NAVIGATION BUTTONS ================= -->
-    <div class="flex justify-between mt-12">
-
-      <atom-button *ngIf="activeStep>0" [label]="getAction('previous').label" [variant]="getAction('previous').variant"
-        [size]="getAction('previous').size" [bgColor]="getAction('previous').bgColor"
-        [textColor]="getAction('previous').textColor" [borderColor]="getAction('previous').borderColor"
-        (onClick)="prevStep()" />
-
-      <div class="ml-auto flex gap-4">
-
-        <atom-button *ngIf="activeStep < stepperSteps.length-1" [label]="getAction('next').label"
-          [variant]="getAction('next').variant" [size]="getAction('next').size" [bgColor]="getAction('next').bgColor"
-          [textColor]="getAction('next').textColor" [borderColor]="getAction('next').borderColor"
-          (onClick)="nextStep()" />
-
-        <atom-button *ngIf="activeStep === stepperSteps.length-1" [label]="getAction('save').label"
-          [variant]="getAction('save').variant" [size]="getAction('save').size" [bgColor]="getAction('save').bgColor"
-          [textColor]="getAction('save').textColor" [borderColor]="getAction('save').borderColor" (onClick)="save()" />
-
-        <atom-button [label]="getAction('cancel').label" [variant]="getAction('cancel').variant"
-          [size]="getAction('cancel').size" [bgColor]="getAction('cancel').bgColor"
-          [textColor]="getAction('cancel').textColor" [borderColor]="getAction('cancel').borderColor"
-          (onClick)="cancel()" />
-
-      </div>
-    </div>
-
   </div>
-
 </div>

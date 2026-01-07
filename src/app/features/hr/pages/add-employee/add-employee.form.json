@@ -1,10 +1,11 @@
 {
   "title": "Add New Employee",
-  "apiEndpoints": {
+   "apiEndpoints": {
     "create": "{{API_BASE}}/employees",
     "list": "{{API_BASE}}/employees",
-    "update": "{{API_BASE}}/employees",
-    "delete": "{{API_BASE}}/employees"
+    "getById": "{{API_BASE}}/employees/{id}",
+    "update": "{{API_BASE}}/employees/{id}",
+    "delete": "{{API_BASE}}/employees/{id}"
   },
   "subtitle": "Complete employee enrollment with personal, education & experience details.",
   

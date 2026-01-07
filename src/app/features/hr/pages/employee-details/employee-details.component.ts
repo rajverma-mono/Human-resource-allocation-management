@@ -9,7 +9,8 @@ import configData from './employee-details.config.json';
 
 import {
   CompositeEmployeeProfileComponent,
-  CompositeConfig
+  CompositeConfig,
+  ActionConfig
 } from '../../../../atoms/generic-details-renderer/details-composite.component';
 
 const typedConfig = configData as CompositeConfig;
@@ -24,47 +25,39 @@ const typedConfig = configData as CompositeConfig;
   templateUrl: './employee-details.component.html'
 })
 export class EmployeeDetailsComponent implements OnInit {
-
   employee: any;
   loading = true;
-
   config: CompositeConfig = typedConfig;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef  // <-- Add ChangeDetectorRef
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    // Initial load
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       this.loading = true;
       this.fetchEmployee(id);
-      this.cdr.detectChanges(); // Force UI update
+      this.cdr.detectChanges();
     });
     
-    // Listen to router navigation events
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
-        // When navigation completes, check if we're on this page
         if (this.router.url.includes('/hr/employees/')) {
           const id = this.route.snapshot.paramMap.get('id');
           if (id) {
             this.loading = true;
-            this.cdr.detectChanges(); // Force UI update
+            this.cdr.detectChanges();
             this.fetchEmployee(id);
           }
         }
       });
   }
 
-  // -----------------------------
-  // JSON DRIVEN GET BY ID
-  // -----------------------------
   fetchEmployee(id: string | null) {
     const getByIdApi = this.config.apiEndpoints?.getById;
 
@@ -81,33 +74,25 @@ export class EmployeeDetailsComponent implements OnInit {
       next: (res: any) => {
         this.employee = this.transformEmployeeData(res);
         this.loading = false;
-        this.cdr.detectChanges(); // Force UI update after data loads
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loading = false;
-        this.cdr.detectChanges(); // Force UI update
+        this.cdr.detectChanges();
         this.navigateToList();
       }
     });
   }
 
-  // -----------------------------
-  // JSON DRIVEN LIST NAVIGATION
-  // -----------------------------
   navigateToList() {
     const listApi = this.config.apiEndpoints?.list;
-
     if (!listApi) return;
-
-    // derive route safely (can be replaced with explicit listRoute later)
+    
     if (listApi.includes('/employees')) {
       this.router.navigate(['/hr/employees']);
     }
   }
 
-  // -----------------------------
-  // DATA NORMALIZATION (TS RESPONSIBILITY)
-  // -----------------------------
   transformEmployeeData(apiData: any): any {
     const transformed = { ...apiData };
 
@@ -127,12 +112,8 @@ export class EmployeeDetailsComponent implements OnInit {
     return transformed;
   }
 
-  // -----------------------------
-  // JSON DRIVEN ACTION HANDLER
-  // -----------------------------
-  handleAction(event: { action: string; data?: any }) {
+  handleAction(event: { action: string; actionConfig?: ActionConfig; data?: any }) {
     switch (event.action) {
-
       case 'goBack':
         this.navigateToList();
         break;
@@ -142,20 +123,44 @@ export class EmployeeDetailsComponent implements OnInit {
         break;
 
       case 'editProfile': {
-        const editConfig = this.config.apiEndpoints?.edit;
-        if (!editConfig) return;
-
-        this.router.navigate(
-          [editConfig.route],
-          {
-            queryParams: {
-              [editConfig.idParam || 'id']: this.employee?.id,
-              mode: editConfig.mode
-            }
-          }
-        );
+        this.handleEditAction(event.actionConfig);
         break;
       }
+    }
+  }
+
+  private handleEditAction(actionConfig?: ActionConfig) {
+    const editConfig = this.config.apiEndpoints?.edit;
+    if (!editConfig) return;
+
+    if (editConfig.mode === 'edit' && this.employee) {
+      const routeData: any = {
+        queryParams: {}
+      };
+
+      if (editConfig.idParam && this.employee[editConfig.idParam]) {
+        routeData.queryParams[editConfig.idParam] = this.employee[editConfig.idParam];
+      } else if (this.employee.id) {
+        routeData.queryParams['id'] = this.employee.id;
+      } else if (this.employee.employeeId) {
+        routeData.queryParams['id'] = this.employee.employeeId;
+      } else if (this.employee.employeeID) {
+        routeData.queryParams['id'] = this.employee.employeeID;
+      }
+
+      routeData.queryParams['mode'] = editConfig.mode || 'edit';
+
+      routeData.state = {
+        employeeData: this.employee,
+        mode: editConfig.mode || 'edit',
+        config: this.config
+      };
+
+      this.router.navigate([editConfig.route], routeData);
+    } else {
+      this.router.navigate([editConfig.route], {
+        queryParams: { mode: editConfig.mode || 'add' }
+      });
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from "@angular/core";
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ButtonAtomComponent } from "../button/button";
 
@@ -9,7 +9,7 @@ import { ButtonAtomComponent } from "../button/button";
   templateUrl: "./photo-upload.html",
   styleUrls: ["./photo-upload.scss"]
 })
-export class PhotoUploadAtomComponent {
+export class PhotoUploadAtomComponent implements OnInit, OnChanges {
   @Input() label: string = "Photo";
   @Input() required: boolean = false;
   @Input() defaultImage?: string;
@@ -34,6 +34,22 @@ export class PhotoUploadAtomComponent {
   previewUrl: string | null = null;
   error: string | null = null;
 
+  ngOnInit(): void {
+    // Initialize previewUrl from defaultImage when component loads
+    if (this.defaultImage) {
+      console.log('📷 PhotoUploadComponent: Setting previewUrl from defaultImage');
+      this.previewUrl = this.defaultImage;
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Update previewUrl when defaultImage changes
+    if (changes['defaultImage'] && changes['defaultImage'].currentValue) {
+      console.log('📷 PhotoUploadComponent: defaultImage changed, updating previewUrl');
+      this.previewUrl = changes['defaultImage'].currentValue;
+    }
+  }
+
   // Helper method to get button config by id
   getButtonConfig(id: string) {
     return this.buttons?.find(btn => btn.id === id) || {
@@ -48,23 +64,22 @@ export class PhotoUploadAtomComponent {
   selectFile(i: HTMLInputElement) { i.click(); }
 
   onFileSelect(e: any) {
-  const file = e.target.files[0];
-  if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-  if (file.size > this.maxSizeMB * 1024 * 1024) {
-    this.error = `Max ${this.maxSizeMB}MB allowed`;
-    return;
+    if (file.size > this.maxSizeMB * 1024 * 1024) {
+      this.error = `Max ${this.maxSizeMB}MB allowed`;
+      return;
+    }
+
+    this.error = null;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      this.previewUrl = base64;
+      this.fileChange.emit(base64); // ✅ BASE64 ONLY
+    };
+    reader.readAsDataURL(file);
   }
-
-  this.error = null;
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    const base64 = reader.result as string;
-    this.previewUrl = base64;
-    this.fileChange.emit(base64); // ✅ BASE64 ONLY
-  };
-  reader.readAsDataURL(file);
-}
-
 }

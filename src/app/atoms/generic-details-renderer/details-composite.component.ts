@@ -1,4 +1,3 @@
-// details-composite.component.ts
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -25,6 +24,14 @@ export interface SectionConfig {
   icon?: string;
   iconClass?: string;
 }
+
+export interface ActionConfig {
+  label: string;
+  action: string;
+  variant: 'primary' | 'secondary' | 'outline';
+  mode?: 'add' | 'edit' | 'view';
+}
+
 export interface CompositeConfig {
   apiEndpoints?: {
     list?: string;
@@ -35,18 +42,9 @@ export interface CompositeConfig {
       idParam?: string;
     };
   };
-
-  actions: any[];
-  sections: any[];
+  actions: ActionConfig[];
+  sections: SectionConfig[];
 }
-
-export interface ActionConfig {
-  label: string;
-  action: string;
-  variant: 'primary' | 'secondary' | 'outline';
-}
-
-
 
 @Component({
   selector: 'composite-employee-profile',
@@ -62,7 +60,7 @@ export class CompositeEmployeeProfileComponent implements OnInit {
     sections: []
   };
 
-  @Output() action = new EventEmitter<{action: string, data?: any}>();
+  @Output() action = new EventEmitter<{action: string, actionConfig?: ActionConfig, data?: any}>();
 
   private sectionIcons: Map<string, {icon: string, iconClass: string}> = new Map([
     ['Professional Details', { icon: 'fa-briefcase', iconClass: 'bg-red-50 text-[#801519]' }],
@@ -73,7 +71,6 @@ export class CompositeEmployeeProfileComponent implements OnInit {
   ]);
 
   ngOnInit() {
-    // Add icons based on section titles if not present in config
     this.config.sections.forEach(section => {
       const iconData = this.sectionIcons.get(section.title);
       if (iconData && !section.icon) {
@@ -122,18 +119,15 @@ export class CompositeEmployeeProfileComponent implements OnInit {
   }
 
   shouldShowSection(section: SectionConfig, data: any): boolean {
-    // Check if section has condition
     if (section.condition && !section.condition(data)) {
       return false;
     }
 
-    // Check hideIfAllEmpty for repeat sections
     if (section.type === 'repeat' && section.hideIfAllEmpty) {
       const items = this.getRepeatData(section, data);
       return items.length > 0;
     }
 
-    // Check hideIfAllEmpty for normal sections
     if (section.hideIfAllEmpty) {
       const hasVisibleField = section.fields.some(field => 
         this.shouldShowField(field, data)
@@ -180,7 +174,25 @@ export class CompositeEmployeeProfileComponent implements OnInit {
   }
 
   onAction(actionType: string): void {
-    this.action.emit({ action: actionType });
+    const actionConfig = this.config.actions.find(act => act.action === actionType);
+    const eventData: any = { 
+      action: actionType,
+      actionConfig: actionConfig
+    };
+    
+    if (actionType === 'edit' || actionConfig?.mode === 'edit') {
+      eventData.data = this.data;
+      
+      if (this.data?.id) {
+        eventData.employeeId = this.data.id;
+      } else if (this.data?.employeeId) {
+        eventData.employeeId = this.data.employeeId;
+      } else if (this.data?.employeeID) {
+        eventData.employeeId = this.data.employeeID;
+      }
+    }
+    
+    this.action.emit(eventData);
   }
 
   onRepeatAction(section: SectionConfig, item: any): void {
