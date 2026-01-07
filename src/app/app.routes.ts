@@ -4,9 +4,9 @@ import { LayoutComponent } from './layout/layout';
 import { AddEmployeeComponent } from './features/hr/pages/add-employee/add-employee';
 import { EmployeeListComponent } from './features/hr/pages/employee-list/employee-list.component';
 import { EmployeeDetailsComponent } from './features/hr/pages/employee-details/employee-details.component';
-export const routes: Routes = [
+import { RoleGuard } from './services/role.guard';
 
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+export const routes: Routes = [
 
   { path: 'login', component: LoginPageComponent },
 
@@ -14,15 +14,26 @@ export const routes: Routes = [
     path: '',
     component: LayoutComponent,
     children: [
-      { path: 'hr', redirectTo: 'hr/add-employee', pathMatch: 'full' },
-      { path: 'hr/add-employee', component: AddEmployeeComponent },
-       { path: 'hr/employees', component: EmployeeListComponent } ,
-       { path: 'hr/employees/:id', component: EmployeeDetailsComponent },
-      { path: 'projects', redirectTo: 'projects/list', pathMatch: 'full' },
- 
 
-      { path: 'roster', redirectTo: 'roster/assign', pathMatch: 'full' },
-     
+      {
+        path: 'hr/add-employee',
+        component: AddEmployeeComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['hr'] }
+      },
+      {
+        path: 'hr/employees',
+        component: EmployeeListComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['hr'] }
+      },
+      {
+        path: 'hr/employees/:id',
+        component: EmployeeDetailsComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['hr'] }
+      }
+
     ]
   }
 ];

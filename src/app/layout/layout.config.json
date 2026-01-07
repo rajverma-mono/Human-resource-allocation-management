@@ -3,27 +3,24 @@
     "logo": "assets/logo/keenable.png",
     "title": "Resource Allocation & Management System",
     "subtitle": "RAMS - Employee & Project Management",
-    "avatar": { 
-      "initials": "AU", 
+    "avatar": {
+      "initials": "AU",
       "enabled": true,
-      "size": "w-11 h-11 text-base" 
+      "size": "w-11 h-11 text-base"
     },
-
-    "height": "py-8", 
-    "logoSize": "h-14",     
+    "height": "py-8",
+    "logoSize": "h-14",
     "titleSize": "text-2xl font-bold",
     "subtitleSize": "text-sm text-gray-500",
-
-    "totalHeight": "140px"       
+    "totalHeight": "140px"
   },
 
   "modules": [
     {
       "name": "HR Module",
       "code": "hr",
-      "route": "/hr",
-      "roles": ["admin", "hr"],                
-      "sidebar": [
+      "roles": ["hr","mgr-1"],
+      "nav": [
         { "label": "Add Employee", "icon": "fas fa-user-plus", "route": "/hr/add-employee" },
         { "label": "Employee List", "icon": "fas fa-users", "route": "/hr/employees" }
       ]
@@ -33,7 +30,7 @@
       "code": "pm",
       "route": "/projects",
       "roles": ["admin", "pm", "lead"],
-      "sidebar": [
+      "nav": [
         { "label": "All Projects", "icon": "fas fa-briefcase", "route": "/projects/list" },
         { "label": "Create Project", "icon": "fas fa-plus-circle", "route": "/projects/new" }
       ]
@@ -42,8 +39,8 @@
       "name": "Allocation & Roster",
       "code": "ar",
       "route": "/roster",
-      "roles": ["admin", "hr", "pm"],
-      "sidebar": [
+      "roles": ["admin", "", "pm"],
+      "nav": [
         { "label": "Resource Allocation", "icon": "fas fa-sitemap", "route": "/roster/assign" },
         { "label": "Roster Calendar", "icon": "fas fa-calendar", "route": "/roster/calendar" }
       ]

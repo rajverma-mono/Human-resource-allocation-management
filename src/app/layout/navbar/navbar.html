@@ -1,11 +1,14 @@
 <nav class="bg-[#451111] h-[55px] flex items-center px-10">
   <div class="flex gap-3 items-center">
 
-    <a *ngFor="let item of menu"
-       [routerLink]="item.route"
-       routerLinkActive="active-tab"
-       class="px-6 py-2.5 font-semibold text-[#e8d4d4] rounded-[20px] transition-all duration-300 hover:bg-[#af9a9a] hover:text-[#451111]">
-      <i class="{{item.icon}}"></i> {{item.label}}
+    <a
+      *ngFor="let item of menu"
+      [routerLink]="item.route"
+      routerLinkActive="active-tab"
+      class="px-6 py-2.5 font-semibold text-[#e8d4d4] rounded-[20px]
+             transition-all duration-300 hover:bg-[#af9a9a] hover:text-[#451111]">
+      <i class="{{ item.icon }}"></i>
+      <span class="ml-2">{{ item.label }}</span>
     </a>
 
   </div>

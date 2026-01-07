@@ -1,3 +1,17 @@
+<header class="w-full bg-white border-b px-10 py-6 shadow-sm flex items-center justify-between">
+  <div class="flex items-center gap-5">
+    <img [src]="headerConfig.logo" class="h-16" />
+
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">
+        {{ headerConfig.title }}
+      </h1>
+      <p class="text-sm text-gray-500">
+        {{ headerConfig.subtitle }}
+      </p>
+    </div>
+  </div>
+</header>
 <div class="flex items-center justify-center h-screen bg-gradient-to-br from-gray-50 to-gray-100">
 
   <div class="bg-white shadow-2xl rounded-2xl p-10 w-[430px] space-y-6 flex flex-col items-center">
