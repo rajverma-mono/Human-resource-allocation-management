@@ -1,47 +1,80 @@
 <div class="space-y-2">
-  <label class="font-semibold text-[14px] flex items-center gap-1">
+
+  <label class="font-semibold text-sm">
     {{ label }}
     <span *ngIf="required" class="text-red-500">*</span>
   </label>
 
-  <p class="text-xs text-gray-500 -mt-1 mb-2">{{ helperText }}</p>
+  <p *ngIf="helperText" class="text-xs text-gray-500">
+    {{ helperText }}
+  </p>
 
-  <div class="space-y-3">
-    <!-- Select Photo Button -->
-    <atom-button
-      [label]="getButtonConfig('photoSelect').label"
-      [variant]="getButtonConfig('photoSelect').variant"
-      [size]="getButtonConfig('photoSelect').size"
-      [bgColor]="getButtonConfig('photoSelect').bgColor"
-      [textColor]="getButtonConfig('photoSelect').textColor"
-      [borderColor]="getButtonConfig('photoSelect').borderColor"
-      (onClick)="selectFile(fileInput)">
-    </atom-button>
+  <!-- SELECT -->
+  <atom-button
+    [label]="getButtonConfig('photoSelect').label"
+    [variant]="getButtonConfig('photoSelect').variant"
+    [size]="getButtonConfig('photoSelect').size"
+    [bgColor]="getButtonConfig('photoSelect').bgColor"
+    [textColor]="getButtonConfig('photoSelect').textColor"
+    [borderColor]="getButtonConfig('photoSelect').borderColor"
+    (onClick)="selectFile(fileInput)">
+  </atom-button>
 
-    <input type="file" #fileInput accept="image/*" hidden (change)="onFileSelect($event)" />
+  <input
+  type="file"
+  #fileInput
+  hidden
+  [accept]="accept"
+  (change)="onFileSelect($event)"
+/>
 
-    <!-- Upload / View Buttons -->
-    <div *ngIf="previewUrl" class="flex gap-3">
-      <atom-button
-        [label]="getButtonConfig('photoUpload').label"
-        [variant]="getButtonConfig('photoUpload').variant"
-        [size]="getButtonConfig('photoUpload').size"
-        [bgColor]="getButtonConfig('photoUpload').bgColor"
-        [textColor]="getButtonConfig('photoUpload').textColor"
-        [borderColor]="getButtonConfig('photoUpload').borderColor"
-        (onClick)="upload.emit()">
-      </atom-button>
 
-      <atom-button
-        [label]="getButtonConfig('photoView').label"
-        [variant]="getButtonConfig('photoView').variant"
-        [size]="getButtonConfig('photoView').size"
-        [bgColor]="getButtonConfig('photoView').bgColor"
-        [textColor]="getButtonConfig('photoView').textColor"
-        [borderColor]="getButtonConfig('photoView').borderColor"
-        (onClick)="view.emit()">
-      </atom-button>
-    </div>
+  <!-- IMAGE PREVIEW -->
+  <img
+    *ngIf="previewType === 'image' && previewUrl"
+    [src]="previewUrl"
+    class="w-32 h-32 object-cover border rounded-md"
+  />
+
+  <!-- PDF PREVIEW (SAFE) -->
+  <iframe
+    *ngIf="previewType === 'pdf' && safePdfUrl"
+    [src]="safePdfUrl"
+    height="300"
+    class="w-full border rounded-md">
+  </iframe>
+
+  <!-- DOC FALLBACK -->
+  <div
+    *ngIf="previewType === 'doc'"
+    class="p-3 border rounded-md bg-gray-50 flex gap-2 items-center"
+  >
+    📄 <span class="text-sm">{{ fileName }}</span>
+  </div>
+
+  <!-- ACTIONS -->
+  <div *ngIf="previewType" class="flex gap-3">
+   <atom-button
+  [label]="getButtonConfig('photoUpload').label"
+  [variant]="getButtonConfig('photoUpload').variant"
+  [size]="getButtonConfig('photoUpload').size"
+  [bgColor]="getButtonConfig('photoUpload').bgColor"
+  [textColor]="getButtonConfig('photoUpload').textColor"
+  [borderColor]="getButtonConfig('photoUpload').borderColor"
+  (onClick)="upload.emit()">
+</atom-button>
+
+<atom-button
+  [label]="getButtonConfig('photoView').label"
+  [variant]="getButtonConfig('photoView').variant"
+  [size]="getButtonConfig('photoView').size"
+  [bgColor]="getButtonConfig('photoView').bgColor"
+  [textColor]="getButtonConfig('photoView').textColor"
+  [borderColor]="getButtonConfig('photoView').borderColor"
+  [disabled]="previewType === 'doc'"
+  (onClick)="onView()">
+</atom-button>
+
   </div>
 
   <p *ngIf="error" class="text-xs text-red-600">{{ error }}</p>
