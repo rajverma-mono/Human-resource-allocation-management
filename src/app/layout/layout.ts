@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './header/header';
 import { NavbarComponent } from './navbar/navbar';
+import { SidebarComponent } from './sidebar/sidebar';
 
 @Component({
   selector: 'app-layout',
@@ -13,7 +14,8 @@ import { NavbarComponent } from './navbar/navbar';
     CommonModule,
     RouterOutlet,
     HeaderComponent,
-    NavbarComponent
+    NavbarComponent,
+    SidebarComponent
   ]
 })
 export class LayoutComponent implements OnInit {
@@ -25,10 +27,12 @@ export class LayoutComponent implements OnInit {
   navbarMenu: any[] = [];
 
   ngOnInit(): void {
-    console.log('Layout init');
+    this.resolveActiveModule();
+  }
 
-    this.activeModule = this.layout.modules.find((m: any) =>
-      m.roles.includes(this.userRole)
+  private resolveActiveModule(): void {
+    this.activeModule = this.layout.modules.find(
+      (m: any) => !m.roles || m.roles.includes(this.userRole)
     );
 
     this.navbarMenu = this.activeModule?.nav || [];

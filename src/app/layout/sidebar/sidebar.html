@@ -1,20 +1,152 @@
-<div class="sidebar-container">
+<div 
+  class="h-full bg-white border-r border-gray-200 transition-all duration-300 relative"
+  [ngClass]="isCollapsed ? 'w-20' : 'w-64'"
+  style="box-shadow: 2px 0 12px rgba(91, 15, 20, 0.08);">
+  
+  <!-- Toggle Button -->
+  <button
+    (click)="toggleSidebar()"
+    class="absolute -right-3 top-6 w-7 h-7 bg-white border-2 border-[#5b0f14] rounded-full 
+           flex items-center justify-center shadow-md hover:bg-[#5b0f14] hover:text-white
+           transition-all z-10 group">
+    <mat-icon class="text-[#5b0f14] group-hover:text-white !text-base !w-4 !h-4">
+      {{ isCollapsed ? 'chevron_right' : 'chevron_left' }}
+    </mat-icon>
+  </button>
 
-  <!-- MODULES LIST -->
-  <div class="menu-wrapper">
-    <ng-container *ngIf="modules && modules.length > 0; else noModules">
-      <a *ngFor="let m of modules"
-         [routerLink]="m.route"
-         routerLinkActive="active-sidebar"
-         [routerLinkActiveOptions]="{exact:true}"
-         class="menu-item">
-         {{m.name}}
+  <div class="h-full overflow-y-auto px-3 py-6">
+
+    <div *ngFor="let module of modules"
+         routerLinkActive="module-active"
+         [routerLinkActiveOptions]="{ exact: false }"
+         class="mb-7">
+
+      <!-- MODULE NAME (pill design) - Expanded State -->
+      <div *ngIf="!isCollapsed"
+           class="w-fit px-5 py-2 mb-3 font-semibold text-[10px] uppercase 
+                  tracking-widest rounded-full transition-all duration-300
+                  text-gray-500 bg-gray-100 module-title">
+        {{ module.name }}
+      </div>
+
+      <!-- MODULE NAME - Collapsed State (Icon Only) -->
+      <div *ngIf="isCollapsed" 
+           class="flex justify-center mb-3">
+        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center
+                    module-icon-collapsed">
+          <span class="text-xs font-bold text-gray-500 uppercase">
+            {{ module.name.substring(0, 2) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- MODULE NAV ITEMS -->
+      <a
+        *ngFor="let item of module.nav"
+        [routerLink]="item.route"
+        routerLinkActive="sidebar-active"
+        [title]="isCollapsed ? item.label : ''"
+        class="flex items-center gap-3 mb-1.5 rounded-lg
+               text-sm font-medium text-gray-700 hover:bg-gray-50
+               transition-all duration-200 group relative"
+        [ngClass]="isCollapsed ? 'justify-center py-3 px-2' : 'px-4 py-2.5'">
+        
+        <i *ngIf="item.icon" 
+           [class]="item.icon" 
+           class="text-lg text-gray-600 group-hover:text-[#5b0f14] transition-colors"></i>
+        
+        <span *ngIf="!isCollapsed" class="group-hover:text-gray-900 transition-colors">
+          {{ item.label }}
+        </span>
+
+        <!-- Tooltip for collapsed state -->
+        <div *ngIf="isCollapsed"
+             class="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white 
+                    text-xs rounded-md opacity-0 invisible group-hover:opacity-100 
+                    group-hover:visible transition-all duration-200 whitespace-nowrap 
+                    pointer-events-none z-50 shadow-lg">
+          {{ item.label }}
+          <div class="absolute right-full top-1/2 -translate-y-1/2 
+                      border-4 border-transparent border-r-gray-900"></div>
+        </div>
       </a>
-    </ng-container>
+
+    </div>
+
   </div>
-
-  <ng-template #noModules>
-    <p class="no-menu">No modules configured</p>
-  </ng-template>
-
 </div>
+
+<!-- Add this to your component CSS -->
+<style>
+/* Active nav item */
+.sidebar-active {
+  background: linear-gradient(135deg, #5b0f14 0%, #7a1419 100%);
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(91, 15, 20, 0.25);
+  font-weight: 600;
+}
+
+.sidebar-active i {
+  color: white !important;
+}
+
+.sidebar-active span {
+  color: white !important;
+}
+
+/* Active module - changes module title style */
+.module-active .module-title {
+  background: linear-gradient(135deg, #5b0f14 0%, #7a1419 100%);
+  color: white !important;
+  box-shadow: 0 2px 6px rgba(91, 15, 20, 0.2);
+}
+
+/* Active module collapsed icon */
+.module-active .module-icon-collapsed {
+  background: linear-gradient(135deg, #5b0f14 0%, #7a1419 100%);
+}
+
+.module-active .module-icon-collapsed span {
+  color: white !important;
+}
+
+/* Smooth scrollbar */
+.h-full.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.h-full.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.h-full.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.h-full.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+</style>
+
+<!-- Add this to your component TypeScript -->
+<!-- 
+export class YourComponent {
+  isCollapsed = false;
+
+  toggleSidebar() {
+    this.isCollapsed = !this.isCollapsed;
+  }
+
+  modules = [
+    {
+      name: 'HR MODULE',
+      nav: [
+        { label: 'Add Employee', route: '/add-employee', icon: 'bi bi-person-plus' },
+        { label: 'Employee List', route: '/employee-list', icon: 'bi bi-people' }
+      ]
+    }
+    // ... other modules
+  ];
+}
+-->

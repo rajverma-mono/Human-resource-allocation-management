@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
-
+import { SidebarComponent } from '../../../../layout/sidebar/sidebar';
 import formJson from './add-employee.form.json';
 import Swal from 'sweetalert2';
 import { environment } from '../../../../../environment';
@@ -44,7 +44,8 @@ import { StepperUIComponent } from '../../../../atoms/stepper/stepper.component'
     PhotoUploadAtomComponent,
 
     SelectOptionsPipe,
-    StepperUIComponent
+    StepperUIComponent,
+    SidebarComponent
   ],
   templateUrl: './add-employee.html'
 })

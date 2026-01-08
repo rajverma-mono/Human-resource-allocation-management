@@ -58,7 +58,6 @@ export class ButtonAtomComponent {
   @Input() disabled: boolean = false;
   @Input() loading: boolean = false;
 
-  // 🔥 Custom styling support
   @Input() bgColor?: string;
   @Input() textColor?: string;
   @Input() borderColor?: string;
@@ -68,7 +67,6 @@ export class ButtonAtomComponent {
 
  get classes() {
 
-  // 🔥 If custom bgColor is provided -> skip variant background classes
   if (this.bgColor) {
     return `
       ${sizeClassMap[this.size]}

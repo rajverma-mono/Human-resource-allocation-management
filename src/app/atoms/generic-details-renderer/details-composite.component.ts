@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { ButtonAtomComponent } from '../button/button';
 export interface FieldConfig {
   key: string;
   label: string;
@@ -9,6 +9,28 @@ export interface FieldConfig {
   prefix?: string;
   hideIfEmpty?: boolean;
   condition?: (value: any) => boolean;
+}
+export interface ActionConfig {
+  action: string;
+  label: string;
+
+  /* existing */
+  variant?: 'primary' | 'secondary' | 'outline';
+  mode?: 'add' | 'edit' | 'view';
+
+  /* ✅ ADD THESE (ATOM BUTTON PROPS) */
+  size?: 'sm' | 'md' | 'lg';
+
+  icon?: string;
+  iconRight?: string;
+
+  bgColor?: string;
+  textColor?: string;
+  borderColor?: string;
+
+  fullWidth?: boolean;
+  disabled?: boolean;
+  loading?: boolean;
 }
 
 export interface SectionConfig {
@@ -25,12 +47,6 @@ export interface SectionConfig {
   iconClass?: string;
 }
 
-export interface ActionConfig {
-  label: string;
-  action: string;
-  variant: 'primary' | 'secondary' | 'outline';
-  mode?: 'add' | 'edit' | 'view';
-}
 
 export interface CompositeConfig {
   apiEndpoints?: {
@@ -49,7 +65,7 @@ export interface CompositeConfig {
 @Component({
   selector: 'composite-employee-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonAtomComponent],
   templateUrl: './details-composite.component.html',
 })
 export class CompositeEmployeeProfileComponent implements OnInit {

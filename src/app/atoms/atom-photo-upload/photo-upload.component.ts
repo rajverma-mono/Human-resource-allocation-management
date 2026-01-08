@@ -25,6 +25,12 @@ export class PhotoUploadAtomComponent {
   @Output() fileChange = new EventEmitter<string>();
   @Output() upload = new EventEmitter<void>();
   @Output() view = new EventEmitter<void>();
+@Input() buttonText?: {
+  choose?: string;
+  upload?: string;
+  view?: string;
+  remove?: string;
+};
 
   /* ------------ STATE ------------ */
   previewUrl: string | null = null;          // image + doc

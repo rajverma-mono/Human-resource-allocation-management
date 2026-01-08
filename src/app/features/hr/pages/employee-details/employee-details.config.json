@@ -14,18 +14,25 @@
     {
       "label": "Back",
       "action": "goBack",
-      "variant": "secondary"
+      "variant": "secondary",
+      "bgColor": "#451111",
+      "textColor": "#fff"
     },
     {
       "label": "Print PDF",
       "action": "print",
-      "variant": "secondary"
+      "variant": "secondary",
+      "bgColor": "#451111",
+      "textColor": "#fff"
     },
     {
       "label": "Edit Profile",
       "action": "editProfile",
-      "variant": "primary",
-      "mode": "edit"
+      "variant": "warning",
+      "mode": "edit",
+      "bgColor": "#451111",
+      "textColor": "#fff"
+
     }
   ],
 

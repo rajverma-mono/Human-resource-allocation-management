@@ -1,0 +1,27 @@
+.sidebar-item {
+  transition: all 0.2s ease;
+}
+
+.sidebar-item:hover {
+  background-color: #ece9f6; /* same tone as active pills */
+}
+
+.sidebar-active {
+  background-color: #f0eef8;
+  color: #451111;
+  font-weight: 600;
+}
+
+.sidebar-active i {
+  color: #451111;
+}
+.active-tab {
+  background-color: #e8d4d4;
+  color: #451111;
+  font-weight: 700;
+}
+.module-active .module-title {
+  background-color: #e8d4d4; /* same as navbar active tab */
+  color: #451111;
+  font-weight: 700;
+}
