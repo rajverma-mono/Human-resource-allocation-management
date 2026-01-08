@@ -1,0 +1,213 @@
+<!-- add-project.html -->
+<div class="max-w-6xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden mt-8">
+  <div class="px-10 pb-10 bg-white">
+
+    @if (!formConfig) {
+      <div class="flex justify-center py-20">
+        <div class="w-12 h-12 border-4 border-[#801519]/20 border-t-[#801519] rounded-full animate-spin"></div>
+      </div>
+    }
+
+    @if (formConfig) {
+      
+      <app-page-header
+        [title]="formConfig.title"
+        [icon]="formConfig.icon">
+      </app-page-header>
+
+      @if(formConfig.sections && formConfig.sections.length > 0) {
+
+        @for(section of formConfig.sections; track section.title) {
+
+          <div class="mt-8">
+
+            <h3 class="text-lg font-bold text-[#801519] mb-6 flex items-center gap-3">
+              <i [class]="section.icon"></i>
+              {{ section.title }}
+            </h3>
+
+            <div class="grid gap-6" [ngClass]="section.layout === 'two-column' ? 'grid-cols-2' : 'grid-cols-1'">
+
+              @for(field of section.fields; track field.id) {
+
+                @switch(field.type) {
+
+                  @case('text') {
+                    <atom-input 
+                      [value]="form[field.id]"
+                      (valueChange)="form[field.id] = $event"
+                      [label]="field.label" 
+                      type="text"
+                      [validation]="field.validation || 'none'" 
+                      [placeholder]="field.placeholder || field.label"
+                      [required]="field.required || false" 
+                      [maxLength]="field.maxLength || null"
+                      [disabled]="field.disabled || false" 
+                      [errorMessage]="field.errorMessage || ''"
+                      [className]="field.className || ''" 
+                      [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+                      [borderColor]="field.borderColor || 'border-gray-300'" 
+                      [rounded]="field.rounded || 'rounded-lg'"
+                      [fullWidth]="field.fullWidth !== false" 
+                      [pattern]="field.pattern || undefined"
+                      [showToggleIcon]="field.showToggleIcon || false" />
+                  }
+
+                  @case('number') {
+                    <atom-input 
+                      [value]="form[field.id]"
+                      (valueChange)="form[field.id] = $event"
+                      [label]="field.label" 
+                      type="number"
+                      [validation]="field.validation || 'numeric'" 
+                      [placeholder]="field.placeholder || field.label"
+                      [required]="field.required || false" 
+                      [maxLength]="field.maxLength || null"
+                      [disabled]="field.disabled || false" 
+                      [errorMessage]="field.errorMessage || ''"
+                      [className]="field.className || ''" 
+                      [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+                      [borderColor]="field.borderColor || 'border-gray-300'" 
+                      [rounded]="field.rounded || 'rounded-lg'"
+                      [fullWidth]="field.fullWidth !== false" />
+                  }
+
+                  @case('email') {
+                    <atom-input 
+                      [value]="form[field.id]"
+                      (valueChange)="form[field.id] = $event"
+                      [label]="field.label" 
+                      type="email" 
+                      [validation]="'email'"
+                      [placeholder]="field.placeholder || field.label" 
+                      [required]="field.required || false"
+                      [maxLength]="field.maxLength || null" 
+                      [disabled]="field.disabled || false"
+                      [errorMessage]="field.errorMessage || ''" 
+                      [className]="field.className || ''"
+                      [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+                      [borderColor]="field.borderColor || 'border-gray-300'" 
+                      [rounded]="field.rounded || 'rounded-lg'"
+                      [fullWidth]="field.fullWidth !== false" 
+                      [showVerifiedStatus]="field.showVerifiedStatus || false"
+                      [isVerified]="field.isVerified || false" 
+                      [pattern]="field.pattern || undefined" />
+                  }
+
+                  @case('date') {
+                    <atom-date-picker 
+                      [value]="form[field.id]"
+                      (valueChange)="form[field.id] = $event"
+                      [label]="field.label" 
+                      [required]="field.required || false"
+                      [disabled]="field.disabled || false" />
+                  }
+
+                  @case('select') {
+                    <div class="flex flex-col">
+                      <label class="text-sm font-semibold mb-1">
+                        {{field.label}}
+                        @if(field.required) {
+                          <span class="text-red-500">*</span>
+                        }
+                      </label>
+
+                      <atom-select 
+                        [options]="field.options | selectOptions" 
+                        [value]="form[field.id]"
+                        (valueChange)="form[field.id] = $event"
+                        [placeholder]="field.placeholder || 'Select ' + field.label" 
+                        [disabled]="field.disabled || false"
+                        class="w-full" />
+
+                      @if(field.note) {
+                        <span class="text-xs text-gray-500 mt-1">{{field.note}}</span>
+                      }
+
+                      @if(field.required && !form[field.id]) {
+                        <span class="text-xs text-red-500 mt-1">* Required</span>
+                      }
+                    </div>
+                  }
+
+                  @case('textarea') {
+                    <atom-textarea 
+                      [value]="form[field.id]"
+                      (valueChange)="form[field.id] = $event"
+                      [label]="field.label" 
+                      [rows]="field.rows || 3"
+                      [maxLength]="field.maxLength || 500" 
+                      [placeholder]="field.placeholder || field.label"
+                      [disabled]="field.disabled || false" 
+                      [ariaLabel]="field.ariaLabel || field.label"
+                      [className]="field.className || ''" 
+                      [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+                      [borderColor]="field.borderColor || ''" 
+                      [rounded]="field.rounded || 'rounded-lg'"
+                      [containerClass]="field.containerClass || ''" 
+                      [sanitize]="field.sanitize || false"
+                      [removeChars]="field.removeChars || ''" 
+                      [removeEmojis]="field.removeEmojis || false"
+                      [normalizeAccents]="field.normalizeAccents || false" 
+                      [toCase]="field.toCase || ''" />
+                  }
+
+                  @default {
+                    <atom-input 
+                      [value]="form[field.id]"
+                      (valueChange)="form[field.id] = $event"
+                      [label]="field.label" 
+                      type="text"
+                      [placeholder]="field.placeholder || field.label"
+                      [required]="field.required || false">
+                    </atom-input>
+                  }
+
+                }
+              }
+
+            </div>
+
+          </div>
+        }
+
+        <div class="flex justify-end gap-4 mt-12">
+          
+          @if(getAction('cancel')) {
+            <atom-button
+              [label]="getAction('cancel').label"
+              [variant]="getAction('cancel').variant || 'outlineSecondary'"
+              [size]="getAction('cancel').size || 'md'"
+              [bgColor]="getAction('cancel').bgColor"
+              [textColor]="getAction('cancel').textColor"
+              [borderColor]="getAction('cancel').borderColor"
+              [fullWidth]="getAction('cancel').fullWidth || false"
+              (onClick)="cancel()">
+            </atom-button>
+          }
+
+          @if(getAction('save')) {
+            <atom-button
+              [label]="getAction('save').label"
+              [variant]="getAction('save').variant || 'primary'"
+              [size]="getAction('save').size || 'md'"
+              [bgColor]="getAction('save').bgColor"
+              [textColor]="getAction('save').textColor"
+              [borderColor]="getAction('save').borderColor"
+              [fullWidth]="getAction('save').fullWidth || false"
+              (onClick)="save()">
+            </atom-button>
+          }
+
+        </div>
+
+      } @else {
+        <div class="text-center py-8 text-gray-500">
+          No form fields configured
+        </div>
+      }
+
+    }
+
+  </div>
+</div>

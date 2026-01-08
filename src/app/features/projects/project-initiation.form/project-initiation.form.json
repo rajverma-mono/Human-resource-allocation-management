@@ -1,0 +1,104 @@
+{
+  "title": "Add New Project",
+  "icon": "folder-add",
+  "subtitle": "Initiate a new project with client and timeline details.",
+  
+  "apiEndpoints": {
+    "create": "http://localhost:3000/projects",
+    "list": "http://localhost:3000/projects",
+    "getById": "http://localhost:3000/projects/{id}",
+    "update": "http://localhost:3000/projects/{id}",
+    "delete": "http://localhost:3000/projects/{id}"
+  },
+  
+  "sections": [
+    {
+      "title": "Project & Client Details",
+      "icon": "description",
+      "layout": "two-column",
+      "fields": [
+        {
+          "id": "projectCode",
+          "type": "text",
+          "label": "Project Code",
+          "required": true,
+          "placeholder": "PRJ-001",
+          "default": "PRJ-"
+        },
+        {
+          "id": "projectName",
+          "type": "text",
+          "label": "Project Name",
+          "required": true,
+          "placeholder": "Enter project name",
+          "fullWidth": true
+        },
+        {
+          "id": "workOrderNumber",
+          "type": "text",
+          "label": "Work Order / SO Number",
+          "required": true,
+          "placeholder": "Enter work order number"
+        },
+        {
+          "id": "clientName",
+          "type": "text",
+          "label": "Client Name",
+          "required": true,
+          "placeholder": "Enter client name"
+        },
+        {
+          "id": "projectTenure",
+          "type": "number",
+          "label": "Project Tenure (Months)",
+          "required": true,
+          "placeholder": "e.g., 12"
+        },
+        {
+          "id": "projectStartDate",
+          "type": "date",
+          "label": "Project Start Date",
+          "required": true
+        },
+        {
+          "id": "projectEndDate",
+          "type": "date",
+          "label": "Project End Date",
+          "required": true
+        },
+        {
+          "id": "projectType",
+          "type": "select",
+          "label": "Project Type",
+          "required": true,
+          "options": ["Internal", "External"]
+        },
+        {
+          "id": "projectStatus",
+          "type": "select",
+          "label": "Project Status",
+          "required": true,
+          "options": ["Active", "On-Hold", "Completed"],
+          "default": "Active"
+        }
+      ]
+    }
+  ],
+  
+  "actions": [
+    {
+      "id": "save",
+      "label": "Save Project",
+      "variant": "primary",
+      "size": "md",
+      "bgColor": "#451111",
+      "textColor": "#fff"
+    },
+    {
+      "id": "cancel",
+      "label": "Cancel",
+      "variant": "outlineSecondary",
+      "size": "md"
+    }
+  ]
+}

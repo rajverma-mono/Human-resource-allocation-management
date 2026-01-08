@@ -28,11 +28,11 @@
     {
       "name": "Project Management",
       "code": "pm",
-      "route": "/projects",
-      "roles": ["admin", "pm", "lead"],
+      "route": "/projects/add",
+      "roles": ["hr", "pm", "lead"],
       "nav": [
         { "label": "All Projects", "icon": "fas fa-briefcase", "route": "/projects/list" },
-        { "label": "Create Project", "icon": "fas fa-plus-circle", "route": "/projects/new" }
+        { "label": "Create Project", "icon": "fas fa-plus-circle", "route": "/projects/add" }
       ]
     },
     {

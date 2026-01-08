@@ -332,7 +332,6 @@ private prefillFormFromData(employeeData: any): void {
       return block;
     });
     
-    // Assign NEW array
     this.certificationList = newCertificationList;
     
     if (this.certificationList.length > 0 && !newForm.hasCertification) {
@@ -491,20 +490,51 @@ private getFieldConfig(fieldId: string): any {
     );
   }
 
-  onCertificateView(cert: any) {
-    const base64 = cert?.uploadCertificate;
+onCertificateView(cert: any) {
+  const base64 = cert?.uploadCertificate;
 
-    if (!base64) {
-      Swal.fire('No certificate to view');
-      return;
-    }
+  if (!base64) {
+    Swal.fire('No certificate to view');
+    return;
+  }
+
+  const isPdf = base64.startsWith('data:application/pdf');
+
+  if (isPdf) {
+    const pdfUrl = `${base64}#toolbar=0&navpanes=0&scrollbar=0`;
 
     Swal.fire({
+      title: 'Certificate Preview',
+      html: `
+        <iframe
+          src="${pdfUrl}"
+          style="
+            width:100%;
+            height:80vh;
+            border:none;
+            border-radius:8px;
+            background:#fff;
+          ">
+        </iframe>
+      `,
+      width: '85vw',
+      padding: '1rem',
+      showCloseButton: true,
+      showConfirmButton: false,
+      backdrop: true
+    });
+
+  } else {
+    Swal.fire({
       imageUrl: base64,
-      width: 400,
-      showCloseButton: true
+      imageAlt: 'Certificate',
+      imageWidth: 600,
+      showCloseButton: true,
+      showConfirmButton: false
     });
   }
+}
+
 
   createCertificationBlock() {
     const block: any = {};
