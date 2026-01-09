@@ -12,17 +12,17 @@
  "stepper": [
   {
     "key": "personal",
-    "label": "Personal",
+    "label": "Personal Information",
     "icon": "person"
   },
   {
     "key": "professional",
-    "label": "Professional",
+    "label": "Professional Information",
     "icon": "work"
   },
   {
     "key": "education",
-    "label": "Education",
+    "label": "Education Information",
     "icon": "school"
   },
   {
@@ -571,7 +571,8 @@
       "label": "Next →",
       "variant": "primary",
       "size": "md",
-      "bgColor": "#451111"
+      "bgColor": "#451111",
+      "textColor": "#fff"
     },
     {
       "id": "save",

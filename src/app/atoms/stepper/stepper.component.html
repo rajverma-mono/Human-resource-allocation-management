@@ -38,9 +38,12 @@
           </div>
 
           <!-- LABEL -->
-          <p class="text-[11px] mt-2 text-center font-semibold leading-tight w-[110px]">
+          <p class="mt-2 text-center font-semibold text-[11px] leading-tight
+         max-w-[90px] block
+         whitespace-normal break-words">
             {{ step?.label || ('Step ' + (i + 1)) }}
           </p>
+
 
           <!-- CONNECTOR -->
           <div *ngIf="i < steps.length - 1" class="absolute top-[34px] left-[calc(50%+35px)]
