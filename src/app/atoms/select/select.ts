@@ -1,93 +1,103 @@
-import { Component, Input, Output, EventEmitter } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 export interface SelectOption {
   label: string;
-  value: string;
-  disabled?: boolean;
+  value: any;
   icon?: string;
-  iconPosition?: "left" | "right";
+  iconPosition?: 'left' | 'right';
+  disabled?: boolean;
 }
 
 @Component({
-  selector: "atom-select",
+  selector: 'atom-select',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: "./select.html",
+  templateUrl: './select.html',
   styleUrls: ['./select.scss']
 })
-export class SelectAtomComponent {
+export class SelectAtomComponent implements OnInit, OnChanges {
 
   @Input() label?: string;
-  @Input() options: SelectOption[] = [];
-  @Input() placeholder: string = "Select option";
-  @Input() liveSearch: boolean = false;
-  @Input() customClass: string = "";
-  @Input() showIcons: boolean = true;
-
-  /* ----------------- 🔥 Added Inputs ----------------- */
-  @Input() required: boolean = false;
+  @Input() options: SelectOption[] = [];   // ✅ API-ready
+  @Input() value: any;
+  @Input() placeholder: string = 'Select';
   @Input() disabled: boolean = false;
-  @Input() error?: string;                 // If error is externally passed
+  @Input() required: boolean = false;
   @Input() helperText?: string;
+  @Input() customClass: string = '';
+  @Input() hasError: boolean = false;
+  @Input() liveSearch: boolean = false;
+  @Input() showIcons: boolean = false;
 
-  @Input() value: string = "";
-  @Output() valueChange = new EventEmitter<string>();
-  @Output() onValueChange = new EventEmitter<{value:string, option?:SelectOption}>();
+  @Output() valueChange = new EventEmitter<any>();
 
-  /* Internal State */
-  searchText = "";
   dropdownOpen = false;
-  internalError: string | null = null;     // For required validation
+  searchText = '';
+  filteredOptions: SelectOption[] = [];
 
-  /* ----------------- Options Filter ----------------- */
-  get filteredOptions() {
-    if (!this.liveSearch || !this.searchText.trim()) return this.options;
-    return this.options.filter(opt =>
-      opt.label.toLowerCase().includes(this.searchText.toLowerCase())
-    );
+  selectedLabel: string = '';
+  selectedIcon?: string;
+
+  ngOnInit(): void {
+    this.syncOptions();
+    this.syncSelected();
   }
 
-  toggleDropdown() {
-    if (!this.disabled) this.dropdownOpen = !this.dropdownOpen;
-  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['options']) {
+      this.syncOptions();
+    }
 
-  selectOption(option: SelectOption) {
-    if (option.disabled) return;
-
-    this.value = option.value;
-    this.valueChange.emit(option.value);
-    this.onValueChange.emit({value:option.value, option});
-    
-    this.dropdownOpen = false;
-    this.validate(); // trigger validation
-  }
-
-  /* ----------------- Getters ----------------- */
-  get selectedLabel() {
-    return this.options.find(o=>o.value===this.value)?.label || this.placeholder;
-  }
-
-  get selectedIcon() {
-    return this.options.find(o=>o.value===this.value)?.icon;
-  }
-
-  /* ----------------- 🔥 Validation Handler ----------------- */
-  validate() {
-    if (this.required && !this.value) {
-      this.internalError = `${this.label || 'Field'} is required`;
-    } else {
-      this.internalError = null;
+    if (changes['value']) {
+      this.syncSelected();
     }
   }
 
-  /* Merged error priority: internal > external */
-  get finalError() {
-    return this.internalError || this.error || null;
+  toggleDropdown(): void {
+    if (this.disabled) return;
+    this.dropdownOpen = !this.dropdownOpen;
   }
 
-  get hasError() {
-    return !!this.finalError;
+  selectOption(opt: SelectOption): void {
+    if (opt.disabled) return;
+
+    this.value = opt.value;
+    this.valueChange.emit(opt.value);
+
+    this.selectedLabel = opt.label;
+    this.selectedIcon = opt.icon;
+
+    this.dropdownOpen = false;
+  }
+
+  private syncOptions(): void {
+    this.filteredOptions = [...this.options];
+    this.applySearch();
+  }
+
+  private syncSelected(): void {
+    const selected = this.options?.find(o => o.value === this.value);
+
+    if (selected) {
+      this.selectedLabel = selected.label;
+      this.selectedIcon = selected.icon;
+    } else {
+      this.selectedLabel = this.placeholder;
+      this.selectedIcon = undefined;
+    }
+  }
+
+  applySearch(): void {
+    if (!this.searchText) {
+      this.filteredOptions = [...this.options];
+      return;
+    }
+
+    const search = this.searchText.toLowerCase();
+    this.filteredOptions = this.options.filter(opt =>
+      opt.label.toLowerCase().includes(search)
+    );
   }
 }

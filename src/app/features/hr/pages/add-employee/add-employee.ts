@@ -4,13 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SidebarComponent } from '../../../../layout/sidebar/sidebar';
 import formJson from './add-employee.form.json';
 import Swal from 'sweetalert2';
 import { environment } from '../../../../../environment';
 
 import { PageHeaderComponent } from '../../../../atoms/page-header/page-header';
-import { SectionHeaderComponent } from '../../../../atoms/section-header/section-header';
 
 import { InputAtomComponent } from '../../../../atoms/input/input';
 import { SelectAtomComponent } from '../../../../atoms/select/select';
@@ -33,7 +31,6 @@ import { StepperUIComponent } from '../../../../atoms/stepper/stepper.component'
     MatIconModule,
 
     PageHeaderComponent,
-    SectionHeaderComponent,
 
     InputAtomComponent,
     SelectAtomComponent,
@@ -45,7 +42,6 @@ import { StepperUIComponent } from '../../../../atoms/stepper/stepper.component'
 
     SelectOptionsPipe,
     StepperUIComponent,
-    SidebarComponent
   ],
   templateUrl: './add-employee.html'
 })

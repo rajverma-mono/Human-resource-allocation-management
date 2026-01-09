@@ -1,21 +1,28 @@
 <div class="select-container w-full" [ngClass]="customClass">
 
   <label *ngIf="label" class="block mb-1 text-sm font-medium">
-    {{label}} <span *ngIf="required" class="text-red-500">*</span>
+    {{ label }}
+    <span *ngIf="required" class="text-red-500">*</span>
   </label>
 
   <div class="relative w-full">
 
-    <button 
+    <button
       type="button"
       (click)="toggleDropdown()"
       [disabled]="disabled"
-      [ngClass]="{'border-red-500':hasError}"
+      [ngClass]="{ 'border-red-500': hasError }"
       class="atom-select-base w-full block">
 
       <div class="flex items-center gap-2">
-        <img *ngIf="showIcons && selectedIcon" [src]="selectedIcon" class="w-5 h-5" />
-        <span [class.placeholder]="!value">{{selectedLabel}}</span>
+        <img
+          *ngIf="showIcons && selectedIcon"
+          [src]="selectedIcon"
+          class="w-5 h-5" />
+
+        <span [class.placeholder]="!value">
+          {{ selectedLabel || placeholder }}
+        </span>
       </div>
 
       <span class="text-gray-700 text-lg pointer-events-none">▾</span>
@@ -24,31 +31,45 @@
     <!-- Dropdown panel -->
     <div *ngIf="dropdownOpen" class="dropdown-panel absolute w-full bg-white mt-2 z-[50]">
 
-      <input *ngIf="liveSearch"
+      <input
+        *ngIf="liveSearch"
         type="text"
         [(ngModel)]="searchText"
+        (input)="applySearch()"
         placeholder="Search..."
-        class="border-b w-full px-3 py-2 outline-none"/>
+        class="border-b w-full px-3 py-2 outline-none" />
 
       <div class="max-h-52 overflow-y-auto">
-        <div *ngFor="let opt of filteredOptions"
-             (click)="selectOption(opt)"
-             class="item flex justify-between items-center"
-             [class.disabled]="opt.disabled">
+        <div
+          *ngFor="let opt of filteredOptions"
+          (click)="selectOption(opt)"
+          class="item flex justify-between items-center"
+          [class.disabled]="opt.disabled">
 
           <div class="flex gap-2 items-center">
-            <img *ngIf="showIcons && opt.icon && opt.iconPosition!='right'" [src]="opt.icon" class="w-5 h-5"/>
-            <span>{{opt.label}}</span>
+            <img
+              *ngIf="showIcons && opt.icon && opt.iconPosition !== 'right'"
+              [src]="opt.icon"
+              class="w-5 h-5" />
+            <span>{{ opt.label }}</span>
           </div>
 
-          <img *ngIf="showIcons && opt.icon && opt.iconPosition=='right'" [src]="opt.icon" class="w-5 h-5"/>
+          <img
+            *ngIf="showIcons && opt.icon && opt.iconPosition === 'right'"
+            [src]="opt.icon"
+            class="w-5 h-5" />
         </div>
       </div>
 
     </div>
   </div>
 
-  <p *ngIf="finalError" class="text-red-500 text-xs mt-1">{{finalError}}</p>
-  <p *ngIf="helperText && !finalError" class="text-gray-500 text-xs mt-1">{{helperText}}</p>
+  <p *ngIf="hasError" class="text-red-500 text-xs mt-1">
+    * Required
+  </p>
+
+  <p *ngIf="helperText && !hasError" class="text-gray-500 text-xs mt-1">
+    {{ helperText }}
+  </p>
 
 </div>

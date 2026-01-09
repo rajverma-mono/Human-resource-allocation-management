@@ -337,6 +337,13 @@
           "experienceCategory": "Relevant",
           "fromDate": "2026-01-06",
           "toDate": "2026-01-06"
+        },
+        {
+          "companyName": "oiuytrdyui",
+          "role": "lkjhgfdghj",
+          "experienceCategory": "Non-Relevant",
+          "fromDate": "2026-01-14",
+          "toDate": "2026-01-23"
         }
       ],
       "certifications": [
@@ -378,6 +385,20 @@
       "projectStatus": "On-Hold",
       "createdAt": "2026-01-08T10:20:57.880Z",
       "updatedAt": "2026-01-08T10:20:57.880Z"
+    },
+    {
+      "id": "proj-ojq6qt1qi",
+      "projectName": "skjfdv",
+      "workOrderNumber": "8732tr",
+      "clientName": "iuewoyf",
+      "projectTenure": "12",
+      "projectStartDate": "2025-12-30",
+      "projectEndDate": "2026-01-06",
+      "projectType": "Internal",
+      "projectManager": "4251",
+      "projectStatus": "Active",
+      "createdAt": "2026-01-09T06:25:29.017Z",
+      "updatedAt": "2026-01-09T06:25:29.018Z"
     }
   ]
 }

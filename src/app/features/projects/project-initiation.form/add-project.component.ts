@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import Swal from 'sweetalert2';
 
-// Import JSON directly
 import formConfigJson from './project-initiation.form.json';
 
 import { PageHeaderComponent } from '../../../atoms/page-header/page-header';
@@ -38,16 +37,19 @@ export class AddProjectComponent implements OnInit {
   isEditMode = false;
   projectId: string = '';
   isLoading = false;
+  selectOptionsMap: Record<string, any[]> = {};
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initializeForm();
     this.checkEditMode();
+    this.loadSelectOptionsFromApi();
+
   }
 
   checkEditMode() {
@@ -62,9 +64,9 @@ export class AddProjectComponent implements OnInit {
 
   initializeForm() {
     console.log('🟢 Project Form Config:', this.formConfig);
-    
+
     this.form = {};
-    
+
     if (this.formConfig?.sections) {
       this.formConfig.sections.forEach((section: any) => {
         if (section.fields) {
@@ -74,14 +76,13 @@ export class AddProjectComponent implements OnInit {
         }
       });
     }
-    
+
     console.log('🟢 Form initialized:', this.form);
   }
 
   loadProjectData(id: string) {
     this.isLoading = true;
-    
-    // Show loading alert
+
     Swal.fire({
       title: 'Loading...',
       text: 'Please wait while we load project data',
@@ -90,12 +91,17 @@ export class AddProjectComponent implements OnInit {
         Swal.showLoading();
       }
     });
-    
-    // Read API endpoint from JSON config
-    const getEndpoint = this.formConfig.apiEndpoints?.getById || 
-                       'http://localhost:3000/projects/{id}';
+
+    const getEndpoint = this.formConfig.apiEndpoints?.getById;
+
+    if (!getEndpoint) {
+      console.error('❌ getById endpoint missing in form config');
+      return;
+    }
+
     const url = getEndpoint.replace('{id}', id);
-    
+
+
     this.http.get(url).subscribe({
       next: (project: any) => {
         this.form = { ...this.form, ...project };
@@ -114,6 +120,81 @@ export class AddProjectComponent implements OnInit {
       }
     });
   }
+  loadSelectOptionsFromApi() {
+    console.group('🔵 loadSelectOptionsFromApi START');
+
+    if (!this.formConfig?.sections) {
+      console.warn('⚠️ No sections found in formConfig');
+      console.groupEnd();
+      return;
+    }
+
+    this.formConfig.sections.forEach((section: any, sIndex: number) => {
+      console.group(`🟣 Section[${sIndex}]: ${section.title}`);
+
+      if (!section.fields) {
+        console.warn('⚠️ No fields in this section');
+        console.groupEnd();
+        return;
+      }
+
+      section.fields.forEach((field: any, fIndex: number) => {
+        console.group(`🟢 Field[${fIndex}]: ${field.id}`);
+
+        console.log('Field type:', field.type);
+        console.log('Field optionsSource:', field.optionsSource);
+
+        if (field.type === 'select' && field.optionsSource?.type === 'api') {
+          const { url, valueKey, labelKey } = field.optionsSource;
+
+          console.log('➡️ API URL:', url);
+          console.log('➡️ valueKey:', valueKey);
+          console.log('➡️ labelKey:', labelKey);
+
+          this.http.get<any>(url).subscribe({
+            next: (data) => {
+              console.log('✅ RAW API RESPONSE:', data);
+              console.log('Is Array?', Array.isArray(data));
+
+              const list = Array.isArray(data) ? data : [data];
+
+              console.log('Normalized list:', list);
+
+              this.selectOptionsMap[field.id] = list.map((item, index) => {
+                const value = item[valueKey];
+                const label = item[labelKey];
+
+                console.log(`Option[${index}] raw:`, item);
+                console.log(`Option[${index}] mapped → value:`, value, 'label:', label);
+
+                return {
+                  value,
+                  label
+                };
+              });
+
+              console.log(
+                `✅ FINAL OPTIONS for "${field.id}":`,
+                this.selectOptionsMap[field.id]
+              );
+            },
+            error: (err) => {
+              console.error(`❌ API ERROR for field "${field.id}"`, err);
+              this.selectOptionsMap[field.id] = [];
+            }
+          });
+        } else {
+          console.log('ℹ️ Field is not API-based select');
+        }
+
+        console.groupEnd();
+      });
+
+      console.groupEnd();
+    });
+
+    console.groupEnd();
+  }
 
   getAction(actionId: string) {
     return this.formConfig.actions?.find((a: any) => a.id === actionId) || {};
@@ -127,7 +208,7 @@ export class AddProjectComponent implements OnInit {
       }
 
       this.isLoading = true;
-      
+
       // Show loading alert
       Swal.fire({
         title: 'Saving...',
@@ -137,38 +218,38 @@ export class AddProjectComponent implements OnInit {
           Swal.showLoading();
         }
       });
-      
+
       // Generate unique ID if not in edit mode
       if (!this.isEditMode) {
         this.form.id = this.generateUniqueId();
         this.form.createdAt = new Date().toISOString();
       }
       this.form.updatedAt = new Date().toISOString();
-      
+
       console.log('✅ Project Payload:', this.form);
-      
+
       // Read API endpoints from JSON config
       const apiEndpoints = this.formConfig.apiEndpoints || {};
-      
+
       let apiUrl: string;
       let method: 'post' | 'put';
-      
+
       if (this.isEditMode && this.projectId) {
-        apiUrl = apiEndpoints.update?.replace('{id}', this.projectId) || 
-                `http://localhost:3000/projects/${this.projectId}`;
+        apiUrl = apiEndpoints.update?.replace('{id}', this.projectId) ||
+          `http://localhost:3000/projects/${this.projectId}`;
         method = 'put';
       } else {
         apiUrl = apiEndpoints.create || 'http://localhost:3000/projects';
         method = 'post';
       }
-      
+
       let response;
       if (method === 'post') {
         response = await this.http.post(apiUrl, this.form).toPromise();
       } else {
         response = await this.http.put(apiUrl, this.form).toPromise();
       }
-      
+
       Swal.fire({
         icon: 'success',
         title: 'Success!',
@@ -179,10 +260,10 @@ export class AddProjectComponent implements OnInit {
       }).then(() => {
         this.router.navigate(['/projects']);
       });
-      
+
     } catch (error: any) {
       console.error('❌ Error saving project:', error);
-      
+
       let errorMessage = 'Error saving project. Please try again.';
       if (error.status === 400) {
         errorMessage = 'Invalid data. Please check your inputs.';
@@ -191,7 +272,7 @@ export class AddProjectComponent implements OnInit {
       } else if (error.status === 500) {
         errorMessage = 'Server error. Please try again later.';
       }
-      
+
       Swal.fire({
         icon: 'error',
         title: 'Save Failed',
@@ -223,13 +304,13 @@ export class AddProjectComponent implements OnInit {
   private validateForm(): boolean {
     const requiredFields = this.getRequiredFields();
     const missingFields: string[] = [];
-    
+
     for (const field of requiredFields) {
       if (!this.form[field.id] || this.form[field.id].toString().trim() === '') {
         missingFields.push(field.label);
       }
     }
-    
+
     if (missingFields.length > 0) {
       Swal.fire({
         icon: 'warning',
@@ -241,13 +322,13 @@ export class AddProjectComponent implements OnInit {
       });
       return false;
     }
-    
+
     return true;
   }
 
   private getRequiredFields(): any[] {
     const requiredFields: any[] = [];
-    
+
     if (this.formConfig?.sections) {
       this.formConfig.sections.forEach((section: any) => {
         if (section.fields) {
@@ -262,7 +343,7 @@ export class AddProjectComponent implements OnInit {
         }
       });
     }
-    
+
     return requiredFields;
   }
 

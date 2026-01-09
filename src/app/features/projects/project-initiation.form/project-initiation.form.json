@@ -2,7 +2,6 @@
   "title": "Add New Project",
   "icon": "folder-add",
   "subtitle": "Initiate a new project with client and timeline details.",
-  
   "apiEndpoints": {
     "create": "http://localhost:3000/projects",
     "list": "http://localhost:3000/projects",
@@ -10,21 +9,12 @@
     "update": "http://localhost:3000/projects/{id}",
     "delete": "http://localhost:3000/projects/{id}"
   },
-  
   "sections": [
     {
       "title": "Project & Client Details",
       "icon": "description",
       "layout": "two-column",
       "fields": [
-        {
-          "id": "projectCode",
-          "type": "text",
-          "label": "Project Code",
-          "required": true,
-          "placeholder": "PRJ-001",
-          "default": "PRJ-"
-        },
         {
           "id": "projectName",
           "type": "text",
@@ -71,20 +61,40 @@
           "type": "select",
           "label": "Project Type",
           "required": true,
-          "options": ["Internal", "External"]
+          "options": [
+            "Internal",
+            "External"
+          ]
+        },
+        {
+          "id": "projectManager",
+          "type": "select",
+          "label": "Project Manager",
+          "required": false,
+          "optionsSource": {
+            "type": "api",
+            "url": "http://localhost:3000/employees",
+            "method": "GET",
+            "valueKey": "id",
+            "labelKey": "employeeName"
+          },
+          "placeholder": "Select Project Manager"
         },
         {
           "id": "projectStatus",
           "type": "select",
           "label": "Project Status",
           "required": true,
-          "options": ["Active", "On-Hold", "Completed"],
+          "options": [
+            "Active",
+            "On-Hold",
+            "Completed"
+          ],
           "default": "Active"
         }
       ]
     }
   ],
-  
   "actions": [
     {
       "id": "save",
