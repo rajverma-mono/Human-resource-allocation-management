@@ -16,24 +16,26 @@ export class LoginPageComponent {
   error = '';
   headerConfig = layoutConfig.header;
 
-  private mockUsers = [
-    {
-      email: 'hr@company.com',
-      password: 'hr123',
-      role: 'hr'
-    },
-    {
-      email: 'manager@company.com',
-      password: 'mgr123',
-      role: 'MGR-1'
-    }
-  ];
+ private mockUsers = [
+  {
+    email: 'admin@company.com',
+    password: 'admin123',
+    role: 'admin'
+  },
+  {
+    email: 'hr@company.com',
+    password: 'hr123',
+    role: 'hr'
+  }
+];
+
 
   constructor(private router: Router) {}
-
- login() {
+login() {
   const user = this.mockUsers.find(
-    u => u.email === this.email && u.password === this.password
+    u =>
+      u.email === this.email.trim() &&
+      u.password === this.password.trim()
   );
 
   if (!user) {
@@ -41,14 +43,12 @@ export class LoginPageComponent {
     return;
   }
 
-  localStorage.setItem('mockUser', JSON.stringify(user));
+  localStorage.setItem('user', JSON.stringify(user));
   localStorage.setItem('role', user.role);
 
-  if (user.role === 'hr') {
-    this.router.navigate(['/hr/employees']);
-  } else if (user.role === 'mgr') {
-    this.router.navigate(['/login']); 
-  }
+  // 🔥 Always redirect to app root
+  this.router.navigate(['/']);
 }
+
 
 }

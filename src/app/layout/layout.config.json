@@ -15,11 +15,12 @@
     "totalHeight": "140px"
   },
 
+ 
   "modules": [
     {
       "name": "HR Module",
       "code": "hr",
-      "roles": ["hr","mgr-1"],
+      "roles": ["hr", "admin"],
       "nav": [
         { "label": "Add Employee", "icon": "fas fa-user-plus", "route": "/hr/add-employee" },
         { "label": "Employee List", "icon": "fas fa-users", "route": "/hr/employees" }
@@ -28,21 +29,10 @@
     {
       "name": "Project Management",
       "code": "pm",
-      "route": "/projects/add",
-      "roles": ["hr", "pm", "lead"],
+      "roles": ["admin", "pm"],
       "nav": [
         { "label": "All Projects", "icon": "fas fa-briefcase", "route": "/projects/list" },
         { "label": "Create Project", "icon": "fas fa-plus-circle", "route": "/projects/add" }
-      ]
-    },
-    {
-      "name": "Allocation & Roster",
-      "code": "ar",
-      "route": "/roster",
-      "roles": ["admin", "", "pm"],
-      "nav": [
-        { "label": "Resource Allocation", "icon": "fas fa-sitemap", "route": "/roster/assign" },
-        { "label": "Roster Calendar", "icon": "fas fa-calendar", "route": "/roster/calendar" }
       ]
     }
   ]

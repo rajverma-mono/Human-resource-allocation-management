@@ -2,7 +2,7 @@
   class="h-full bg-white border-r border-gray-200 transition-all duration-300 relative"
   [ngClass]="isCollapsed ? 'w-20' : 'w-64'"
   style="box-shadow: 2px 0 12px rgba(91, 15, 20, 0.08);">
-  
+
   <!-- Toggle Button -->
   <button
     (click)="toggleSidebar()"
@@ -16,12 +16,13 @@
 
   <div class="h-full overflow-y-auto px-3 py-6">
 
-    <div *ngFor="let module of modules"
+    <!-- 🔥 USE visibleModules HERE -->
+    <div *ngFor="let module of visibleModules"
          routerLinkActive="module-active"
          [routerLinkActiveOptions]="{ exact: false }"
          class="mb-7">
 
-      <!-- MODULE NAME (pill design) - Expanded State -->
+      <!-- MODULE NAME (Expanded) -->
       <div *ngIf="!isCollapsed"
            class="w-fit px-5 py-2 mb-3 font-semibold text-[10px] uppercase 
                   tracking-widest rounded-full transition-all duration-300
@@ -29,9 +30,8 @@
         {{ module.name }}
       </div>
 
-      <!-- MODULE NAME - Collapsed State (Icon Only) -->
-      <div *ngIf="isCollapsed" 
-           class="flex justify-center mb-3">
+      <!-- MODULE NAME (Collapsed) -->
+      <div *ngIf="isCollapsed" class="flex justify-center mb-3">
         <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center
                     module-icon-collapsed">
           <span class="text-xs font-bold text-gray-500 uppercase">
@@ -50,16 +50,16 @@
                text-sm font-medium text-gray-700 hover:bg-gray-50
                transition-all duration-200 group relative"
         [ngClass]="isCollapsed ? 'justify-center py-3 px-2' : 'px-4 py-2.5'">
-        
-        <i *ngIf="item.icon" 
-           [class]="item.icon" 
+
+        <i *ngIf="item.icon"
+           [class]="item.icon"
            class="text-lg text-gray-600 group-hover:text-[#5b0f14] transition-colors"></i>
-        
+
         <span *ngIf="!isCollapsed" class="group-hover:text-gray-900 transition-colors">
           {{ item.label }}
         </span>
 
-        <!-- Tooltip for collapsed state -->
+        <!-- Tooltip (Collapsed) -->
         <div *ngIf="isCollapsed"
              class="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white 
                     text-xs rounded-md opacity-0 invisible group-hover:opacity-100 
@@ -75,6 +75,7 @@
 
   </div>
 </div>
+
 
 <!-- Add this to your component CSS -->
 <style>
@@ -129,24 +130,3 @@
 }
 </style>
 
-<!-- Add this to your component TypeScript -->
-<!-- 
-export class YourComponent {
-  isCollapsed = false;
-
-  toggleSidebar() {
-    this.isCollapsed = !this.isCollapsed;
-  }
-
-  modules = [
-    {
-      name: 'HR MODULE',
-      nav: [
-        { label: 'Add Employee', route: '/add-employee', icon: 'bi bi-person-plus' },
-        { label: 'Employee List', route: '/employee-list', icon: 'bi bi-people' }
-      ]
-    }
-    // ... other modules
-  ];
-}
--->

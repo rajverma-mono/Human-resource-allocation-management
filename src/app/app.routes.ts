@@ -24,26 +24,26 @@ export const routes: Routes = [
         path: 'hr/add-employee',
         component: AddEmployeeComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['hr'] }
+        data: { roles: ['hr','admin'] }
       },
       {
         path: 'hr/employees',
         component: EmployeeListComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['hr'] }
+        data: { roles: ['hr','admin'] }
       },
       {
         path: 'hr/employees/:id',
         component: EmployeeDetailsComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['hr'] }
+        data: { roles: ['hr','admin'] }
       },
 
       {
         path: 'projects/add',
         component: AddProjectComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['hr', 'pm'] }
+        data: { roles: ['hr', 'admin'] }
       }
 
     ]
