@@ -1,0 +1,38 @@
+<app-page-header
+  [title]="config.title"
+  [subtitle]="config.subtitle"
+  [icon]="config.icon">
+</app-page-header>
+
+<!-- Loader -->
+<div *ngIf="loading" class="text-center py-10 text-gray-500">
+  Loading projects...
+</div>
+
+<div *ngIf="!loading && projects.length === 0"
+     class="text-center py-10 text-gray-500">
+  No projects found.
+</div>
+
+<div style="margin-top: 16px;"></div>
+
+<!-- SAME SEARCH ATOM -->
+<atom-search-filter
+  [config]="config.search"
+  [data]="projects"
+  (filtered)="onFiltered($event)">
+</atom-search-filter>
+
+<!-- SAME CARD ATOM -->
+<div
+  *ngIf="!loading && filteredProjects.length"
+  class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6"
+>
+  <atom-project-card
+    *ngFor="let project of filteredProjects; trackBy: trackByProjectId"
+    [data]="project"
+    (cardClick)="openProject(project)">
+  </atom-project-card>
+
+
+</div>

@@ -7,6 +7,7 @@ import { EmployeeListComponent } from './features/hr/pages/employee-list/employe
 import { EmployeeDetailsComponent } from './features/hr/pages/employee-details/employee-details.component';
 
 import { AddProjectComponent } from './features/projects/project-initiation.form/add-project.component';
+import { ProjectListComponent } from './features/projects/project-list/project-list.component';
 
 import { RoleGuard } from './services/role.guard';
 
@@ -39,13 +40,19 @@ export const routes: Routes = [
         data: { roles: ['hr','admin'] }
       },
 
+      /* ================= PROJECT MODULE ================= */
+      {
+        path: 'projects/list',
+        component: ProjectListComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['pm', 'admin'] }
+      },
       {
         path: 'projects/add',
         component: AddProjectComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['hr', 'admin'] }
+        data: { roles: ['pm', 'admin'] }
       }
-
     ]
   }
 ];

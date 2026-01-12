@@ -1,0 +1,70 @@
+{
+  "title": "Projects",
+  "subtitle": "All projects currently in the system",
+  "icon": "assignment",
+
+  "apiEndpoints": {
+    "list": "{{API_BASE}}/projects"
+  },
+
+  "search": {
+    "placeholder": "Search projects...",
+    "keys": [
+      "projectName",
+      "projectCode",
+      "clientName",
+      "projectType"
+    ],
+    "filters": [
+      {
+        "key": "projectStatus",
+        "label": "Status",
+        "type": "select",
+        "options": [
+          "Active",
+          "On-Hold",
+          "Closed"
+        ]
+      },
+      {
+        "key": "projectType",
+        "label": "Type",
+        "type": "select",
+        "options": [
+          "Internal",
+          "External"
+        ]
+      }
+    ]
+  },
+
+  "card": {
+    "cardClass": "bg-white border border-red-100 rounded-2xl p-6 shadow-sm",
+
+    "header": {
+      "showAvatar": false,
+      "showStatus": true,
+      "statusKey": "projectStatus",
+      "statusClassMap": {
+        "Active": "bg-green-100 text-green-700",
+        "On-Hold": "bg-yellow-100 text-yellow-700",
+        "Closed": "bg-red-100 text-red-700"
+      }
+    },
+
+    "fields": [
+      {
+        "key": "projectCode",
+        "icon": "confirmation_number"
+      },
+      {
+        "key": "clientName",
+        "icon": "business"
+      },
+      {
+        "key": "projectType",
+        "icon": "category"
+      }
+    ]
+  }
+}

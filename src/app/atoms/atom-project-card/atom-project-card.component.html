@@ -1,0 +1,63 @@
+<div class="cursor-pointer bg-white border border-red-100 rounded-2xl p-6 shadow-sm
+         hover:shadow-md transition-all" (click)="cardClick.emit(data)">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-start mb-4">
+        <div>
+            <h3 class="text-lg font-bold text-gray-900 leading-snug
+         line-clamp-2 break-words" [title]="data.projectName">
+                {{ data.projectName }}
+            </h3>
+
+            <p class="text-xs text-gray-500 mt-1">
+                {{ data.projectCode }}
+            </p>
+        </div>
+
+        <span class="px-3 py-1 text-xs font-bold rounded-full" [ngClass]="getStatusClass()">
+            {{ data.projectStatus }}
+        </span>
+    </div>
+
+    <!-- BODY -->
+    <div class="grid grid-cols-2 gap-4 text-sm">
+        <div>
+            <p class="text-gray-400 text-xs">Client</p>
+            <p class="font-semibold text-gray-700">
+                {{ data.clientName || '-' }}
+            </p>
+        </div>
+
+        <div>
+            <p class="text-gray-400 text-xs">Type</p>
+            <p class="font-semibold text-gray-700">
+                {{ data.projectType }}
+            </p>
+        </div>
+
+        <div>
+            <p class="text-gray-400 text-xs">Start Date</p>
+            <p class="font-semibold text-gray-700">
+                {{ data.projectStartDate }}
+            </p>
+        </div>
+
+        <div>
+            <p class="text-gray-400 text-xs">End Date</p>
+            <p class="font-semibold text-gray-700">
+                {{ data.projectEndDate }}
+            </p>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="mt-5 flex justify-between items-center">
+        <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">
+            Project Details
+        </span>
+
+        <span class="text-[#801519] font-bold text-sm">
+            View →
+        </span>
+    </div>
+</div>
