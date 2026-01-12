@@ -20,7 +20,6 @@ import { Router } from '@angular/router';
   ]
 })
 
-
 export class LayoutComponent implements OnInit {
 
   layout: any = layoutConfig;
@@ -40,6 +39,11 @@ export class LayoutComponent implements OnInit {
   }
 
   private syncRole(): void {
+    // ✅ THIS IS THE FIX
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     const role = localStorage.getItem('role');
     if (!role) return;
 
@@ -55,4 +59,3 @@ export class LayoutComponent implements OnInit {
     this.navbarMenu = this.activeModule?.nav || [];
   }
 }
-
