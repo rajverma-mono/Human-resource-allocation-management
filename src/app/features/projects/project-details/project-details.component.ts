@@ -1,46 +1,45 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 
 import { environment } from '../../../../environment';
 import detailConfig from './project-detail.config.json';
-import requirementsConfig from '../project-requirements/project-requirements.config.json';
 
 import { DetailsCompositeComponent } from '../../../atoms/details-composite-project/details-composite.component';
-import { RequirementsSidePanelComponent } from '../project-requirements/requirements-side-panel.component';
+import { ProjectRequirementsModalComponent } from '../project-requirements/project-requirements-modal.component';
 
 @Component({
-  selector: 'app-project-details',
-  standalone: true,
-  imports: [
-    CommonModule,
-    HttpClientModule,
-    DetailsCompositeComponent,
-    RequirementsSidePanelComponent,
-    MatIconModule
-  ],
-  templateUrl: './project-details.component.html'
+    selector: 'app-project-details',
+    standalone: true,
+    imports: [
+        CommonModule,
+        HttpClientModule,
+        RouterModule,
+        DetailsCompositeComponent,
+        ProjectRequirementsModalComponent,
+        MatIconModule,
+    ],
+    templateUrl: './project-details.component.html'
 })
 export class ProjectDetailsComponent implements OnInit {
 
-  config = detailConfig;
-  project: any;
-  loading = true;
-  
-  // Requirements panel properties
-  showRequirementsPanel = false;
-  requirementsConfig = requirementsConfig;
-  existingRequirements: any;
-  loadingRequirements = false;
+    config = detailConfig;
+    project: any;
+    loading = true;
 
-  constructor(
-    private route: ActivatedRoute,
-    private http: HttpClient
-  ) {}
+    // Requirements modal properties
+    showRequirementsModal = false;
 
-  ngOnInit(): void {
+    constructor(
+        private route: ActivatedRoute,
+        private http: HttpClient,
+        private cdr: ChangeDetectorRef // ADD THIS
+
+    ) { }
+
+     ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const projectId = params.get('id');
       if (!projectId || projectId === ':id') {
@@ -53,8 +52,7 @@ export class ProjectDetailsComponent implements OnInit {
     });
   }
 
-  // In your loadProjectDetails method
-private loadProjectDetails(projectId: string) {
+    private loadProjectDetails(projectId: string) {
   const baseUrl = this.config.apiEndpoints?.detail?.replace(
     '{{API_BASE}}',
     environment.API_BASE
@@ -62,222 +60,135 @@ private loadProjectDetails(projectId: string) {
 
   const url = `${baseUrl}/${projectId}`;
   
-  console.log('Fetching from URL:', url); // Add this
+  console.log('Fetching from URL:', url);
 
   this.http.get<any>(url).subscribe({
     next: (res) => {
-      console.log('API Response:', res); // Add this
-      this.project = res;
+      console.log('✅ API Response received:', res);
+      console.log('✅ Response type:', typeof res);
+      console.log('✅ Response keys:', Object.keys(res));
+      
+      // Check if response is nested
+      if (res.data) {
+        console.log('✅ Found nested data property:', res.data);
+        this.project = res.data;
+      } else if (res.project) {
+        console.log('✅ Found nested project property:', res.project);
+        this.project = res.project;
+      } else {
+        console.log('✅ Using response directly');
+        this.project = res;
+      }
+      
+      console.log('✅ Project object after assignment:', this.project);
+      console.log('✅ Project ID:', this.project?.id || this.project?._id);
+      
       this.loading = false;
     },
     error: (err) => {
-      console.error('Failed to load project', err);
+      console.error('❌ Failed to load project', err);
       this.loading = false;
     }
   });
 }
-// Add this method to your ProjectDetailsComponent class
-logProjectToConsole() {
-  console.log('🔍 DEBUG - Project Data:', this.project);
-  console.log('🔍 DEBUG - Config:', this.config);
-  console.log('🔍 DEBUG - Loading state:', this.loading);
-}
-  private enhanceProjectData(projectData: any): any {
-    // Add calculated fields if needed
-    return {
-      ...projectData,
-      completionPercentage: projectData.completionPercentage || 0,
-      resourceCount: projectData.resourceCount || 0,
-      teamCount: projectData.teamCount || 0
-    };
-  }
 
-  // Handle actions from details composite component
-  onAction(action: string) {
-    console.log('Action triggered:', action);
-    
-    switch(action) {
-      case 'requirements':
-        this.openRequirementsPanel();
-        break;
-      case 'edit':
-        this.handleEditProject();
-        break;
-      case 'allocate':
-        this.handleResourceAllocation();
-        break;
-      case 'report':
-        this.generateReport();
-        break;
-      // Add more cases as needed from your config
-      default:
-        console.log('Unhandled action:', action);
+    // Handle actions from details composite component
+    onAction(action: string) {
+        console.log('Action triggered:', action);
+
+        switch (action) {
+            case 'requirements':
+                this.openRequirementsModal();
+                break;
+            case 'edit':
+                this.handleEditProject();
+                break;
+            case 'allocate':
+                this.handleResourceAllocation();
+                break;
+            case 'report':
+                this.generateReport();
+                break;
+            default:
+                console.log('Unhandled action:', action);
+        }
     }
+
+    // Open requirements modal
+    openRequirementsModal() {
+    this.showRequirementsModal = true;
+    this.cdr.detectChanges(); // TRIGGER CHANGE DETECTION
   }
 
-  // Open requirements side panel
-// Open requirements side panel
-openRequirementsPanel() {
-  if (!this.project) return;
-  
-  this.loadingRequirements = true;
-  this.showRequirementsPanel = true;
-  
-  // Try to load existing requirements
-  const getUrl = this.requirementsConfig.apiEndpoints?.get
-    ?.replace('{{API_BASE}}', environment.API_BASE)
-    ?.replace('{{projectId}}', this.project.id || this.project._id || this.project.projectId);
-  
-  if (getUrl) {
-    this.http.get<any>(getUrl).subscribe({
-      next: (requirements) => {
-        this.existingRequirements = requirements;
-        this.loadingRequirements = false;
-      },
-      error: (err) => {
-        // No existing requirements - that's OK for first time!
-        console.log('No existing requirements found, opening empty form');
-        this.existingRequirements = null;
-        this.loadingRequirements = false;
-      }
-    });
-  } else {
-    this.loadingRequirements = false;
-  }
-}
 
-  // Close requirements panel
-  closeRequirementsPanel() {
-    this.showRequirementsPanel = false;
-    this.existingRequirements = null;
-  }
-
-  // Save requirements data
-  saveRequirements(data: any) {
-    if (!this.project) return;
-    
-    const saveUrl = this.requirementsConfig.apiEndpoints.save
-      .replace('{{API_BASE}}', environment.API_BASE)
-      .replace('{{projectId}}', this.project.id || this.project.projectId);
-    
-    // Ensure projectName is included
-    data.projectName = this.project.projectName || this.project.project_name;
-    
-    // Process skills array if present
-    if (data.requiredSkills && Array.isArray(data.requiredSkills)) {
-      data.requiredSkills = data.requiredSkills.join(',');
+    // Close requirements modal
+    closeRequirementsModal() {
+        this.showRequirementsModal = false;
     }
-    
-    this.http.post(saveUrl, data).subscribe({
-      next: (response) => {
-        console.log('Requirements saved successfully:', response);
-        this.closeRequirementsPanel();
-        // Show success notification
-        this.showNotification('Requirements saved successfully!', 'success');
-        
-        // Optionally reload project data to reflect changes
-        this.loadProjectDetails(this.project.id || this.project.projectId);
-      },
-      error: (err) => {
-        console.error('Failed to save requirements:', err);
-        // Show error notification
-        this.showNotification('Failed to save requirements. Please try again.', 'error');
-      }
-    });
-  }
 
-  // Handle edit project
-  private handleEditProject() {
-    // Implement edit project logic
-    console.log('Edit project:', this.project);
-    // Navigate to edit page or open edit modal
-  }
+    // Handle requirements saved
+    onRequirementsSaved() {
+        this.showRequirementsModal = false;
+        // Show success message or refresh data
+        console.log('Requirements saved successfully');
+        // Optionally refresh project data
+        if (this.project?.id) {
+            this.loadProjectDetails(this.project.id);
+        }
+    }
 
-  // Handle resource allocation
-  private handleResourceAllocation() {
-    // Implement resource allocation logic
-    console.log('Resource allocation for:', this.project);
-    // Navigate to allocation page or open allocation modal
-  }
+    // Handle quick actions
+    onQuickAction(event: any) {
+        if (typeof event === 'string') {
+            this.onAction(event);
+        } else if (event?.action) {
+            this.onAction(event.action);
+        }
+    }
 
-  // Generate report
-  private generateReport() {
-    // Implement report generation logic
-    console.log('Generate report for:', this.project);
-  }
+    // Other action handlers
+    private handleEditProject() {
+        console.log('Edit project:', this.project);
+        // Navigate to edit page
+        // this.router.navigate(['/projects/edit', this.project.id]);
+    }
 
-// Quick action handlers from side panel
-onQuickAction(event: any) {
-  console.log('Quick action event:', event);
-  
-  // Extract action from the event
-  let action: string;
-  let data: any;
-  
-  if (typeof event === 'string') {
-    action = event;
-  } else if (event?.action) {
-    // If event has action property
-    action = event.action;
-    data = event.data;
-  } else if (event?.target?.value) {
-    // If it's a DOM event
-    action = event.target.value;
-  } else {
-    console.error('Unknown quick action format:', event);
-    return;
-  }
-  
-  console.log('Processing action:', action);
-  
-  switch(action) {
-    case 'addEmployee':
-      this.addEmployeeToProject();
-      break;
-    case 'viewTeam':
-      this.viewProjectTeam();
-      break;
-    case 'updateProgress':
-      this.updateProjectProgress();
-      break;
-    // Add more quick actions as needed
-    default:
-      console.log('Unhandled quick action:', action);
-  }
-}
+    private handleResourceAllocation() {
+        console.log('Resource allocation for:', this.project);
+        // Navigate to allocation page
+        // this.router.navigate(['/projects', this.project.id, 'allocation']);
+    }
 
-  // Additional quick action methods
-  private addEmployeeToProject() {
-    console.log('Add employee to project');
-    // Implement add employee logic
-  }
+    private generateReport() {
+        console.log('Generate report for:', this.project);
+        // Implement report generation
+    }
 
-  private viewProjectTeam() {
-    console.log('View project team');
-    // Implement view team logic
-  }
+    private addEmployeeToProject() {
+        console.log('Add employee to project');
+        // Implement add employee logic
+    }
 
-  private updateProjectProgress() {
-    console.log('Update project progress');
-    // Implement update progress logic
-  }
+    private viewProjectTeam() {
+        console.log('View project team');
+        // Implement view team logic
+    }
 
-  // Helper method for notifications (you can use a toast service)
-  private showNotification(message: string, type: 'success' | 'error' | 'info') {
-    // Implement notification logic (e.g., using MatSnackBar)
-    console.log(`${type.toUpperCase()}: ${message}`);
-    
-    // Example with MatSnackBar (uncomment if you have it configured)
-    /*
-    this.snackBar.open(message, 'Close', {
-      duration: 3000,
-      panelClass: [`snackbar-${type}`]
-    });
-    */
-  }
+    private updateProjectProgress() {
+        console.log('Update project progress');
+        // Implement update progress logic
+    }
 
-  // Get formatted project ID for display
-  getProjectId(): string {
-    return this.project?.id || this.project?.projectId || 'N/A';
-  }
+    // Helper method for notifications
+    private showNotification(message: string, type: 'success' | 'error' | 'info') {
+        console.log(`${type.toUpperCase()}: ${message}`);
+        // You can implement toast/notification service here
+    }
+
+    // Debug method
+    logProjectToConsole() {
+        console.log('🔍 DEBUG - Project Data:', this.project);
+        console.log('🔍 DEBUG - Config:', this.config);
+        console.log('🔍 DEBUG - Loading state:', this.loading);
+    }
 }

@@ -1,0 +1,173 @@
+<!-- multi-select.component.html -->
+<div class="atom-multi-select w-full">
+  <!-- Label -->
+  <label *ngIf="label" class="block text-sm font-medium text-gray-700 mb-1">
+    {{ label }}
+    <span *ngIf="required" class="text-red-500">*</span>
+  </label>
+
+  <!-- Main Dropdown Container -->
+  <div class="relative">
+    <!-- Selected Values Display -->
+    <div class="min-h-[44px] border border-gray-300 rounded-lg bg-white cursor-pointer 
+                hover:border-gray-400 transition-all duration-200"
+         [class.border-[#5b0f14]!]="isOpen"
+         [class.border-red-500!]="hasError"
+         [class.opacity-50]="disabled"
+         [class.cursor-not-allowed]="disabled"
+         (click)="toggleDropdown()">
+      
+      <div class="flex items-center justify-between p-2">
+        <!-- Selected Chips -->
+        <div class="flex flex-wrap gap-1 flex-1">
+          <ng-container *ngIf="selectedValues.length > 0; else placeholderText">
+            <span *ngFor="let value of selectedValues" 
+                  class="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-[#5b0f14]/10 to-[#7a1419]/10 
+                         text-[#5b0f14] text-xs font-medium rounded border border-[#5b0f14]/20">
+              {{ getSelectedLabel(value) }}
+              <button type="button"
+                      (click)="removeSelection(value, $event)"
+                      class="w-3 h-3 flex items-center justify-center rounded-full hover:bg-[#5b0f14] hover:text-white 
+                             transition-colors duration-150 ml-0.5">
+                <mat-icon class="!text-xs !w-2.5 !h-2.5">close</mat-icon>
+              </button>
+            </span>
+          </ng-container>
+          
+          <ng-template #placeholderText>
+            <span class="text-gray-400">{{ placeholder }}</span>
+          </ng-template>
+        </div>
+
+        <!-- Clear and Chevron Icons -->
+        <div class="flex items-center gap-1 ml-2">
+          <button *ngIf="clearable && selectedValues.length > 0"
+                  type="button"
+                  (click)="clearSelection($event)"
+                  class="p-1 rounded hover:bg-gray-100 transition-colors">
+            <mat-icon class="!text-base text-gray-400">close</mat-icon>
+          </button>
+          <mat-icon class="!text-base text-gray-400 transition-transform duration-200"
+                    [class.rotate-180]="isOpen">
+            expand_more
+          </mat-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dropdown Options -->
+    <div *ngIf="isOpen" 
+         class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl 
+                max-h-60 overflow-y-auto"
+         (click)="$event.stopPropagation()">
+      
+      <!-- Search Input -->
+      <div *ngIf="searchable" class="sticky top-0 bg-white border-b border-gray-200 p-2">
+        <div class="relative">
+          <mat-icon class="absolute left-2 top-1/2 transform -translate-y-1/2 !text-base text-gray-400">
+            search
+          </mat-icon>
+          <input type="text"
+                 [(ngModel)]="searchQuery"
+                 placeholder="Search..."
+                 class="w-full pl-8 pr-3 py-2 border-0 focus:ring-0 focus:outline-none text-sm"
+                 (click)="$event.stopPropagation()">
+        </div>
+      </div>
+
+      <!-- Options List -->
+      <div class="py-1">
+        <div *ngFor="let option of filteredOptions; trackBy: trackByValue"
+             class="px-3 py-2 hover:bg-gray-50 cursor-pointer flex items-center justify-between 
+                    transition-colors duration-150"
+             [class.opacity-50]="option.disabled"
+             [class.cursor-not-allowed]="option.disabled"
+             (click)="toggleSelection(option)">
+          
+          <div class="flex items-center gap-3">
+            <!-- Checkbox -->
+            <div class="w-5 h-5 flex items-center justify-center border border-gray-300 rounded 
+                       transition-all duration-200"
+                 [class.bg-gradient-to-r]="isSelected(option.value)"
+                 [class.from-[#5b0f14]]="isSelected(option.value)"
+                 [class.to-[#7a1419]]="isSelected(option.value)"
+                 [class.border-[#5b0f14]]="isSelected(option.value)">
+              <mat-icon *ngIf="isSelected(option.value)" 
+                        class="!text-sm text-white">
+                check
+              </mat-icon>
+            </div>
+            
+            <!-- Option Label -->
+            <span class="text-sm text-gray-900"
+                  [class.font-medium]="isSelected(option.value)">
+              {{ option.label }}
+            </span>
+          </div>
+
+          <!-- Disabled Badge -->
+          <span *ngIf="option.disabled" class="text-xs text-gray-500 px-2 py-0.5 bg-gray-100 rounded">
+            Disabled
+          </span>
+        </div>
+
+        <!-- No Results -->
+        <div *ngIf="filteredOptions.length === 0" 
+             class="px-3 py-8 text-center text-gray-500">
+          <mat-icon class="!text-3xl text-gray-300 mb-2">search_off</mat-icon>
+          <p class="text-sm">No results found</p>
+        </div>
+      </div>
+
+      <!-- Selection Counter -->
+      <div *ngIf="maxSelections > 0" 
+           class="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-3 py-2">
+        <p class="text-xs text-gray-600">
+          {{ selectedValues.length }} of {{ maxSelections }} selected
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <p *ngIf="hasError" class="mt-1 text-xs text-red-600 font-medium">
+    {{ errorMessage || 'Please select at least one option' }}
+  </p>
+</div>
+
+<!-- Backdrop for closing dropdown -->
+<div *ngIf="isOpen" 
+     class="fixed inset-0 z-40"
+     (click)="closeDropdown()">
+</div>
+
+
+
+<style>
+.atom-multi-select .max-h-60 {
+  max-height: 15rem;
+}
+
+.atom-multi-select .rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.atom-multi-select .overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.atom-multi-select .overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.atom-multi-select .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.atom-multi-select .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+</style>

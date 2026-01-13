@@ -1,0 +1,273 @@
+<!-- Modal Backdrop -->
+<div *ngIf="isOpen" class="fixed inset-0 z-50 overflow-y-auto">
+  <!-- Backdrop -->
+  <div class="fixed inset-0 bg-black/50 transition-opacity" (click)="close()"></div>
+  
+  <!-- Modal Container -->
+  <div class="flex min-h-full items-center justify-center p-4">
+    <!-- Modal Content -->
+    <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      
+      <!-- Header -->
+      <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-8 py-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <mat-icon class="!text-2xl text-[#5b0f14]">{{ formConfig?.icon || 'list_alt' }}</mat-icon>
+            <h2 class="text-2xl font-bold text-gray-900">{{ formConfig?.title || 'Project Requirements' }}</h2>
+          </div>
+          <button (click)="close()" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <mat-icon class="!text-xl text-gray-500">close</mat-icon>
+          </button>
+        </div>
+        <p class="text-gray-600 mt-2">Define resource requirements for: <strong>{{ project?.projectName }}</strong></p>
+      </div>
+      
+      <!-- Form Content -->
+      <div class="overflow-y-auto p-8" style="max-height: calc(90vh - 140px)">
+        
+        @if (!formConfig) {
+          <div class="flex justify-center py-20">
+            <div class="w-12 h-12 border-4 border-[#5b0f14]/20 border-t-[#5b0f14] rounded-full animate-spin"></div>
+          </div>
+        }
+        
+        @if (formConfig) {
+          
+          <app-page-header [title]="formConfig.title" [icon]="formConfig.icon">
+          </app-page-header>
+          
+          @if(formConfig.sections && formConfig.sections.length > 0) {
+            
+            @for(section of formConfig.sections; track section.title) {
+              
+              <div class="mt-8">
+                
+                <h3 class="text-lg font-bold text-[#5b0f14] mb-6 flex items-center gap-3">
+                  <mat-icon>{{ section.icon }}</mat-icon>
+                  {{ section.title }}
+                </h3>
+                
+                <div class="grid gap-6" [ngClass]="section.layout === 'two-column' ? 'grid-cols-2' : 'grid-cols-1'">
+                  
+                  @for(field of section.fields; track field.id) {
+                    
+                    @if(shouldShowField(field)) {
+                      
+                      @switch(field.type) {
+                        
+                        @case('text') {
+                          <atom-input 
+                            [value]="form[field.id]" 
+                            (valueChange)="form[field.id] = $event" 
+                            [label]="field.label" 
+                            type="text"
+                            [validation]="field.validation || 'none'" 
+                            [placeholder]="field.placeholder || field.label"
+                            [required]="field.required || false" 
+                            [maxLength]="field.maxLength || null"
+                            [disabled]="field.disabled || false" 
+                            [errorMessage]="field.errorMessage || ''"
+                            [className]="field.className || ''" 
+                            [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+                            [borderColor]="field.borderColor || 'border-gray-300'" 
+                            [rounded]="field.rounded || 'rounded-lg'"
+                            [fullWidth]="field.fullWidth !== false" 
+                            [pattern]="field.pattern || undefined"
+                            [showToggleIcon]="field.showToggleIcon || false" />
+                        }
+                        
+                        @case('number') {
+                          <atom-input 
+                            [value]="form[field.id]" 
+                            (valueChange)="form[field.id] = $event" 
+                            [label]="field.label" 
+                            type="number"
+                            [validation]="field.validation || 'numeric'" 
+                            [placeholder]="field.placeholder || field.label"
+                            [required]="field.required || false" 
+                            [maxLength]="field.maxLength || null"
+                            [disabled]="field.disabled || false" 
+                            [errorMessage]="field.errorMessage || ''"
+                            [className]="field.className || ''" 
+                            [backgroundColor]="field.bgColor || field.backgroundColor || ''"
+                            [borderColor]="field.borderColor || 'border-gray-300'" 
+                            [rounded]="field.rounded || 'rounded-lg'"
+                            [fullWidth]="field.fullWidth !== false" 
+                             />
+                        }
+                        
+                        @case('select') {
+                          <div class="flex flex-col">
+                            <label class="text-sm font-semibold mb-1">
+                              {{field.label}}
+                              @if(field.required) {
+                                <span class="text-red-500">*</span>
+                              }
+                            </label>
+                            
+                            <atom-select 
+                              [options]="(selectOptionsMap[field.id] || field.options) | selectOptions"
+                              [value]="form[field.id]" 
+                              (valueChange)="form[field.id] = $event"
+                              [placeholder]="field.placeholder || 'Select ' + field.label" 
+                              [disabled]="field.disabled || false"
+                              class="w-full"
+                              (valueChange)="field.id === 'requiredRoles' ? onRoleSelectionChange() : null" />
+                            
+                            @if(field.note) {
+                              <span class="text-xs text-gray-500 mt-1">{{field.note}}</span>
+                            }
+                            
+                            @if(field.required && !form[field.id]) {
+                              <span class="text-xs text-red-500 mt-1">* Required</span>
+                            }
+                          </div>
+                        }
+                        
+                        @case('multi-select') {
+                          <div class="flex flex-col">
+                            <label class="text-sm font-semibold mb-1">
+                              {{field.label}}
+                              @if(field.required) {
+                                <span class="text-red-500">*</span>
+                              }
+                            </label>
+                            
+                            <!-- Using the atom-multi-select component -->
+                            <atom-multi-select
+  [label]="field.label"
+  [placeholder]="field.placeholder || 'Select options'"
+  [required]="field.required || false"
+  [options]="field.options || []"
+  [(ngModel)]="form[field.id]"
+  (selectionChange)="onMultiSelectChange(field.id, $event)">
+</atom-multi-select>
+                            
+                            @if(field.note) {
+                              <span class="text-xs text-gray-500 mt-1">{{field.note}}</span>
+                            }
+                          </div>
+                        }
+                        
+                        @case('chip-input') {
+                          <div class="flex flex-col">
+                            <label class="text-sm font-semibold mb-1">
+                              {{field.label}}
+                              @if(field.required) {
+                                <span class="text-red-500">*</span>
+                              }
+                            </label>
+                            
+                            <!-- Using the atom-chip-input component -->
+                            <atom-chip-input
+  [label]="field.label"
+  [placeholder]="field.placeholder || 'Add items'"
+  [required]="field.required || false"
+  [(ngModel)]="form[field.id]">
+</atom-chip-input>
+                          </div>
+                        }
+                        
+                        @case('toggle') {
+                          <div class="flex flex-col">
+                            <!-- Using the atom-toggle component -->
+                           <atom-toggle
+  [label]="field.label"
+  [(ngModel)]="form[field.id]">
+</atom-toggle>
+                            
+                            @if(field.note) {
+                              <span class="text-xs text-gray-500 mt-1">{{field.note}}</span>
+                            }
+                          </div>
+                        }
+                        
+                        @case('dynamic-table') {
+                          <div *ngIf="shouldShowField(field)" class="mt-4">
+                            <!-- Using the atom-dynamic-table component -->
+                            <atom-dynamic-table
+                              [label]="field.label"
+                              [columns]="getTableColumns(field.id)"
+                              [data]="form[field.id] || []"
+                              [emptyMessage]="field.placeholder || 'No data available'"
+                              [allowAdd]="field.tableConfig?.allowAdd !== false"
+                              [allowRemove]="field.tableConfig?.allowRemove !== false"
+                              [maxRows]="field.tableConfig?.maxRows || 0"
+                              [disabled]="field.disabled || false"
+                              (cellChanged)="onDynamicTableCellChanged($event)"
+                              class="w-full">
+                            </atom-dynamic-table>
+                            
+                            <p *ngIf="field.hint" class="text-xs text-gray-500 mt-2">
+                              {{ field.hint }}
+                            </p>
+                          </div>
+                        }
+                        
+                        @default {
+                          <atom-input 
+                            [value]="form[field.id]" 
+                            (valueChange)="form[field.id] = $event" 
+                            [label]="field.label" 
+                            type="text"
+                            [placeholder]="field.placeholder || field.label" 
+                            [required]="field.required || false">
+                          </atom-input>
+                        }
+                      }
+                    }
+                  }
+                </div>
+              </div>
+            }
+            
+            <div class="flex justify-end gap-4 mt-12">
+              
+              @if(getAction('cancel')) {
+                <atom-button 
+                  [label]="getAction('cancel').label" 
+                  [variant]="getAction('cancel').variant || 'outlineSecondary'"
+                  [size]="getAction('cancel').size || 'md'" 
+                  [bgColor]="getAction('cancel').bgColor"
+                  [textColor]="getAction('cancel').textColor" 
+                  [borderColor]="getAction('cancel').borderColor"
+                  [fullWidth]="getAction('cancel').fullWidth || false" 
+                  (onClick)="cancel()">
+                </atom-button>
+              }
+              
+              @if(getAction('save')) {
+                <atom-button 
+                  [label]="getAction('save').label" 
+                  [variant]="getAction('save').variant || 'primary'"
+                  [size]="getAction('save').size || 'md'" 
+                  [bgColor]="getAction('save').bgColor"
+                  [textColor]="getAction('save').textColor" 
+                  [borderColor]="getAction('save').borderColor"
+                  [fullWidth]="getAction('save').fullWidth || false" 
+                  (onClick)="save()">
+                </atom-button>
+              }
+              
+            </div>
+            
+          } @else {
+            <div class="text-center py-8 text-gray-500">
+              No form fields configured
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>

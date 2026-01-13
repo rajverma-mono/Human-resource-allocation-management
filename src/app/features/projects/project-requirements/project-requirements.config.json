@@ -1,110 +1,231 @@
 {
-  "title": "Project Requirements",
-  "description": "Define resource requirements for this project",
-  "apiEndpoints": {
-    "save": "{{API_BASE}}/projects/{{projectId}}/requirements",
-    "get": "{{API_BASE}}/projects/{{projectId}}/requirements"
-  },
-  "fields": [
-    {
-      "key": "projectName",
-      "label": "Project Name",
-      "type": "text",
-      "defaultValue": "{{projectName}}",
-      "disabled": true,
-      "required": true,
-      "readonly": true
+    "title": "Define Project Requirements",
+    "icon": "list_alt",
+    "apiEndpoints": {
+        "create": "{{API_BASE}}/projects/{{projectId}}/requirements",
+        "update": "{{API_BASE}}/projects/{{projectId}}/requirements/{id}",
+        "getById": "{{API_BASE}}/projects/{{projectId}}/requirements/{id}"
     },
-    {
-      "key": "requiredHeadcount",
-      "label": "Required Headcount",
-      "type": "number",
-      "placeholder": "Enter number of employees required",
-      "required": true,
-      "min": 1,
-      "max": 100
-    },
-    {
-      "key": "requiredSkills",
-      "label": "Required Skills",
-      "type": "chip-input",
-      "placeholder": "Add skills (press Enter)",
-      "required": true,
-      "multiple": true,
-      "hint": "Enter skills separated by comma or press Enter"
-    },
-    {
-      "key": "requiredQualification",
-      "label": "Minimum Qualification",
-      "type": "select",
-      "options": [
-        { "value": "B.Tech", "label": "B.Tech / BE" },
-        { "value": "MCA", "label": "MCA" },
-        { "value": "BSc", "label": "B.Sc" },
-        { "value": "Diploma", "label": "Diploma" },
-        { "value": "M.Tech", "label": "M.Tech / ME" },
-        { "value": "MBA", "label": "MBA" },
-        { "value": "Other", "label": "Other" }
-      ],
-      "required": false
-    },
-    {
-      "key": "requiredExperience",
-      "label": "Required Experience (Years)",
-      "type": "number",
-      "placeholder": "Minimum years of experience",
-      "min": 0,
-      "max": 30,
-      "step": 0.5,
-      "required": false
-    },
-    {
-      "key": "workType",
-      "label": "Work Type",
-      "type": "radio-group",
-      "required": true,
-      "options": [
-        { "value": "Onsite", "label": "Onsite" },
-        { "value": "Remote", "label": "Remote" },
-        { "value": "Office", "label": "Office" }
-      ]
-    },
-    {
-      "key": "officeLocation",
-      "label": "Office Location",
-      "type": "text",
-      "placeholder": "Enter work location",
-      "required": false
-    },
-    {
-      "key": "customerPresenceRequired",
-      "label": "Client Site Presence Required",
-      "type": "toggle",
-      "required": false
-    },
-    {
-      "key": "attendanceMode",
-      "label": "Attendance Mode",
-      "type": "select",
-      "required": false,
-      "options": [
-        { "value": "Biometric", "label": "Biometric" },
-        { "value": "System", "label": "System (Digital)" },
-        { "value": "Manual", "label": "Manual" }
-      ]
-    }
-  ],
-  "actions": [
-    {
-      "label": "Save Requirements",
-      "action": "save",
-      "variant": "primary",
-      "icon": "save"
-    },
-    {
-      "label": "Cancel",
-      "action": "cancel",
-      "variant": "secondary"
-    }
-  ]
+    "sections": [
+        {
+            "title": "Basic Requirements",
+            "icon": "info",
+            "layout": "two-column",
+            "fields": [
+                {
+                    "id": "projectName",
+                    "label": "Project Name",
+                    "type": "text",
+                    "placeholder": "Project name",
+                    "required": true,
+                    "disabled": true
+                },
+                {
+                    "id": "requiredHeadcount",
+                    "label": "Required Headcount",
+                    "type": "number",
+                    "placeholder": "Number of employees needed",
+                    "required": true,
+                    "min": 1,
+                    "max": 100,
+                    "default": 1
+                },
+                {
+                    "id": "workType",
+                    "label": "Work Type",
+                    "type": "select",
+                    "required": true,
+                    "options": [
+                        {
+                            "value": "Onsite",
+                            "label": "Onsite"
+                        },
+                        {
+                            "value": "Remote",
+                            "label": "Remote"
+                        },
+                        {
+                            "value": "Office",
+                            "label": "Office"
+                        },
+                        {
+                            "value": "Hybrid",
+                            "label": "Hybrid"
+                        }
+                    ],
+                    "default": "Onsite"
+                },
+                {
+                    "id": "officeLocation",
+                    "label": "Office Location",
+                    "type": "text",
+                    "placeholder": "Enter work location",
+                    "required": false
+                }
+            ]
+        },
+        {
+            "title": "Role Requirements",
+            "icon": "groups",
+            "layout": "one-column",
+            "fields": [
+                {
+                    "id": "requiredRoles",
+                    "label": "Roles Required",
+                    "type": "multi-select",
+                    "placeholder": "Select required roles",
+                    "required": true,
+                    "options": [
+                        {
+                            "value": "project_manager",
+                            "label": "Project Manager"
+                        },
+                        {
+                            "value": "developer",
+                            "label": "Developer"
+                        },
+                        {
+                            "value": "designer",
+                            "label": "UI/UX Designer"
+                        },
+                        {
+                            "value": "qa",
+                            "label": "QA Engineer"
+                        },
+                        {
+                            "value": "ba",
+                            "label": "Business Analyst"
+                        },
+                        {
+                            "value": "devops",
+                            "label": "DevOps Engineer"
+                        }
+                    ]
+                },
+                {
+                    "id": "roleExperienceMap",
+                    "type": "dynamic-table",
+                    "label": "Role Experience & Skills Requirements",
+                    "conditional": "requiredRoles.length > 0",
+                    "tableConfig": {
+                        "columns": [
+                            {
+                                "key": "roleName",
+                                "label": "Role",
+                                "type": "text",
+                                "readonly": true,
+                                "width": "20%"
+                            },
+                            {
+                                "key": "minExperience",
+                                "label": "Min Experience (years)",
+                                "type": "number",
+                                "min": 0,
+                                "max": 30,
+                                "width": "15%"
+                            },
+                            {
+                                "key": "qualification",
+                                "label": "Qualification",
+                                "type": "select",
+                                "options": [
+                                    {
+                                        "value": "B.Tech",
+                                        "label": "B.Tech / BE"
+                                    },
+                                    {
+                                        "value": "MCA",
+                                        "label": "MCA"
+                                    },
+                                    {
+                                        "value": "BSc",
+                                        "label": "B.Sc"
+                                    },
+                                    {
+                                        "value": "Diploma",
+                                        "label": "Diploma"
+                                    },
+                                    {
+                                        "value": "M.Tech",
+                                        "label": "M.Tech / ME"
+                                    },
+                                    {
+                                        "value": "MBA",
+                                        "label": "MBA"
+                                    },
+                                    {
+                                        "value": "Other",
+                                        "label": "Other"
+                                    }
+                                ],
+                                "width": "20%"
+                            },
+                            {
+                                "key": "requiredSkills",
+                                "label": "Required Skills",
+                                "type": "chip-input",
+                                "placeholder": "Add skills for this role",
+                                "width": "50%"
+                            }
+                        ],
+                        "allowAdd": false,
+                        "allowRemove": false,
+                        "maxRows": 0
+                    }
+                }
+            ]
+        },
+        {
+            "title": "Technical Requirements",
+            "icon": "code",
+            "layout": "one-column",
+            "fields": [
+                
+                {
+                    "id": "customerPresenceRequired",
+                    "label": "Client Site Presence Required",
+                    "type": "toggle",
+                    "default": false
+                },
+                {
+                    "id": "attendanceMode",
+                    "label": "Attendance Mode",
+                    "type": "select",
+                    "required": false,
+                    "options": [
+                        {
+                            "value": "Biometric",
+                            "label": "Biometric"
+                        },
+                        {
+                            "value": "System",
+                            "label": "System (Digital)"
+                        },
+                        {
+                            "value": "Manual",
+                            "label": "Manual"
+                        },
+                        {
+                            "value": "Flexible",
+                            "label": "Flexible"
+                        }
+                    ],
+                    "default": "System"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "id": "cancel",
+            "label": "Cancel",
+            "variant": "outlineSecondary"
+        },
+        {
+            "id": "save",
+            "label": "Save Requirements",
+            "variant": "primary",
+            "bgcolor": "red"
+        }
+    ]
 }

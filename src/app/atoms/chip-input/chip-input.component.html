@@ -1,0 +1,74 @@
+<!-- chip-input.component.html -->
+<div class="atom-chip-input w-full">
+  <!-- Label -->
+  <label *ngIf="label" class="block text-sm font-medium text-gray-700 mb-1">
+    {{ label }}
+    <span *ngIf="required" class="text-red-500">*</span>
+  </label>
+
+  <!-- Chips Container -->
+  <div class="relative">
+    <!-- Chips Display -->
+    <div class="flex flex-wrap gap-2 p-2 min-h-[44px] border border-gray-300 rounded-lg 
+                focus-within:ring-2 focus-within:ring-[#5b0f14] focus-within:border-[#5b0f14]
+                hover:border-gray-400 transition-all duration-200"
+         [class.border-red-500]="hasError"
+         [class.opacity-50]="disabled">
+      
+      <!-- Existing Chips -->
+      <span *ngFor="let chip of chips" 
+            class="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-[#5b0f14]/10 to-[#7a1419]/10 
+                   text-[#5b0f14] text-sm font-medium rounded-full border border-[#5b0f14]/20
+                   hover:bg-gradient-to-r hover:from-[#5b0f14]/20 hover:to-[#7a1419]/20 transition-all duration-200">
+        {{ chip }}
+        <button type="button" 
+                (click)="removeChip(chip)"
+                [disabled]="disabled"
+                class="w-4 h-4 flex items-center justify-center rounded-full hover:bg-[#5b0f14] hover:text-white 
+                       transition-colors duration-150 ml-1">
+          <mat-icon class="!text-sm !w-3 !h-3">close</mat-icon>
+        </button>
+      </span>
+      
+      <!-- Input Field -->
+      <input type="text" 
+             [(ngModel)]="inputValue"
+             (keydown)="onKeyDown($event)"
+             (blur)="onTouchedFn()"
+             (keyup.enter)="addChip()"
+             [placeholder]="chips.length === 0 ? placeholder : ''"
+             [disabled]="disabled"
+             class="flex-1 min-w-[120px] border-0 focus:ring-0 focus:outline-none bg-transparent 
+                    placeholder-gray-400 text-gray-900"
+             [class.cursor-not-allowed]="disabled">
+    </div>
+    
+    <!-- Hint/Error Messages -->
+    <div class="mt-1 space-y-1">
+      <p *ngIf="hint && !hasError" class="text-xs text-gray-500">
+        {{ hint }}
+      </p>
+      <p *ngIf="hasError" class="text-xs text-red-600 font-medium">
+        {{ errorMessage || 'This field is required' }}
+      </p>
+      <p *ngIf="maxChips && chips.length >= maxChips" class="text-xs text-amber-600">
+        Maximum {{ maxChips }} chips allowed
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+.atom-chip-input input:disabled {
+  background-color: transparent;
+  cursor: not-allowed;
+}
+
+.atom-chip-input input::placeholder {
+  color: #9ca3af;
+}
+
+.atom-chip-input input:focus::placeholder {
+  color: #d1d5db;
+}
+</style>
