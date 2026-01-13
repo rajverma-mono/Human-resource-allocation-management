@@ -1,0 +1,110 @@
+{
+  "title": "Project Requirements",
+  "description": "Define resource requirements for this project",
+  "apiEndpoints": {
+    "save": "{{API_BASE}}/projects/{{projectId}}/requirements",
+    "get": "{{API_BASE}}/projects/{{projectId}}/requirements"
+  },
+  "fields": [
+    {
+      "key": "projectName",
+      "label": "Project Name",
+      "type": "text",
+      "defaultValue": "{{projectName}}",
+      "disabled": true,
+      "required": true,
+      "readonly": true
+    },
+    {
+      "key": "requiredHeadcount",
+      "label": "Required Headcount",
+      "type": "number",
+      "placeholder": "Enter number of employees required",
+      "required": true,
+      "min": 1,
+      "max": 100
+    },
+    {
+      "key": "requiredSkills",
+      "label": "Required Skills",
+      "type": "chip-input",
+      "placeholder": "Add skills (press Enter)",
+      "required": true,
+      "multiple": true,
+      "hint": "Enter skills separated by comma or press Enter"
+    },
+    {
+      "key": "requiredQualification",
+      "label": "Minimum Qualification",
+      "type": "select",
+      "options": [
+        { "value": "B.Tech", "label": "B.Tech / BE" },
+        { "value": "MCA", "label": "MCA" },
+        { "value": "BSc", "label": "B.Sc" },
+        { "value": "Diploma", "label": "Diploma" },
+        { "value": "M.Tech", "label": "M.Tech / ME" },
+        { "value": "MBA", "label": "MBA" },
+        { "value": "Other", "label": "Other" }
+      ],
+      "required": false
+    },
+    {
+      "key": "requiredExperience",
+      "label": "Required Experience (Years)",
+      "type": "number",
+      "placeholder": "Minimum years of experience",
+      "min": 0,
+      "max": 30,
+      "step": 0.5,
+      "required": false
+    },
+    {
+      "key": "workType",
+      "label": "Work Type",
+      "type": "radio-group",
+      "required": true,
+      "options": [
+        { "value": "Onsite", "label": "Onsite" },
+        { "value": "Remote", "label": "Remote" },
+        { "value": "Office", "label": "Office" }
+      ]
+    },
+    {
+      "key": "officeLocation",
+      "label": "Office Location",
+      "type": "text",
+      "placeholder": "Enter work location",
+      "required": false
+    },
+    {
+      "key": "customerPresenceRequired",
+      "label": "Client Site Presence Required",
+      "type": "toggle",
+      "required": false
+    },
+    {
+      "key": "attendanceMode",
+      "label": "Attendance Mode",
+      "type": "select",
+      "required": false,
+      "options": [
+        { "value": "Biometric", "label": "Biometric" },
+        { "value": "System", "label": "System (Digital)" },
+        { "value": "Manual", "label": "Manual" }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "label": "Save Requirements",
+      "action": "save",
+      "variant": "primary",
+      "icon": "save"
+    },
+    {
+      "label": "Cancel",
+      "action": "cancel",
+      "variant": "secondary"
+    }
+  ]
+}

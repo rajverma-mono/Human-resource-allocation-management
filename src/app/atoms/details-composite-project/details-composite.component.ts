@@ -1,18 +1,18 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-
+// Update the interfaces to be more flexible
 interface FieldConfig {
   label: string;
   key: string;
   icon?: string;
   hint?: string;
-  format?: 'date' | 'currency' | 'percentage';
+  format?: string; // Make it string instead of specific union
 }
 
 interface SectionConfig {
   title?: string;
-  type: 'info-grid' | 'list' | 'custom';
+  type: string; // Make it string to accept any value
   columns?: number;
   fields?: FieldConfig[];
   slot?: string;
@@ -21,7 +21,7 @@ interface SectionConfig {
 interface ActionConfig {
   label: string;
   action: string;
-  variant: 'primary' | 'secondary' | 'tertiary';
+  variant: string; // Make it string to accept any value
   icon?: string;
 }
 
@@ -43,7 +43,11 @@ interface Config {
     createdByKey?: string;
     lastUpdatedKey?: string;
   };
+  apiEndpoints?: {
+    detail?: string;
+  };
 }
+
 
 @Component({
   selector: 'details-composite',
