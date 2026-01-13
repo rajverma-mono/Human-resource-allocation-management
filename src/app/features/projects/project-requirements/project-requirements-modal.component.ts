@@ -107,70 +107,98 @@ export class ProjectRequirementsModalComponent implements OnInit {
   }
 
   private initializeForm() {
-    this.form = {};
-    this.form['projectName'] = this.project?.projectName || this.project?.name || '';
-    
-    if (this.formConfig?.sections) {
-      this.formConfig.sections.forEach((section: any) => {
-        if (section.fields) {
-          section.fields.forEach((field: any) => {
-            if (field.id === 'projectName') {
-              return;
-            }
-            
-            switch (field.type) {
-              case 'multi-select':
-              case 'chip-input':
-              case 'dynamic-table':
-                this.form[field.id] = field.default || [];
-                break;
-              case 'toggle':
-                this.form[field.id] = field.default || false;
-                break;
-              case 'number':
-                this.form[field.id] = field.default || 0;
-                break;
-              default:
-                this.form[field.id] = field.default || '';
-            }
-          });
+  this.form = {};
+
+  // ✅ IMPORTANT: bind projectId & projectName
+  this.form['projectId'] =
+    this.project?.id || this.project?._id || this.project?.projectId;
+
+  this.form['projectName'] =
+    this.project?.projectName || this.project?.name || '';
+
+  if (this.formConfig?.sections) {
+    this.formConfig.sections.forEach((section: any) => {
+      section.fields?.forEach((field: any) => {
+        if (field.id === 'projectName' || field.id === 'projectId') {
+          return;
+        }
+
+        switch (field.type) {
+          case 'multi-select':
+          case 'chip-input':
+          case 'dynamic-table':
+            this.form[field.id] = field.default || [];
+            break;
+
+          case 'toggle':
+            this.form[field.id] = field.default || false;
+            break;
+
+          case 'number':
+            this.form[field.id] = field.default || 0;
+            break;
+
+          default:
+            this.form[field.id] = field.default || '';
         }
       });
-    }
-    
-    this.loadExistingRequirements();
-  }
-
-  private loadExistingRequirements() {
-    if (!this.project || !this.formConfig?.apiEndpoints?.getById) return;
-    
-    const loadUrl = this.formConfig.apiEndpoints.getById.replace('{id}', '');
-    
-    this.http.get(loadUrl).subscribe({
-      next: (requirements: any) => {
-        this.form = { ...this.form, ...requirements };
-        
-        if (typeof this.form.roleExperienceMap === 'string') {
-          try {
-            this.form.roleExperienceMap = JSON.parse(this.form.roleExperienceMap);
-            this.form.roleExperienceMap = this.form.roleExperienceMap.map((item: any) => ({
-              ...item,
-              requiredSkills: typeof item.requiredSkills === 'string' 
-                ? item.requiredSkills.split(',').map((s: string) => s.trim()).filter(Boolean)
-                : item.requiredSkills || []
-            }));
-          } catch {
-            this.form.roleExperienceMap = [];
-          }
-        }
-        
-        this.form.projectName = this.project?.projectName || this.project?.name || '';
-      },
-      error: (err) => {
-        console.log('No existing requirements found:', err.status);
-      }
     });
   }
+
+  // ✅ Load existing requirements for this project
+  this.loadExistingRequirements();
+}
+
+ private loadExistingRequirements() {
+  if (!this.project || !this.formConfig?.apiEndpoints?.getById) return;
+
+  const loadUrl = this.formConfig.apiEndpoints.getById;
+  // Example:
+  // http://localhost:3000/requirements?projectId=proj-ug3btll9y
+
+  this.http.get<any[]>(loadUrl).subscribe({
+    next: (list) => {
+      if (!list || list.length === 0) {
+        console.log('ℹ️ No existing requirements found');
+        return;
+      }
+
+      const requirements = list[0]; // one requirement per project
+
+      this.form = {
+        ...this.form,
+        ...requirements
+      };
+
+      // ✅ Parse roleExperienceMap
+      if (typeof this.form.roleExperienceMap === 'string') {
+        try {
+          this.form.roleExperienceMap = JSON.parse(this.form.roleExperienceMap).map(
+            (item: any) => ({
+              ...item,
+              requiredSkills: item.requiredSkills
+                ? item.requiredSkills.split(',').map((s: string) => s.trim())
+                : []
+            })
+          );
+        } catch {
+          this.form.roleExperienceMap = [];
+        }
+      }
+
+      // Ensure project identifiers stay intact
+      this.form.projectId =
+        this.project?.id || this.project?._id || this.project?.projectId;
+
+      this.form.projectName =
+        this.project?.projectName || this.project?.name || '';
+    },
+    error: (err) => {
+      console.warn('⚠️ Failed to load requirements', err);
+    }
+  });
+}
+
 
   onRoleExperienceNumberChange(event: Event, index: number, field: string): void {
     const target = event.target as HTMLInputElement;
@@ -314,74 +342,77 @@ export class ProjectRequirementsModalComponent implements OnInit {
   }
 
   async save() {
-    try {
-      if (!this.validateForm()) {
-        return;
-      }
+  try {
+    if (!this.validateForm()) return;
 
-      this.isLoading = true;
-      
-      Swal.fire({
-        title: 'Saving...',
-        text: 'Please wait while we save requirements',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
+    this.isLoading = true;
 
-      const formData = { ...this.form };
-      
-      delete formData.requiredSkills;
-      
-      if (Array.isArray(formData.roleExperienceMap)) {
-        formData.roleExperienceMap = formData.roleExperienceMap.map((item: any) => ({
+    Swal.fire({
+      title: 'Saving...',
+      text: 'Please wait while we save requirements',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
+
+    // ✅ Ensure projectId is always saved
+    const formData: any = {
+      ...this.form,
+      projectId:
+        this.project?.id || this.project?._id || this.project?.projectId,
+      projectName:
+        this.project?.projectName || this.project?.name || ''
+    };
+
+    delete formData.requiredSkills;
+
+    // ✅ Normalize roleExperienceMap for DB
+    if (Array.isArray(formData.roleExperienceMap)) {
+      formData.roleExperienceMap = JSON.stringify(
+        formData.roleExperienceMap.map((item: any) => ({
           ...item,
-          requiredSkills: Array.isArray(item.requiredSkills) 
-            ? item.requiredSkills.join(',') 
+          requiredSkills: Array.isArray(item.requiredSkills)
+            ? item.requiredSkills.join(',')
             : item.requiredSkills || ''
-        }));
-        
-        formData.roleExperienceMap = JSON.stringify(formData.roleExperienceMap);
-      }
-
-      const saveUrl = this.formConfig.apiEndpoints?.create;
-      if (!saveUrl) {
-        throw new Error('Save API endpoint not configured');
-      }
-
-      const response = await this.http.post(saveUrl, formData).toPromise();
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Requirements saved successfully!',
-        confirmButtonColor: '#5b0f14',
-        timer: 2000,
-        timerProgressBar: true
-      }).then(() => {
-        this.saved.emit(response);
-        this.close();
-      });
-
-    } catch (error: any) {
-      console.error('Error saving requirements:', error);
-      
-      let errorMessage = 'Error saving requirements. Please try again.';
-      if (error.status === 400) errorMessage = 'Invalid data. Please check your inputs.';
-      if (error.status === 404) errorMessage = 'API endpoint not found. Check your backend.';
-      if (error.status === 500) errorMessage = 'Server error. Please try again later.';
-
-      Swal.fire({
-        icon: 'error',
-        title: 'Save Failed',
-        text: errorMessage,
-        confirmButtonColor: '#5b0f14'
-      });
-    } finally {
-      this.isLoading = false;
+        }))
+      );
     }
+
+    const saveUrl = this.formConfig.apiEndpoints?.create;
+    if (!saveUrl) throw new Error('Save API endpoint not configured');
+
+    const response = await this.http.post(saveUrl, formData).toPromise();
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: 'Requirements saved successfully!',
+      confirmButtonColor: '#5b0f14',
+      timer: 2000,
+      timerProgressBar: true
+    }).then(() => {
+      this.saved.emit(response);
+      this.close();
+    });
+
+  } catch (error: any) {
+    console.error('❌ Error saving requirements:', error);
+
+    let errorMessage = 'Error saving requirements. Please try again.';
+    if (error.status === 400) errorMessage = 'Invalid data.';
+    if (error.status === 404) errorMessage = 'API endpoint not found.';
+    if (error.status === 500) errorMessage = 'Server error.';
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Save Failed',
+      text: errorMessage,
+      confirmButtonColor: '#5b0f14'
+    });
+  } finally {
+    this.isLoading = false;
   }
+}
+
 
   cancel() {
     Swal.fire({

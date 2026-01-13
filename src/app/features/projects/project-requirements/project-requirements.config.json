@@ -2,9 +2,9 @@
     "title": "Define Project Requirements",
     "icon": "list_alt",
     "apiEndpoints": {
-        "create": "{{API_BASE}}/projects/{{projectId}}/requirements",
-        "update": "{{API_BASE}}/projects/{{projectId}}/requirements/{id}",
-        "getById": "{{API_BASE}}/projects/{{projectId}}/requirements/{id}"
+        "create": "{{API_BASE}}/requirements",
+        "update": "{{API_BASE}}/requirements/{id}",
+        "getById": "{{API_BASE}}/requirements?projectId={{projectId}}"
     },
     "sections": [
         {
@@ -180,7 +180,6 @@
             "icon": "code",
             "layout": "one-column",
             "fields": [
-                
                 {
                     "id": "customerPresenceRequired",
                     "label": "Client Site Presence Required",

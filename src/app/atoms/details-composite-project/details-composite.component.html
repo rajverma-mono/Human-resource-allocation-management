@@ -53,6 +53,12 @@
             <span class="text-sm font-semibold text-gray-700">Tenure:</span>
             <span class="text-sm text-gray-900">{{ data.projectTenure || '—' }} Months</span>
           </div>
+          <!-- Requirements Count -->
+          <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg">
+            <mat-icon class="!text-base !w-4 !h-4 text-[#5b0f14]">assignment</mat-icon>
+            <span class="text-sm font-semibold text-gray-700">Requirements:</span>
+            <span class="text-sm text-gray-900">{{ data.requirements?.requiredHeadcount || '0' }} Positions</span>
+          </div>
         </div>
       </div>
 
@@ -100,6 +106,23 @@
         (click)="emitAction(act.action)">
         <mat-icon *ngIf="act.icon" class="!text-base !w-4 !h-4">{{ act.icon }}</mat-icon>
         {{ act.label }}
+      </button>
+      <!-- Add Requirements Button -->
+      <button *ngIf="!data.requirements"
+              class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 
+                     shadow-sm hover:shadow-md active:scale-95 flex items-center gap-2
+                     bg-gradient-to-r from-[#5b0f14] to-[#7a1419] text-white hover:from-[#7a1419] hover:to-[#5b0f14]"
+              (click)="emitAction('addRequirements')">
+        <mat-icon class="!text-base !w-4 !h-4">add_circle</mat-icon>
+        Add Requirements
+      </button>
+      <button *ngIf="data.requirements"
+              class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 
+                     shadow-sm hover:shadow-md active:scale-95 flex items-center gap-2
+                     bg-white border border-gray-300 text-gray-700 hover:border-[#5b0f14] hover:text-[#5b0f14]"
+              (click)="emitAction('editRequirements')">
+        <mat-icon class="!text-base !w-4 !h-4">edit</mat-icon>
+        Edit Requirements
       </button>
     </div>
 
@@ -153,6 +176,167 @@
               <div *ngIf="field.hint" class="text-xs text-gray-500 mt-1">{{ field.hint }}</div>
             </div>
           </div>
+        </div>
+
+        <!-- Requirements Section -->
+        <div class="bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <mat-icon class="!text-base text-[#5b0f14]">assignment</mat-icon>
+                  Project Requirements
+                </h2>
+                <p class="text-sm text-gray-600 mt-1">Detailed resource requirements for this project</p>
+              </div>
+              <span *ngIf="data.requirements" class="text-xs font-semibold px-2.5 py-1 rounded-full 
+                    bg-gradient-to-r from-[#5b0f14]/10 to-[#7a1419]/10 text-[#5b0f14] border border-[#5b0f14]/20">
+                {{ data.requirements.requiredHeadcount }} Position(s)
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="data.requirements; else noRequirements" class="p-6">
+            <!-- Requirements Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div class="p-4 rounded-lg border border-gray-200 bg-white hover:border-[#5b0f14]/30 transition-colors">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-[#5b0f14]/10 flex items-center justify-center">
+                    <mat-icon class="!text-base text-[#5b0f14]">business</mat-icon>
+                  </div>
+                  <div>
+                    <div class="text-xs font-semibold text-gray-500 uppercase">Work Type</div>
+                    <div class="text-base font-bold text-gray-900">{{ data.requirements.workType }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-lg border border-gray-200 bg-white hover:border-[#5b0f14]/30 transition-colors">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-[#5b0f14]/10 flex items-center justify-center">
+                    <mat-icon class="!text-base text-[#5b0f14]">location_on</mat-icon>
+                  </div>
+                  <div>
+                    <div class="text-xs font-semibold text-gray-500 uppercase">Location</div>
+                    <div class="text-base font-bold text-gray-900">{{ data.requirements.officeLocation || 'Not specified' }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-lg border border-gray-200 bg-white hover:border-[#5b0f14]/30 transition-colors">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-[#5b0f14]/10 flex items-center justify-center">
+                    <mat-icon class="!text-base text-[#5b0f14]">schedule</mat-icon>
+                  </div>
+                  <div>
+                    <div class="text-xs font-semibold text-gray-500 uppercase">Attendance</div>
+                    <div class="text-base font-bold text-gray-900">{{ data.requirements.attendanceMode }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customer Presence -->
+            <div class="mb-6 p-4 rounded-lg border border-gray-200 bg-white">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-[#5b0f14]/10 flex items-center justify-center">
+                    <mat-icon class="!text-base text-[#5b0f14]">people</mat-icon>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-gray-900">Customer Presence Required</div>
+                    <div class="text-xs text-gray-500">Whether client representatives need to be onsite</div>
+                  </div>
+                </div>
+                <div [ngClass]="data.requirements.customerPresenceRequired 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-gray-100 text-gray-800'"
+                     class="px-3 py-1 rounded-full text-xs font-semibold">
+                  {{ data.requirements.customerPresenceRequired ? 'Yes' : 'No' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Required Roles & Experience -->
+            <div class="border-t border-gray-200 pt-6">
+              <h3 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <mat-icon class="!text-base text-[#5b0f14]">engineering</mat-icon>
+                Required Roles & Experience
+              </h3>
+              
+              <div *ngIf="data.requirements.roleExperienceMap?.length; else noRoles" class="space-y-3">
+                <div *ngFor="let role of data.requirements.roleExperienceMap" 
+                     class="p-4 rounded-lg border border-gray-200 bg-white hover:border-[#5b0f14]/30 transition-colors">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-2">
+                        <div class="w-6 h-6 rounded-md bg-[#5b0f14]/10 flex items-center justify-center">
+                          <mat-icon class="!text-xs text-[#5b0f14]">badge</mat-icon>
+                        </div>
+                        <span class="font-semibold text-gray-900 text-sm">{{ role.roleName }}</span>
+                      </div>
+                      <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span class="text-gray-500">Experience:</span>
+                          <span class="font-medium text-gray-900 ml-2">{{ role.yearsOfExperience }} years</span>
+                        </div>
+                        <div>
+                          <span class="text-gray-500">Skills:</span>
+                          <span class="font-medium text-gray-900 ml-2">{{ role.skillsRequired?.join(', ') || 'Not specified' }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noRoles>
+                <div class="text-center py-8 text-gray-500">
+                  <mat-icon class="!text-3xl text-gray-300 mb-2">info</mat-icon>
+                  <p>No specific roles defined</p>
+                </div>
+              </ng-template>
+            </div>
+
+            <!-- Metadata -->
+            <div class="mt-6 pt-6 border-t border-gray-200 text-xs text-gray-500">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <span class="flex items-center gap-1">
+                    <mat-icon class="!text-xs">calendar_today</mat-icon>
+                    Created: {{ getFormattedDate(data.requirements.createdAt) }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <mat-icon class="!text-xs">update</mat-icon>
+                    Updated: {{ getFormattedDate(data.requirements.updatedAt) }}
+                  </span>
+                </div>
+                <button (click)="emitAction('viewRequirementDetails')" 
+                        class="text-[#5b0f14] hover:text-[#7a1419] font-medium flex items-center gap-1">
+                  View Details
+                  <mat-icon class="!text-xs">chevron_right</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noRequirements>
+            <div class="p-8 text-center">
+              <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <mat-icon class="!text-2xl text-gray-400">assignment</mat-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-700 mb-2">No Requirements Defined</h3>
+              <p class="text-gray-500 mb-6 max-w-md mx-auto">
+                Add project requirements to define the roles, skills, and resources needed for this project.
+              </p>
+              <button (click)="emitAction('addRequirements')"
+                      class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 
+                             shadow-sm hover:shadow-md active:scale-95 flex items-center gap-2 mx-auto
+                             bg-gradient-to-r from-[#5b0f14] to-[#7a1419] text-white hover:from-[#7a1419] hover:to-[#5b0f14]">
+                <mat-icon class="!text-base !w-4 !h-4">add_circle</mat-icon>
+                Define Project Requirements
+              </button>
+            </div>
+          </ng-template>
         </div>
 
         <!-- Custom Slot Area -->
@@ -247,6 +431,18 @@
               <div class="flex-1">
                 <div class="text-sm font-medium text-gray-900">View Team</div>
                 <div class="text-xs text-gray-500">See all assigned resources</div>
+              </div>
+            </button>
+            
+            <button *ngIf="data.requirements" (click)="emitAction('matchResources')"
+                    class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white hover:shadow-sm 
+                           border border-gray-200 hover:border-[#5b0f14]/30 transition-all duration-200 text-left">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-[#5b0f14]/10 to-[#7a1419]/10 flex items-center justify-center">
+                <mat-icon class="!text-base text-[#5b0f14]">connect_without_contact</mat-icon>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-900">Match Resources</div>
+                <div class="text-xs text-gray-500">Find employees matching requirements</div>
               </div>
             </button>
             

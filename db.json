@@ -458,7 +458,7 @@
     },
     {
       "id": "proj-rxrlvfemj",
-      "projectName": "Resource allocation management ",
+      "projectName": "Resource allocation management",
       "workOrderNumber": "1234RAMS",
       "clientName": "KEENABLE",
       "projectTenure": "6",
@@ -486,7 +486,7 @@
     },
     {
       "id": "proj-dtvn4dsuf",
-      "projectName": " UPSC SOAP",
+      "projectName": "UPSC SOAP",
       "workOrderNumber": "2342SOAPUPSC",
       "clientName": "UPSC",
       "projectTenure": "29",
@@ -499,5 +499,27 @@
       "updatedAt": "2026-01-12T09:29:33.502Z"
     }
   ],
-   "requirements": []
+  "requirements": [
+  
+    {
+      "id": "req-f9c1",
+      "projectId": "proj-ug3btll9y",
+      "projectName": "UPSC ORA",
+      "requiredHeadcount": 1,
+      "workType": "Onsite",
+      "officeLocation": "Delhi",
+      "requiredRoles": [
+        "project_manager",
+        "developer",
+        "designer",
+        "qa",
+        "devops"
+      ],
+      "roleExperienceMap": "[{\"role\":\"project_manager\",\"roleName\":\"Project Manager\",\"minExperience\":4,\"qualification\":\"B.Tech\",\"requiredSkills\":\"Technical lead\"},{\"role\":\"developer\",\"roleName\":\"Developer\",\"minExperience\":5,\"qualification\":\"B.Tech\",\"requiredSkills\":\"Angular,docker,java\"},{\"role\":\"designer\",\"roleName\":\"UI/UX Designer\",\"minExperience\":1,\"qualification\":\"B.Tech\",\"requiredSkills\":\"figma\"},{\"role\":\"qa\",\"roleName\":\"QA Engineer\",\"minExperience\":1,\"qualification\":\"B.Tech\",\"requiredSkills\":\"selenium,Robotic framework\"},{\"role\":\"devops\",\"roleName\":\"DevOps Engineer\",\"minExperience\":2,\"qualification\":\"B.Tech\",\"requiredSkills\":\"jenkins\"}]",
+      "customerPresenceRequired": true,
+      "attendanceMode": "System",
+      "createdAt": "2026-01-13T10:15:00.000Z",
+      "updatedAt": "2026-01-13T10:15:00.000Z"
+    }
+  ]
 }

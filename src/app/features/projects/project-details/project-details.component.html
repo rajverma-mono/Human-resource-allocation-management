@@ -19,6 +19,9 @@
 
 <!-- Main Content -->
 <div *ngIf="!loading && project" class="relative">
+  
+
+
   <!-- Project Details -->
   <details-composite
     [config]="config"
@@ -26,19 +29,60 @@
     (action)="onAction($event)"
     (quickAction)="onQuickAction($event)">
     
-    <!-- Custom Slot Content -->
+    <!-- Custom Slot Content - Updated to show requirements info -->
     <div slot="allocation" class="p-4 bg-gray-50 rounded-lg">
-      <h4 class="font-semibold text-gray-800 mb-3">Resource Allocation</h4>
+      <div class="flex justify-between items-center mb-3">
+        <h4 class="font-semibold text-gray-800">Resource Allocation</h4>
+        <button *ngIf="project.requirements" 
+                (click)="openRequirementsModal()"
+                class="text-sm px-3 py-1 bg-[#5b0f14] text-white rounded hover:bg-[#7a1419]">
+          Edit Requirements
+        </button>
+      </div>
+      
       <div class="text-gray-600">
-        <p *ngIf="project.resourceCount > 0">
-          {{ project.resourceCount || 0 }} resources allocated
+        <div *ngIf="project.requirements">
+          <p class="mb-2">
+            <span class="font-semibold">{{ project.requirements.requiredHeadcount }}</span> resources required
+            <span class="mx-2">•</span>
+            <span class="font-medium">{{ project.requirements.workType }}</span>
+          </p>
+          
+          <!-- Role Experience Preview -->
+          <div *ngIf="project.requirements.roleExperienceMap && project.requirements.roleExperienceMap.length > 0" 
+               class="mt-3 p-3 bg-white border border-gray-200 rounded">
+            <h5 class="text-sm font-medium text-gray-700 mb-2">Role Requirements:</h5>
+            <div class="space-y-2">
+              <div *ngFor="let role of project.requirements.roleExperienceMap" class="text-sm">
+                <div class="font-medium text-gray-800">{{ role.roleName }}</div>
+                <div class="text-gray-600 text-xs">
+                  {{ role.minExperience }}y exp • {{ role.qualification }}
+                  <span *ngIf="role.requiredSkills"> • Skills: {{ role.requiredSkills }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <p *ngIf="!project.requirements" class="text-amber-700">
+          <mat-icon class="!text-sm align-middle">warning</mat-icon>
+          No requirements defined. Please define requirements before allocating resources.
         </p>
-        <p *ngIf="!project.resourceCount || project.resourceCount === 0">
-          No resources allocated yet. 
-          <button (click)="openRequirementsModal()" class="text-[#5b0f14] hover:underline">
-            Define requirements first
-          </button>
-        </p>
+        
+        <div class="mt-4">
+          <p *ngIf="project.resourceCount > 0">
+            {{ project.resourceCount || 0 }} resources allocated
+          </p>
+          <p *ngIf="!project.resourceCount || project.resourceCount === 0" class="text-gray-500">
+            No resources allocated yet
+          </p>
+        </div>
+        
+        <button *ngIf="!project.requirements"
+                (click)="openRequirementsModal()"
+                class="mt-3 px-4 py-2 bg-gradient-to-r from-[#5b0f14] to-[#7a1419] text-white rounded-lg hover:from-[#7a1419] hover:to-[#5b0f14] transition-all">
+          Define Requirements
+        </button>
       </div>
     </div>
     
