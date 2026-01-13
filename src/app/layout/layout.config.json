@@ -26,14 +26,28 @@
         { "label": "Employee List", "icon": "fas fa-users", "route": "/hr/employees" }
       ]
     },
+  {
+  "name": "Project Management",
+  "code": "pm",
+  "roles": ["admin", "pm"],
+  "nav": [
     {
-      "name": "Project Management",
-      "code": "pm",
-      "roles": ["admin", "pm"],
-      "nav": [
-        { "label": "All Projects", "icon": "fas fa-briefcase", "route": "/projects/list" },
-        { "label": "Create Project", "icon": "fas fa-plus-circle", "route": "/projects/add" }
-      ]
+      "label": "All Projects",
+      "icon": "fas fa-briefcase",
+      "route": "/projects/list"
+    },
+    {
+      "label": "Create Project",
+      "icon": "fas fa-plus-circle",
+      "route": "/projects/add"
+    },
+    {
+      "label": "Project Details",
+      "route": "/projects/:id",
+      "hidden": true
     }
+  ]
+}
+
   ]
 }

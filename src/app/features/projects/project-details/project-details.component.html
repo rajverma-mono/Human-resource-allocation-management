@@ -1,0 +1,11 @@
+<!-- Loader -->
+<div *ngIf="loading" class="text-center py-10 text-gray-400">
+  Loading project details...
+</div>
+
+<!-- DETAILS -->
+<details-composite
+  *ngIf="!loading && project"
+  [config]="config"
+  [data]="project">
+</details-composite>

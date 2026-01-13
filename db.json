@@ -497,20 +497,6 @@
       "projectStatus": "Active",
       "createdAt": "2026-01-12T09:29:33.502Z",
       "updatedAt": "2026-01-12T09:29:33.502Z"
-    },
-    {
-      "id": "proj-bknz8mig0",
-      "projectName": "NPI ",
-      "workOrderNumber": "123NPI23",
-      "clientName": "NIC",
-      "projectTenure": "24",
-      "projectStartDate": "2026-01-14",
-      "projectEndDate": "2026-01-31",
-      "projectType": "External",
-      "projectManager": "8100",
-      "projectStatus": "Completed",
-      "createdAt": "2026-01-12T09:31:17.524Z",
-      "updatedAt": "2026-01-12T09:31:17.524Z"
     }
   ]
 }

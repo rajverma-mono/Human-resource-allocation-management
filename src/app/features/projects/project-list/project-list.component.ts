@@ -52,9 +52,10 @@ export class ProjectListComponent implements OnInit {
     return proj.id;
   }
 
-  openProject(project: any) {
-    this.router.navigate(['/projects', project.id]);
-  }
+ openProject(project: any) {
+  this.router.navigate(['/projects', project.id]);
+}
+
 
   onFiltered(data: any[]) {
     this.filteredProjects = data;

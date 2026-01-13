@@ -1,0 +1,74 @@
+<div *ngIf="data" class="bg-white rounded-xl shadow-sm border p-6">
+
+  <!-- ================= HEADER ================= -->
+  <div class="flex justify-between items-start mb-6">
+
+    <div>
+      <h2 class="text-xl font-bold text-gray-900">
+        {{ data[config.titleKey] }}
+      </h2>
+
+      <p class="text-sm text-gray-500 mt-1">
+        <ng-container *ngFor="let key of config.subtitleKeys; let last = last">
+          {{ data[key] }}<span *ngIf="!last"> • </span>
+        </ng-container>
+      </p>
+    </div>
+
+    <!-- STATUS -->
+    <span
+      *ngIf="config.status"
+      class="px-3 py-1 rounded-full text-xs font-bold"
+      [ngClass]="getStatusClass()">
+      {{ data[config.status.key] }}
+    </span>
+
+  </div>
+
+  <!-- ================= ACTION BAR ================= -->
+  <div *ngIf="config.actions?.length"
+       class="flex gap-3 mb-6">
+
+    <button
+      *ngFor="let act of config.actions"
+      class="px-4 py-2 rounded-lg text-sm font-semibold"
+      [ngClass]="
+        act.variant === 'primary'
+          ? 'bg-[#801519] text-white'
+          : 'border border-gray-300 text-gray-700'
+      "
+      (click)="emitAction(act.action)">
+      {{ act.label }}
+    </button>
+
+  </div>
+
+  <!-- ================= SECTIONS ================= -->
+  <div class="space-y-8">
+
+    <ng-container *ngFor="let section of config.sections">
+
+      <!-- INFO GRID -->
+      <div *ngIf="section.type === 'info-grid'"
+           class="grid gap-6"
+           [ngClass]="section.columns === 2 ? 'grid-cols-2' : 'grid-cols-1'">
+
+        <div *ngFor="let field of section.fields">
+          <p class="text-xs text-gray-400 uppercase tracking-wide">
+            {{ field.label }}
+          </p>
+          <p class="font-semibold text-gray-800 mt-1">
+            {{ data[field.key] || '-' }}
+          </p>
+        </div>
+
+      </div>
+
+      <ng-container *ngIf="section.type === 'custom'">
+        <ng-content select="[slot={{ section.slot }}]"></ng-content>
+      </ng-container>
+
+    </ng-container>
+
+  </div>
+</div>

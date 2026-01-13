@@ -8,6 +8,7 @@ import { EmployeeDetailsComponent } from './features/hr/pages/employee-details/e
 
 import { AddProjectComponent } from './features/projects/project-initiation.form/add-project.component';
 import { ProjectListComponent } from './features/projects/project-list/project-list.component';
+import { ProjectDetailsComponent } from './features/projects/project-details/project-details.component';
 
 import { RoleGuard } from './services/role.guard';
 
@@ -50,6 +51,12 @@ export const routes: Routes = [
       {
         path: 'projects/add',
         component: AddProjectComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['pm', 'admin'] }
+      },
+      {
+        path: 'projects/:id',
+        component: ProjectDetailsComponent,
         canActivate: [RoleGuard],
         data: { roles: ['pm', 'admin'] }
       }

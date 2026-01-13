@@ -1,0 +1,32 @@
+{
+  "apiEndpoints": {
+    "detail": "{{API_BASE}}/projects"
+  },
+
+  "titleKey": "projectName",
+  "subtitleKeys": ["clientName", "projectType"],
+
+  "status": {
+    "key": "projectStatus",
+    "classMap": {
+      "Active": "bg-green-100 text-green-700",
+      "On-Hold": "bg-yellow-100 text-yellow-700",
+      "Closed": "bg-red-100 text-red-700"
+    }
+  },
+
+  "sections": [
+    {
+      "type": "info-grid",
+      "columns": 2,
+      "fields": [
+        { "label": "Project Code", "key": "workOrderNumber" },
+        { "label": "Client Name", "key": "clientName" },
+        { "label": "Start Date", "key": "projectStartDate" },
+        { "label": "End Date", "key": "projectEndDate" },
+        { "label": "Project Type", "key": "projectType" },
+        { "label": "Tenure (Months)", "key": "projectTenure" }
+      ]
+    }
+  ]
+}
