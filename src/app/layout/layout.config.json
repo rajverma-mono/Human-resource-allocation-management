@@ -40,11 +40,6 @@
       "label": "Create Project",
       "icon": "fas fa-plus-circle",
       "route": "/projects/add"
-    },
-    {
-      "label": "Project Details",
-      "route": "/projects/:id",
-      "hidden": true
     }
   ]
 }

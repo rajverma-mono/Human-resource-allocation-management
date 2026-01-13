@@ -9,24 +9,57 @@
   "status": {
     "key": "projectStatus",
     "classMap": {
-      "Active": "bg-green-100 text-green-700",
-      "On-Hold": "bg-yellow-100 text-yellow-700",
-      "Closed": "bg-red-100 text-red-700"
+      "Active": "status-active",
+      "On-Hold": "status-onhold",
+      "Closed": "status-completed"
     }
   },
 
+  "actions": [
+    {
+      "label": "Edit Project",
+      "action": "edit",
+      "variant": "primary",
+      "icon": "edit"
+    },
+    {
+      "label": "Allocate Resources",
+      "action": "allocate",
+      "variant": "secondary",
+      "icon": "group_add"
+    },
+    {
+      "label": "Generate Report",
+      "action": "report",
+      "variant": "tertiary",
+      "icon": "description"
+    }
+  ],
+
   "sections": [
     {
+      "title": "Project Overview",
       "type": "info-grid",
       "columns": 2,
       "fields": [
-        { "label": "Project Code", "key": "workOrderNumber" },
-        { "label": "Client Name", "key": "clientName" },
-        { "label": "Start Date", "key": "projectStartDate" },
-        { "label": "End Date", "key": "projectEndDate" },
-        { "label": "Project Type", "key": "projectType" },
-        { "label": "Tenure (Months)", "key": "projectTenure" }
+        { "label": "Project Code", "key": "workOrderNumber", "icon": "code" },
+        { "label": "Client Name", "key": "clientName", "icon": "business" },
+        { "label": "Start Date", "key": "projectStartDate", "icon": "calendar_today", "format": "date" },
+        { "label": "End Date", "key": "projectEndDate", "icon": "event_available", "format": "date" },
+        { "label": "Project Type", "key": "projectType", "icon": "category" },
+        { "label": "Tenure (Months)", "key": "projectTenure", "icon": "timeline" },
+        { "label": "Project Manager", "key": "projectManager", "icon": "person" }
       ]
+    },
+    {
+      "type": "custom",
+      "slot": "allocation"
     }
-  ]
+  ],
+
+  "metadata": {
+    "resourceCountKey": "assignedResources",
+    "completionKey": "completionPercentage",
+    "teamCountKey": "teamSize"
+  }
 }
