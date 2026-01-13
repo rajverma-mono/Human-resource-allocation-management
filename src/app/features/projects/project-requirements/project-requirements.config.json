@@ -117,6 +117,16 @@
                                 "width": "20%"
                             },
                             {
+                                "key": "requiredCount",
+                                "label": "Count Required",
+                                "type": "number",
+                                "required": true,
+                                "min": 1,
+                                "max": 10,
+                                "width": "15%",
+                                "placeholder": "Count"
+                            },
+                            {
                                 "key": "minExperience",
                                 "label": "Min Experience (years)",
                                 "type": "number",
@@ -165,12 +175,16 @@
                                 "label": "Required Skills",
                                 "type": "chip-input",
                                 "placeholder": "Add skills for this role",
-                                "width": "50%"
+                                "width": "30%"
                             }
                         ],
                         "allowAdd": false,
                         "allowRemove": false,
-                        "maxRows": 0
+                        "maxRows": 0,
+                        "showValidation": true,
+                        "validation": {
+                            "targetField": "requiredCount"
+                        }
                     }
                 }
             ]

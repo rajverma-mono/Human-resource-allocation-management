@@ -50,6 +50,7 @@ export class ProjectRequirementsModalComponent implements OnInit {
   form: any = {};
   isLoading = false;
   selectOptionsMap: Record<string, any[]> = {};
+  availableRolesForTable: { value: string; label: string; description?: string }[] = [];
 
   constructor(private http: HttpClient) {}
 
@@ -57,7 +58,279 @@ export class ProjectRequirementsModalComponent implements OnInit {
     this.initializeFormConfig();
     this.initializeForm();
   }
+// Update the calculateTotalCount method:
+calculateTotalCount(): void {
+  if (!this.form.roleExperienceMap || !Array.isArray(this.form.roleExperienceMap)) {
+    return;
+  }
+  
+  let totalCount = 0;
+  this.form.roleExperienceMap.forEach((row: any) => {
+    // Check if requiredCount field exists
+    if (row.requiredCount) {
+      totalCount += parseInt(row.requiredCount) || 0;
+    }
+  });
+  
+  // Update the requiredHeadcount field
+  if (totalCount > 0) {
+    this.form['requiredHeadcount'] = totalCount;
+  }
+}
 
+// Update the updateRoleExperienceData method:
+private updateRoleExperienceData() {
+  if (!this.form.requiredRoles || this.form.requiredRoles.length === 0) {
+    this.form.roleExperienceMap = [];
+    return;
+  }
+
+  let roleOptions = this.selectOptionsMap['requiredRoles'];
+  
+  if (!roleOptions || roleOptions.length === 0) {
+    const fieldConfig = this.getFieldConfig('requiredRoles');
+    roleOptions = fieldConfig?.options || [];
+  }
+  
+  const selectedRoles = roleOptions.filter((role: any) => 
+    this.form.requiredRoles.includes(role.value)
+  ) || [];
+
+  const existingMap = Array.isArray(this.form.roleExperienceMap) ? this.form.roleExperienceMap : [];
+  
+  this.form.roleExperienceMap = selectedRoles.map((role: any) => {
+    const existing = existingMap.find((item: any) => item.role === role.value);
+    return {
+      role: role.value,
+      roleName: role.label,
+      requiredCount: existing?.requiredCount || 1, // Changed from requirements to requiredCount
+      minExperience: existing?.minExperience || 0,
+      qualification: existing?.qualification || 'B.Tech',
+      requiredSkills: existing?.requiredSkills || []
+    };
+  });
+
+  // Calculate total count after updating
+  this.calculateTotalCount();
+}
+
+// Update the validateForm method to check requiredCount instead of requirements.count:
+private validateForm(): boolean {
+  const requiredFields = this.getRequiredFields();
+  const missingFields: string[] = [];
+
+  for (const field of requiredFields) {
+    const value = this.form[field.id];
+    if (!value || 
+        (typeof value === 'string' && value.trim() === '') ||
+        (Array.isArray(value) && value.length === 0)) {
+      missingFields.push(field.label);
+    }
+  }
+
+  // Additional validation for role counts totals
+  const totalRequired = this.form['requiredHeadcount'];
+  if (totalRequired > 0) {
+    const tableData = this.form['roleExperienceMap'] || [];
+    let tableTotal = 0;
+    
+    tableData.forEach((row: any) => {
+      // Check for requiredCount instead of requirements.count
+      if (row.requiredCount) {
+        tableTotal += parseInt(row.requiredCount) || 0;
+      }
+    });
+    
+    if (tableTotal !== totalRequired) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Count Mismatch',
+        html: `Total role count (${tableTotal}) doesn't match required headcount (${totalRequired}).<br><br>
+               Please adjust the role counts to match the required total.`,
+        confirmButtonColor: '#5b0f14'
+      });
+      return false;
+    }
+  }
+
+  if (missingFields.length > 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Missing Information',
+      html: `The following fields are required:<br><br>
+             <strong>${missingFields.join('<br>')}</strong><br><br>
+             Please fill them before saving.`,
+      confirmButtonColor: '#5b0f14'
+    });
+    return false;
+  }
+
+  return true;
+}
+
+// Update the loadExistingRequirements method to handle requiredCount:
+private loadExistingRequirements() {
+  if (!this.project || !this.formConfig?.apiEndpoints?.getById) return;
+
+  const loadUrl = this.formConfig.apiEndpoints.getById;
+
+  this.http.get<any[]>(loadUrl).subscribe({
+    next: (list) => {
+      if (!list || list.length === 0) {
+        console.log('ℹ️ No existing requirements found');
+        return;
+      }
+
+      const requirements = list[0];
+
+      this.form = {
+        ...this.form,
+        ...requirements
+      };
+
+      // Parse roleExperienceMap
+      if (typeof this.form.roleExperienceMap === 'string') {
+        try {
+          const parsedMap = JSON.parse(this.form.roleExperienceMap);
+          this.form.roleExperienceMap = parsedMap.map((item: any) => {
+            // Handle old requirements field if it exists
+            if (item.requirements && typeof item.requirements === 'object' && item.requirements.count) {
+              // Convert old format to new format
+              item.requiredCount = item.requirements.count;
+              delete item.requirements;
+            } else if (item.requirements && typeof item.requirements === 'string') {
+              try {
+                const req = JSON.parse(item.requirements);
+                if (req.count) {
+                  item.requiredCount = req.count;
+                }
+                delete item.requirements;
+              } catch {
+                // If parsing fails, keep as is
+              }
+            }
+            
+            return {
+              ...item,
+              roleName: item.roleName || item.role,
+              requiredCount: item.requiredCount || 1, // Ensure requiredCount exists
+              requiredSkills: item.requiredSkills
+                ? (Array.isArray(item.requiredSkills) 
+                    ? item.requiredSkills 
+                    : item.requiredSkills.split(',').map((s: string) => s.trim()))
+                : []
+            };
+          });
+        } catch {
+          this.form.roleExperienceMap = [];
+        }
+      }
+
+      // Calculate total count from existing data
+      this.calculateTotalCount();
+
+      // Ensure project identifiers stay intact
+      this.form.projectId = this.project?.id || this.project?._id || this.project?.projectId;
+      this.form.projectName = this.project?.projectName || this.project?.name || '';
+    },
+    error: (err) => {
+      console.warn('⚠️ Failed to load requirements', err);
+    }
+  });
+}
+
+// Update the save method to handle requiredCount:
+async save() {
+  try {
+    if (!this.validateForm()) return;
+
+    this.isLoading = true;
+
+    Swal.fire({
+      title: 'Saving...',
+      text: 'Please wait while we save requirements',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
+
+    // Build payload
+    const formData: any = {
+      ...this.form,
+      projectId: this.project?.id || this.project?._id || this.project?.projectId,
+      projectName: this.project?.projectName || this.project?.name || ''
+    };
+
+    // Normalize roleExperienceMap for API
+    if (Array.isArray(formData.roleExperienceMap)) {
+      formData.roleExperienceMap = JSON.stringify(
+        formData.roleExperienceMap.map((item: any) => ({
+          role: item.role,
+          roleName: item.roleName,
+          requiredCount: item.requiredCount || 1, // Use requiredCount
+          minExperience: item.minExperience,
+          qualification: item.qualification,
+          requiredSkills: Array.isArray(item.requiredSkills) 
+            ? item.requiredSkills.join(',')
+            : item.requiredSkills || ''
+        }))
+      );
+    }
+
+    const existingRequirement = this.project?.requirements;
+
+    let request$;
+
+    if (existingRequirement?.id) {
+      // ================= UPDATE =================
+      const updateUrl = this.formConfig.apiEndpoints.update
+        .replace('{{API_BASE}}', 'http://localhost:3000')
+        .replace('{id}', existingRequirement.id);
+
+      request$ = this.http.put(updateUrl, {
+        ...formData,
+        id: existingRequirement.id
+      });
+
+    } else {
+      // ================= CREATE =================
+      const createUrl = this.formConfig.apiEndpoints.create
+        .replace('{{API_BASE}}', 'http://localhost:3000');
+
+      request$ = this.http.post(createUrl, formData);
+    }
+
+    const response = await request$.toPromise();
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Success!',
+      text: 'Requirements saved successfully!',
+      confirmButtonColor: '#5b0f14',
+      timer: 2000,
+      timerProgressBar: true
+    }).then(() => {
+      this.saved.emit(response);
+      this.close();
+    });
+
+  } catch (error: any) {
+    console.error('❌ Error saving requirements:', error);
+
+    let errorMessage = 'Error saving requirements. Please try again.';
+    if (error.status === 400) errorMessage = 'Invalid data.';
+    if (error.status === 404) errorMessage = 'API endpoint not found.';
+    if (error.status === 500) errorMessage = 'Server error.';
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Save Failed',
+      text: errorMessage,
+      confirmButtonColor: '#5b0f14'
+    });
+  } finally {
+    this.isLoading = false;
+  }
+}
   private initializeFormConfig() {
     this.formConfig = JSON.parse(JSON.stringify(formConfigJson));
     
@@ -88,6 +361,34 @@ export class ProjectRequirementsModalComponent implements OnInit {
     }
     
     this.loadSelectOptions();
+    this.initializeAvailableRoles();
+  }
+
+  // Initialize available roles for the role-with-count field
+  private initializeAvailableRoles() {
+    const rolesField = this.formConfig.sections
+      ?.find((s: any) => s.title === 'Role Requirements')
+      ?.fields?.find((f: any) => f.id === 'requiredRoles');
+    
+    if (rolesField?.options) {
+      this.availableRolesForTable = rolesField.options.map((option: any) => ({
+        value: option.value,
+        label: option.label,
+        description: this.getRoleDescription(option.value)
+      }));
+    }
+  }
+
+  getRoleDescription(role: string): string {
+    const descriptions: Record<string, string> = {
+      'project_manager': 'Oversees project execution and team coordination',
+      'developer': 'Implements features and fixes bugs',
+      'designer': 'Creates user interfaces and experiences',
+      'qa': 'Tests software quality and ensures requirements',
+      'ba': 'Analyzes requirements and creates documentation',
+      'devops': 'Manages deployment and infrastructure'
+    };
+    return descriptions[role] || '';
   }
 
   onMultiSelectChange(fieldId: string, event: any): void {
@@ -99,118 +400,75 @@ export class ProjectRequirementsModalComponent implements OnInit {
     }
   }
 
+  // Handle dynamic table cell changes
   onDynamicTableCellChanged(event: any): void {
-    const { fieldId, data } = event;
-    if (fieldId && this.form[fieldId] !== undefined) {
-      this.form[fieldId] = data;
+    const { row, column, value, rowIndex } = event;
+    
+    // Update the form data
+    if (this.form.roleExperienceMap && this.form.roleExperienceMap[rowIndex]) {
+      this.form.roleExperienceMap[rowIndex][column] = value;
     }
+    
+    // Calculate total count for validation
+    this.calculateTotalCount();
+  }
+
+  // Handle dynamic table data changes
+  onDynamicTableDataChange(data: any[]): void {
+    this.form['roleExperienceMap'] = data;
+    this.calculateTotalCount();
   }
 
   private initializeForm() {
-  this.form = {};
+    this.form = {};
 
-  // ✅ IMPORTANT: bind projectId & projectName
-  this.form['projectId'] =
-    this.project?.id || this.project?._id || this.project?.projectId;
+    // Bind project identifiers
+    this.form['projectId'] = this.project?.id || this.project?._id || this.project?.projectId;
+    this.form['projectName'] = this.project?.projectName || this.project?.name || '';
 
-  this.form['projectName'] =
-    this.project?.projectName || this.project?.name || '';
+    if (this.formConfig?.sections) {
+      this.formConfig.sections.forEach((section: any) => {
+        section.fields?.forEach((field: any) => {
+          if (field.id === 'projectName' || field.id === 'projectId') {
+            return;
+          }
 
-  if (this.formConfig?.sections) {
-    this.formConfig.sections.forEach((section: any) => {
-      section.fields?.forEach((field: any) => {
-        if (field.id === 'projectName' || field.id === 'projectId') {
-          return;
-        }
+          switch (field.type) {
+            case 'multi-select':
+            case 'chip-input':
+            case 'dynamic-table':
+              this.form[field.id] = field.default || [];
+              break;
 
-        switch (field.type) {
-          case 'multi-select':
-          case 'chip-input':
-          case 'dynamic-table':
-            this.form[field.id] = field.default || [];
-            break;
+            case 'toggle':
+              this.form[field.id] = field.default || false;
+              break;
 
-          case 'toggle':
-            this.form[field.id] = field.default || false;
-            break;
+            case 'number':
+              this.form[field.id] = field.default || 0;
+              break;
 
-          case 'number':
-            this.form[field.id] = field.default || 0;
-            break;
-
-          default:
-            this.form[field.id] = field.default || '';
-        }
+            default:
+              this.form[field.id] = field.default || '';
+          }
+        });
       });
-    });
+    }
+
+    // Load existing requirements for this project
+    this.loadExistingRequirements();
   }
 
-  // ✅ Load existing requirements for this project
-  this.loadExistingRequirements();
-}
-
- private loadExistingRequirements() {
-  if (!this.project || !this.formConfig?.apiEndpoints?.getById) return;
-
-  const loadUrl = this.formConfig.apiEndpoints.getById;
-  // Example:
-  // http://localhost:3000/requirements?projectId=proj-ug3btll9y
-
-  this.http.get<any[]>(loadUrl).subscribe({
-    next: (list) => {
-      if (!list || list.length === 0) {
-        console.log('ℹ️ No existing requirements found');
-        return;
-      }
-
-      const requirements = list[0]; // one requirement per project
-
-      this.form = {
-        ...this.form,
-        ...requirements
-      };
-
-      // ✅ Parse roleExperienceMap
-      if (typeof this.form.roleExperienceMap === 'string') {
-        try {
-          this.form.roleExperienceMap = JSON.parse(this.form.roleExperienceMap).map(
-            (item: any) => ({
-              ...item,
-              requiredSkills: item.requiredSkills
-                ? item.requiredSkills.split(',').map((s: string) => s.trim())
-                : []
-            })
-          );
-        } catch {
-          this.form.roleExperienceMap = [];
-        }
-      }
-
-      // Ensure project identifiers stay intact
-      this.form.projectId =
-        this.project?.id || this.project?._id || this.project?.projectId;
-
-      this.form.projectName =
-        this.project?.projectName || this.project?.name || '';
-    },
-    error: (err) => {
-      console.warn('⚠️ Failed to load requirements', err);
-    }
-  });
-}
-
-
-  onRoleExperienceNumberChange(event: Event, index: number, field: string): void {
-    const target = event.target as HTMLInputElement;
-    if (target && this.form.roleExperienceMap && this.form.roleExperienceMap[index]) {
-      const value = target.value ? parseFloat(target.value) : 0;
-      this.form.roleExperienceMap[index][field] = value;
-    }
-  }
+ 
 
   getTableColumns(fieldId: string): any[] {
     const field = this.getFieldConfig(fieldId);
     return field?.tableConfig?.columns || [];
+  }
+
+  // Get total required count for the dynamic table validation
+  getTotalRequiredCount(): number {
+    return this.form['requiredHeadcount'] || 0;
   }
 
   getFieldConfig(fieldId: string): any {
@@ -223,6 +481,14 @@ export class ProjectRequirementsModalComponent implements OnInit {
       }
     }
     return null;
+  }
+
+  onRoleExperienceNumberChange(event: Event, index: number, field: string): void {
+    const target = event.target as HTMLInputElement;
+    if (target && this.form.roleExperienceMap && this.form.roleExperienceMap[index]) {
+      const value = target.value ? parseFloat(target.value) : 0;
+      this.form.roleExperienceMap[index][field] = value;
+    }
   }
 
   onRoleExperienceSelectChange(event: Event, index: number, field: string): void {
@@ -252,37 +518,7 @@ export class ProjectRequirementsModalComponent implements OnInit {
     this.updateRoleExperienceData();
   }
 
-  private updateRoleExperienceData() {
-    if (!this.form.requiredRoles || this.form.requiredRoles.length === 0) {
-      this.form.roleExperienceMap = [];
-      return;
-    }
-
-    let roleOptions = this.selectOptionsMap['requiredRoles'];
-    
-    if (!roleOptions || roleOptions.length === 0) {
-      const fieldConfig = this.getFieldConfig('requiredRoles');
-      roleOptions = fieldConfig?.options || [];
-    }
-    
-    const selectedRoles = roleOptions.filter((role: any) => 
-      this.form.requiredRoles.includes(role.value)
-    ) || [];
-
-    const existingMap = Array.isArray(this.form.roleExperienceMap) ? this.form.roleExperienceMap : [];
-    
-    this.form.roleExperienceMap = selectedRoles.map((role: any) => {
-      const existing = existingMap.find((item: any) => item.role === role.value);
-      return {
-        role: role.value,
-        roleName: role.label,
-        minExperience: existing?.minExperience || 0,
-        qualification: existing?.qualification || 'B.Tech',
-        requiredSkills: existing?.requiredSkills || []
-      };
-    });
-  }
-
+  
   toggleMultiSelect(fieldId: string, value: any): void {
     if (!this.form[fieldId]) {
       this.form[fieldId] = [];
@@ -341,78 +577,7 @@ export class ProjectRequirementsModalComponent implements OnInit {
     return this.formConfig.actions?.find((a: any) => a.id === actionId) || {};
   }
 
-  async save() {
-  try {
-    if (!this.validateForm()) return;
-
-    this.isLoading = true;
-
-    Swal.fire({
-      title: 'Saving...',
-      text: 'Please wait while we save requirements',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
-
-    // ✅ Ensure projectId is always saved
-    const formData: any = {
-      ...this.form,
-      projectId:
-        this.project?.id || this.project?._id || this.project?.projectId,
-      projectName:
-        this.project?.projectName || this.project?.name || ''
-    };
-
-    delete formData.requiredSkills;
-
-    // ✅ Normalize roleExperienceMap for DB
-    if (Array.isArray(formData.roleExperienceMap)) {
-      formData.roleExperienceMap = JSON.stringify(
-        formData.roleExperienceMap.map((item: any) => ({
-          ...item,
-          requiredSkills: Array.isArray(item.requiredSkills)
-            ? item.requiredSkills.join(',')
-            : item.requiredSkills || ''
-        }))
-      );
-    }
-
-    const saveUrl = this.formConfig.apiEndpoints?.create;
-    if (!saveUrl) throw new Error('Save API endpoint not configured');
-
-    const response = await this.http.post(saveUrl, formData).toPromise();
-
-    Swal.fire({
-      icon: 'success',
-      title: 'Success!',
-      text: 'Requirements saved successfully!',
-      confirmButtonColor: '#5b0f14',
-      timer: 2000,
-      timerProgressBar: true
-    }).then(() => {
-      this.saved.emit(response);
-      this.close();
-    });
-
-  } catch (error: any) {
-    console.error('❌ Error saving requirements:', error);
-
-    let errorMessage = 'Error saving requirements. Please try again.';
-    if (error.status === 400) errorMessage = 'Invalid data.';
-    if (error.status === 404) errorMessage = 'API endpoint not found.';
-    if (error.status === 500) errorMessage = 'Server error.';
-
-    Swal.fire({
-      icon: 'error',
-      title: 'Save Failed',
-      text: errorMessage,
-      confirmButtonColor: '#5b0f14'
-    });
-  } finally {
-    this.isLoading = false;
-  }
-}
-
+  
 
   cancel() {
     Swal.fire({
@@ -436,34 +601,7 @@ export class ProjectRequirementsModalComponent implements OnInit {
     this.closed.emit();
   }
 
-  private validateForm(): boolean {
-    const requiredFields = this.getRequiredFields();
-    const missingFields: string[] = [];
-
-    for (const field of requiredFields) {
-      const value = this.form[field.id];
-      if (!value || 
-          (typeof value === 'string' && value.trim() === '') ||
-          (Array.isArray(value) && value.length === 0)) {
-        missingFields.push(field.label);
-      }
-    }
-
-    if (missingFields.length > 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Missing Information',
-        html: `The following fields are required:<br><br>
-               <strong>${missingFields.join('<br>')}</strong><br><br>
-               Please fill them before saving.`,
-        confirmButtonColor: '#5b0f14'
-      });
-      return false;
-    }
-
-    return true;
-  }
-
+ 
   private getRequiredFields(): any[] {
     const requiredFields: any[] = [];
 

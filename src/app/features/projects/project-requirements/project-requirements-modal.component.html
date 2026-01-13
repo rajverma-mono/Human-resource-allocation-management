@@ -185,18 +185,23 @@
                         @case('dynamic-table') {
                           <div *ngIf="shouldShowField(field)" class="mt-4">
                             <!-- Using the atom-dynamic-table component -->
-                            <atom-dynamic-table
-                              [label]="field.label"
-                              [columns]="getTableColumns(field.id)"
-                              [data]="form[field.id] || []"
-                              [emptyMessage]="field.placeholder || 'No data available'"
-                              [allowAdd]="field.tableConfig?.allowAdd !== false"
-                              [allowRemove]="field.tableConfig?.allowRemove !== false"
-                              [maxRows]="field.tableConfig?.maxRows || 0"
-                              [disabled]="field.disabled || false"
-                              (cellChanged)="onDynamicTableCellChanged($event)"
-                              class="w-full">
-                            </atom-dynamic-table>
+                            <!-- In your project-requirements-modal.component.html, update the dynamic-table usage: -->
+<atom-dynamic-table
+  [label]="field.label"
+  [columns]="getTableColumns(field.id)"
+  [data]="form[field.id] || []"
+  [emptyMessage]="field.placeholder || 'No data available'"
+  [allowAdd]="field.tableConfig?.allowAdd !== false"
+  [allowRemove]="field.tableConfig?.allowRemove !== false"
+  [maxRows]="field.tableConfig?.maxRows || 0"
+  [disabled]="field.disabled || false"
+  [availableRoles]="availableRolesForTable"
+  [totalRequiredCount]="getTotalRequiredCount()"
+  [showCountValidation]="field.tableConfig?.showValidation !== false"
+  (cellChanged)="onDynamicTableCellChanged($event)"
+  (dataChange)="onDynamicTableDataChange($event)"
+  class="w-full">
+</atom-dynamic-table>
                             
                             <p *ngIf="field.hint" class="text-xs text-gray-500 mt-2">
                               {{ field.hint }}

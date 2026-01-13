@@ -500,12 +500,10 @@
     }
   ],
   "requirements": [
-  
     {
-      "id": "req-f9c1",
       "projectId": "proj-ug3btll9y",
       "projectName": "UPSC ORA",
-      "requiredHeadcount": 1,
+      "requiredHeadcount": 14,
       "workType": "Onsite",
       "officeLocation": "Delhi",
       "requiredRoles": [
@@ -515,9 +513,10 @@
         "qa",
         "devops"
       ],
-      "roleExperienceMap": "[{\"role\":\"project_manager\",\"roleName\":\"Project Manager\",\"minExperience\":4,\"qualification\":\"B.Tech\",\"requiredSkills\":\"Technical lead\"},{\"role\":\"developer\",\"roleName\":\"Developer\",\"minExperience\":5,\"qualification\":\"B.Tech\",\"requiredSkills\":\"Angular,docker,java\"},{\"role\":\"designer\",\"roleName\":\"UI/UX Designer\",\"minExperience\":1,\"qualification\":\"B.Tech\",\"requiredSkills\":\"figma\"},{\"role\":\"qa\",\"roleName\":\"QA Engineer\",\"minExperience\":1,\"qualification\":\"B.Tech\",\"requiredSkills\":\"selenium,Robotic framework\"},{\"role\":\"devops\",\"roleName\":\"DevOps Engineer\",\"minExperience\":2,\"qualification\":\"B.Tech\",\"requiredSkills\":\"jenkins\"}]",
+      "roleExperienceMap": "[{\"role\":\"project_manager\",\"roleName\":\"Project Manager\",\"requiredCount\":3,\"minExperience\":4,\"qualification\":\"B.Tech\",\"requiredSkills\":\"Technical lead\"},{\"role\":\"developer\",\"roleName\":\"Developer\",\"requiredCount\":2,\"minExperience\":5,\"qualification\":\"B.Tech\",\"requiredSkills\":\"Angular,docker,java\"},{\"role\":\"designer\",\"roleName\":\"UI/UX Designer\",\"requiredCount\":2,\"minExperience\":1,\"qualification\":\"B.Tech\",\"requiredSkills\":\"figma\"},{\"role\":\"qa\",\"roleName\":\"QA Engineer\",\"requiredCount\":3,\"minExperience\":1,\"qualification\":\"B.Tech\",\"requiredSkills\":\"selenium,Robotic framework\"},{\"role\":\"devops\",\"roleName\":\"DevOps Engineer\",\"requiredCount\":4,\"minExperience\":2,\"qualification\":\"B.Tech\",\"requiredSkills\":\"jenkins\"}]",
       "customerPresenceRequired": true,
-      "attendanceMode": "System",
+      "attendanceMode": "Biometric",
+      "id": "req-f9c1",
       "createdAt": "2026-01-13T10:15:00.000Z",
       "updatedAt": "2026-01-13T10:15:00.000Z"
     }
