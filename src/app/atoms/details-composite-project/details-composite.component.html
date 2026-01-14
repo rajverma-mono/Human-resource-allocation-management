@@ -57,7 +57,9 @@
           <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg">
             <mat-icon class="!text-base !w-4 !h-4 text-[#5b0f14]">assignment</mat-icon>
             <span class="text-sm font-semibold text-gray-700">Requirements:</span>
-            <span class="text-sm text-gray-900">{{ data.requirements?.requiredHeadcount || '0' }} Positions</span>
+            <span class="text-sm text-gray-900">
+              {{ getTotalRequiredFromRoles() || data.requirements?.requiredHeadcount || '0' }} Positions
+            </span>
           </div>
         </div>
       </div>
@@ -89,53 +91,46 @@
   </div>
 
   <!-- ================= ACTION BAR ================= -->
-  <div *ngIf="config.actions?.length"
-       class="px-8 py-4 bg-white border-b border-gray-200/80 flex items-center justify-between">
-    <div class="flex gap-2">
-      <button
-        *ngFor="let act of config.actions"
-        class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 
-               shadow-sm hover:shadow-md active:scale-95 flex items-center gap-2"
-        [ngClass]="
-          act.variant === 'primary'
-            ? 'bg-gradient-to-r from-[#5b0f14] to-[#7a1419] text-white hover:from-[#7a1419] hover:to-[#5b0f14]'
-            : act.variant === 'secondary'
-            ? 'bg-white border border-gray-300 text-gray-700 hover:border-[#5b0f14] hover:text-[#5b0f14]'
-            : 'bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100'
-        "
-        (click)="emitAction(act.action)">
-        <mat-icon *ngIf="act.icon" class="!text-base !w-4 !h-4">{{ act.icon }}</mat-icon>
-        {{ act.label }}
-      </button>
-      <!-- Add Requirements Button -->
-      <button *ngIf="!data.requirements"
-              class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 
-                     shadow-sm hover:shadow-md active:scale-95 flex items-center gap-2
-                     bg-gradient-to-r from-[#5b0f14] to-[#7a1419] text-white hover:from-[#7a1419] hover:to-[#5b0f14]"
-              (click)="emitAction('addRequirements')">
-        <mat-icon class="!text-base !w-4 !h-4">add_circle</mat-icon>
-        Add Requirements
-      </button>
-      <button *ngIf="data.requirements"
-              class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 
-                     shadow-sm hover:shadow-md active:scale-95 flex items-center gap-2
-                     bg-white border border-gray-300 text-gray-700 hover:border-[#5b0f14] hover:text-[#5b0f14]"
-              (click)="emitAction('editRequirements')">
-        <mat-icon class="!text-base !w-4 !h-4">edit</mat-icon>
-        Edit Requirements
-      </button>
-    </div>
-
-    <!-- Additional Actions -->
-    <div class="flex items-center gap-2">
-      <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Print">
-        <mat-icon class="!text-base text-gray-600">print</mat-icon>
-      </button>
-      <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Export">
-        <mat-icon class="!text-base text-gray-600">download</mat-icon>
-      </button>
-    </div>
+ <div *ngIf="config.actions?.length"
+     class="px-8 py-4 bg-white border-b border-gray-200/80 flex items-center justify-between">
+  <div class="flex gap-2">
+    <!-- Dynamic buttons from config -->
+    <atom-button
+      *ngFor="let act of config.actions"
+      [label]="act.label"
+      [variant]="act.variant"
+      [icon]="act.icon"
+      [size]="act.size || 'md'"
+      [bgColor]="act.bgcolor || ''"
+      [textColor]="act.textColor || ''"
+      [borderColor]="act.borderColor || ''"
+      [disabled]="act.disabled || false"
+      (onClick)="emitAction(act.action)"
+      class="shadow-sm hover:shadow-md active:scale-95 transition-transform">
+    </atom-button>
   </div>
+
+  <!-- Additional Actions -->
+  <div class="flex items-center gap-2">
+    <atom-button
+      variant="light"
+      icon="print"
+      [iconOnly]="true"
+      size="sm"
+      (onClick)="emitAction('print')"
+      title="Print">
+    </atom-button>
+    
+    <atom-button
+      variant="light"
+      icon="download"
+      [iconOnly]="true"
+      size="sm"
+      (onClick)="emitAction('export')"
+      title="Export">
+    </atom-button>
+  </div>
+</div>
 
   <!-- ================= MAIN CONTENT ================= -->
   <div class="p-8">
@@ -191,7 +186,7 @@
               </div>
               <span *ngIf="data.requirements" class="text-xs font-semibold px-2.5 py-1 rounded-full 
                     bg-gradient-to-r from-[#5b0f14]/10 to-[#7a1419]/10 text-[#5b0f14] border border-[#5b0f14]/20">
-                {{ data.requirements.requiredHeadcount }} Position(s)
+                {{ getTotalRequiredFromRoles() || data.requirements.requiredHeadcount || '0' }} Position(s)
               </span>
             </div>
           </div>
@@ -264,25 +259,32 @@
                 Required Roles & Experience
               </h3>
               
-              <div *ngIf="data.requirements.roleExperienceMap?.length; else noRoles" class="space-y-3">
-                <div *ngFor="let role of data.requirements.roleExperienceMap" 
+              <div *ngIf="getRoleExperienceMap()?.length; else noRoles" class="space-y-3">
+                <div *ngFor="let role of getRoleExperienceMap()" 
                      class="p-4 rounded-lg border border-gray-200 bg-white hover:border-[#5b0f14]/30 transition-colors">
                   <div class="flex items-start justify-between">
                     <div class="flex-1">
-                      <div class="flex items-center gap-2 mb-2">
+                      <div class="flex items-center gap-2 mb-3">
                         <div class="w-6 h-6 rounded-md bg-[#5b0f14]/10 flex items-center justify-center">
                           <mat-icon class="!text-xs text-[#5b0f14]">badge</mat-icon>
                         </div>
-                        <span class="font-semibold text-gray-900 text-sm">{{ role.roleName }}</span>
+                        <span class="font-semibold text-gray-900 text-sm">{{ getRoleDisplayName(role) }}</span>
+                        <div *ngIf="role.requiredCount" class="ml-2 px-2 py-0.5 bg-[#5b0f14]/10 text-[#5b0f14] text-xs font-semibold rounded">
+                          {{ role.requiredCount }} required
+                        </div>
                       </div>
-                      <div class="grid grid-cols-2 gap-4 text-sm">
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                         <div>
                           <span class="text-gray-500">Experience:</span>
-                          <span class="font-medium text-gray-900 ml-2">{{ role.yearsOfExperience }} years</span>
+                          <span class="font-medium text-gray-900 ml-2">{{ getRoleExperience(role) }}</span>
+                        </div>
+                        <div>
+                          <span class="text-gray-500">Qualification:</span>
+                          <span class="font-medium text-gray-900 ml-2">{{ getRoleQualification(role) }}</span>
                         </div>
                         <div>
                           <span class="text-gray-500">Skills:</span>
-                          <span class="font-medium text-gray-900 ml-2">{{ role.skillsRequired?.join(', ') || 'Not specified' }}</span>
+                          <span class="font-medium text-gray-900 ml-2">{{ getRoleSkills(role) }}</span>
                         </div>
                       </div>
                     </div>
@@ -328,13 +330,16 @@
               <p class="text-gray-500 mb-6 max-w-md mx-auto">
                 Add project requirements to define the roles, skills, and resources needed for this project.
               </p>
-              <button (click)="emitAction('addRequirements')"
-                      class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 
-                             shadow-sm hover:shadow-md active:scale-95 flex items-center gap-2 mx-auto
-                             bg-gradient-to-r from-[#5b0f14] to-[#7a1419] text-white hover:from-[#7a1419] hover:to-[#5b0f14]">
-                <mat-icon class="!text-base !w-4 !h-4">add_circle</mat-icon>
-                Define Project Requirements
-              </button>
+              <atom-button
+                label="Define Project Requirements"
+                variant="primary"
+                icon="add_circle"
+                size="md"
+                bgColor="#5b0f14"
+                textColor="white"
+                (onClick)="emitAction('addRequirements')"
+                class="mx-auto">
+              </atom-button>
             </div>
           </ng-template>
         </div>

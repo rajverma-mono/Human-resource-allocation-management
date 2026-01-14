@@ -55,6 +55,12 @@ export const routes: Routes = [
         data: { roles: ['pm', 'admin'] }
       },
       {
+        path: 'projects/edit/:id',  // ✅ ADD THIS ROUTE
+        component: AddProjectComponent,  // ✅ Use the same component as "add"
+        canActivate: [RoleGuard],
+        data: { roles: ['pm', 'admin'] }
+      },
+      {
         path: 'projects/:id',
         component: ProjectDetailsComponent,
         canActivate: [RoleGuard],

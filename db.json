@@ -443,7 +443,6 @@
   ],
   "projects": [
     {
-      "id": "proj-ug3btll9y",
       "projectName": "UPSC ORA",
       "workOrderNumber": "123UPSC#1",
       "clientName": "UPSC",
@@ -453,8 +452,70 @@
       "projectType": "External",
       "projectManager": "206b",
       "projectStatus": "On-Hold",
+      "id": "proj-ug3btll9y",
       "createdAt": "2026-01-12T09:13:05.562Z",
-      "updatedAt": "2026-01-12T09:13:05.562Z"
+      "updatedAt": "2026-01-14T06:39:23.216Z",
+      "requirements": {
+        "projectId": "proj-ug3btll9y",
+        "projectName": "UPSC ORA",
+        "requiredHeadcount": 14,
+        "workType": "Onsite",
+        "officeLocation": "Delhi",
+        "requiredRoles": [
+          "project_manager",
+          "developer",
+          "designer",
+          "qa",
+          "devops"
+        ],
+        "roleExperienceMap": [
+          {
+            "role": "project_manager",
+            "roleName": "Project Manager",
+            "requiredCount": 3,
+            "minExperience": 4,
+            "qualification": "B.Tech",
+            "requiredSkills": "Technical lead"
+          },
+          {
+            "role": "developer",
+            "roleName": "Developer",
+            "requiredCount": 2,
+            "minExperience": 5,
+            "qualification": "B.Tech",
+            "requiredSkills": "Angular,docker,java"
+          },
+          {
+            "role": "designer",
+            "roleName": "UI/UX Designer",
+            "requiredCount": 2,
+            "minExperience": 1,
+            "qualification": "B.Tech",
+            "requiredSkills": "figma"
+          },
+          {
+            "role": "qa",
+            "roleName": "QA Engineer",
+            "requiredCount": 3,
+            "minExperience": 1,
+            "qualification": "B.Tech",
+            "requiredSkills": "selenium,Robotic framework"
+          },
+          {
+            "role": "devops",
+            "roleName": "DevOps Engineer",
+            "requiredCount": 4,
+            "minExperience": 2,
+            "qualification": "B.Tech",
+            "requiredSkills": "jenkins"
+          }
+        ],
+        "customerPresenceRequired": true,
+        "attendanceMode": "Biometric",
+        "id": "req-f9c1",
+        "createdAt": "2026-01-13T10:15:00.000Z",
+        "updatedAt": "2026-01-13T10:15:00.000Z"
+      }
     },
     {
       "id": "proj-rxrlvfemj",

@@ -20,25 +20,25 @@
       "label": "Edit Project",
       "action": "edit",
       "variant": "primary",
-      "icon": "edit"
+      "icon": "edit",
+       "textColor": "white",
+      "bgcolor": "#5b0f14"
     },
     {
       "label": "Define Requirements",  
       "action": "requirements",
       "variant": "secondary",
-      "icon": "description"
+      "icon": "description",
+       "textColor": "white",
+      "bgcolor": "#5b0f14"
     },
     {
       "label": "Allocate Resources",
       "action": "allocate",
       "variant": "secondary",
-      "icon": "group_add"
-    },
-    {
-      "label": "Generate Report",
-      "action": "report",
-      "variant": "tertiary",
-      "icon": "assessment"
+      "icon": "group_add",
+      "textColor": "white",
+      "bgcolor": "#5b0f14"
     }
   ],
 

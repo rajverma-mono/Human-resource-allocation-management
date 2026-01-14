@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { ButtonAtomComponent } from '../button/button';
+
 // Update the interfaces to be more flexible
 interface FieldConfig {
   label: string;
@@ -9,20 +11,26 @@ interface FieldConfig {
   hint?: string;
   format?: string; // Make it string instead of specific union
 }
-
-interface SectionConfig {
-  title?: string;
-  type: string; // Make it string to accept any value
-  columns?: number;
-  fields?: FieldConfig[];
-  slot?: string;
-}
-
 interface ActionConfig {
   label: string;
   action: string;
-  variant: string; // Make it string to accept any value
+  variant: string;
   icon?: string;
+  bgcolor?: string;
+  textColor?: string;
+  borderColor?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  fullWidth?: boolean;
+  iconOnly?: boolean;
+  iconRight?: string;
+  size?: 'sm' | 'md' | 'lg';
+  tooltip?: string;
+  iconConfig?: {
+    width?: number;
+    height?: number;
+    color?: string;
+  };
 }
 
 interface StatusConfig {
@@ -42,17 +50,43 @@ interface Config {
     teamCountKey?: string;
     createdByKey?: string;
     lastUpdatedKey?: string;
+    requirementsButton?: {
+      add?: ActionConfig;
+      edit?: ActionConfig;
+    };
+    additionalActions?: ActionConfig[];
   };
   apiEndpoints?: {
     detail?: string;
   };
+}
+interface SectionConfig {
+  title?: string;
+  type: string; // Make it string to accept any value
+  columns?: number;
+  fields?: FieldConfig[];
+  slot?: string;
+}
+
+interface ActionConfig {
+  label: string;
+  action: string;
+  variant: string; // Make it string to accept any value
+  icon?: string;
+  bgcolor?: string;
+  textColor?: string;
+}
+
+interface StatusConfig {
+  key: string;
+  classMap: { [key: string]: string };
 }
 
 
 @Component({
   selector: 'details-composite',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, ButtonAtomComponent],
   templateUrl: './details-composite.component.html'
 })
 export class DetailsCompositeComponent implements OnInit {
@@ -164,5 +198,92 @@ export class DetailsCompositeComponent implements OnInit {
   // Get the overview section (first info-grid)
   getOverviewSection(): SectionConfig | undefined {
     return this.config?.sections?.find(s => s.type === 'info-grid');
+  }
+
+  // Get role experience map data with proper parsing
+  getRoleExperienceMap(): any[] {
+    if (!this.data?.requirements?.roleExperienceMap) {
+      return [];
+    }
+    
+    try {
+      let roleExperienceMap = this.data.requirements.roleExperienceMap;
+      
+      // If it's a string (JSON stringified), parse it
+      if (typeof roleExperienceMap === 'string') {
+        roleExperienceMap = JSON.parse(roleExperienceMap);
+      }
+      
+      // Ensure it's an array
+      if (Array.isArray(roleExperienceMap)) {
+        return roleExperienceMap.map((role: any) => {
+          // Handle old format where requiredSkills might be a comma-separated string
+          if (role.requiredSkills && typeof role.requiredSkills === 'string') {
+            return {
+              ...role,
+              requiredSkills: role.requiredSkills.split(',').map((s: string) => s.trim()).filter(Boolean)
+            };
+          }
+          return role;
+        });
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Error parsing roleExperienceMap:', error);
+      return [];
+    }
+  }
+
+  // Get role display name
+  getRoleDisplayName(role: any): string {
+    if (role.roleName) return role.roleName;
+    if (role.role) {
+      // Format role key to readable name (e.g., "project_manager" -> "Project Manager")
+      return role.role
+        .split('_')
+        .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+    return 'Unknown Role';
+  }
+
+  // Get role skills as comma-separated string
+  getRoleSkills(role: any): string {
+    if (!role.requiredSkills) return 'Not specified';
+    
+    if (Array.isArray(role.requiredSkills)) {
+      return role.requiredSkills.length > 0 ? role.requiredSkills.join(', ') : 'Not specified';
+    }
+    
+    if (typeof role.requiredSkills === 'string') {
+      return role.requiredSkills || 'Not specified';
+    }
+    
+    return 'Not specified';
+  }
+
+  // Get total count from roleExperienceMap
+  getTotalRequiredFromRoles(): number {
+    const roles = this.getRoleExperienceMap();
+    let total = 0;
+    
+    roles.forEach((role: any) => {
+      if (role.requiredCount) {
+        total += parseInt(role.requiredCount) || 0;
+      }
+    });
+    
+    return total;
+  }
+
+  // Get role qualification
+  getRoleQualification(role: any): string {
+    return role.qualification || 'Not specified';
+  }
+
+  // Get role experience
+  getRoleExperience(role: any): string {
+    return role.minExperience ? `${role.minExperience} years` : 'Not specified';
   }
 }

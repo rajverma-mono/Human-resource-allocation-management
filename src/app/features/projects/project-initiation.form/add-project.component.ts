@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
+// Import JSON directly
 import formConfigJson from './project-initiation.form.json';
 
 import { PageHeaderComponent } from '../../../atoms/page-header/page-header';
@@ -31,33 +33,86 @@ import { SelectOptionsPipe } from '../../../pipes/select-options.pipe';
   ],
   templateUrl: './add-project.html'
 })
-export class AddProjectComponent implements OnInit {
+export class AddProjectComponent implements OnInit, OnDestroy {
   formConfig: any = formConfigJson;
   form: any = {};
   isEditMode = false;
   projectId: string = '';
   isLoading = false;
   selectOptionsMap: Record<string, any[]> = {};
+  
+  private navigationState: any = null;
+  private routeParamsSubscription: any;
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private route: ActivatedRoute
-  ) { }
+  ) { 
+    // Listen to router events to capture state
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      // Get state from browser history
+      const navigation = this.router.getCurrentNavigation();
+      if (navigation?.extras?.state) {
+        this.navigationState = navigation.extras.state;
+        console.log('📦 Router state captured:', this.navigationState);
+      }
+    });
+  }
 
   ngOnInit(): void {
+    console.log('🔵 AddProjectComponent initialized');
+    console.log('🔵 Current route:', this.router.url);
+    
+    // Try to get state from browser history
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras?.state) {
+      this.navigationState = navigation.extras.state;
+      console.log('📦 Initial navigation state:', this.navigationState);
+    }
+    
     this.initializeForm();
     this.checkEditMode();
     this.loadSelectOptionsFromApi();
+  }
 
+  ngOnDestroy(): void {
+    if (this.routeParamsSubscription) {
+      this.routeParamsSubscription.unsubscribe();
+    }
   }
 
   checkEditMode() {
-    this.route.params.subscribe(params => {
+    console.log('🔍 checkEditMode called');
+    console.log('📦 Available navigation state:', this.navigationState);
+    
+    // Check route params
+    this.routeParamsSubscription = this.route.params.subscribe(params => {
+      console.log('📝 Route params:', params);
+      
       if (params['id']) {
         this.isEditMode = true;
         this.projectId = params['id'];
-        this.loadProjectData(this.projectId);
+        console.log('🎯 Edit mode detected via route param, ID:', this.projectId);
+        
+        // Check if we have data in navigation state
+        if (this.navigationState?.projectData) {
+          console.log('🚀 Pre-filling from navigation state');
+          this.prefillFormFromState(this.navigationState.projectData);
+        } else {
+          console.log('📡 Loading project data from API');
+          this.loadProjectData(this.projectId);
+        }
+      } else {
+        console.log('➕ Add mode (no ID in params)');
+        
+        // Even in add mode, check if we have data to prefill (for cloning)
+        if (this.navigationState?.projectData) {
+          console.log('📋 Pre-filling for clone mode');
+          this.prefillFormForClone(this.navigationState.projectData);
+        }
       }
     });
   }
@@ -80,6 +135,54 @@ export class AddProjectComponent implements OnInit {
     console.log('🟢 Form initialized:', this.form);
   }
 
+  private prefillFormFromState(projectData: any) {
+    console.log('🔥 Prefilling form from state data:', projectData);
+    
+    // Format date fields if they exist
+    const dateFields = ['projectStartDate', 'projectEndDate'];
+    dateFields.forEach(field => {
+      if (projectData[field]) {
+        projectData[field] = this.formatDateForInput(projectData[field]);
+      }
+    });
+    
+    // Merge with existing form data
+    this.form = { ...this.form, ...projectData };
+    
+    console.log('✅ Form pre-filled from state:', this.form);
+    
+    // Still load from API to ensure we have complete data
+    setTimeout(() => {
+      if (this.projectId) {
+        console.log('📡 Loading additional data from API...');
+        this.loadProjectData(this.projectId);
+      }
+    }, 100);
+  }
+
+  private prefillFormForClone(projectData: any) {
+    console.log('📋 Prefilling form for clone:', projectData);
+    
+    // Format date fields if they exist
+    const dateFields = ['projectStartDate', 'projectEndDate'];
+    dateFields.forEach(field => {
+      if (projectData[field]) {
+        projectData[field] = this.formatDateForInput(projectData[field]);
+      }
+    });
+    
+    // Clone the data but remove the ID so it creates a new project
+    const clonedData = { ...projectData };
+    delete clonedData.id;
+    delete clonedData.createdAt;
+    delete clonedData.updatedAt;
+    
+    // Update the form
+    this.form = { ...this.form, ...clonedData };
+    
+    console.log('✅ Form pre-filled for clone:', this.form);
+  }
+
   loadProjectData(id: string) {
     this.isLoading = true;
 
@@ -92,19 +195,27 @@ export class AddProjectComponent implements OnInit {
       }
     });
 
-    const getEndpoint = this.formConfig.apiEndpoints?.getById;
-
-    if (!getEndpoint) {
-      console.error('❌ getById endpoint missing in form config');
-      return;
-    }
-
+    const getEndpoint = this.formConfig.apiEndpoints?.getById ||
+      'http://localhost:3000/projects/{id}';
     const url = getEndpoint.replace('{id}', id);
-
 
     this.http.get(url).subscribe({
       next: (project: any) => {
+        console.log('📥 Project data loaded from API:', project);
+        
+        // Format date fields if they exist
+        const dateFields = ['projectStartDate', 'projectEndDate'];
+        dateFields.forEach(field => {
+          if (project[field]) {
+            project[field] = this.formatDateForInput(project[field]);
+          }
+        });
+        
+        // Merge with existing form data (preserving state data)
         this.form = { ...this.form, ...project };
+        
+        console.log('✅ Final form after API load:', this.form);
+        
         this.isLoading = false;
         Swal.close();
       },
@@ -120,6 +231,24 @@ export class AddProjectComponent implements OnInit {
       }
     });
   }
+
+  private formatDateForInput(date: string | Date): string {
+    if (!date) return '';
+    
+    try {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return '';
+      
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}`;
+    } catch {
+      return '';
+    }
+  }
+
   loadSelectOptionsFromApi() {
     console.group('🔵 loadSelectOptionsFromApi START');
 
@@ -349,5 +478,12 @@ export class AddProjectComponent implements OnInit {
 
   private generateUniqueId(): string {
     return 'proj-' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Helper method to check if form has data
+  hasFormData(): boolean {
+    return Object.values(this.form).some(value => 
+      value !== null && value !== undefined && value !== ''
+    );
   }
 }
