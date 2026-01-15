@@ -21,7 +21,7 @@
       "action": "edit",
       "variant": "primary",
       "icon": "edit",
-       "textColor": "white",
+      "textColor": "white",
       "bgcolor": "#5b0f14"
     },
     {
@@ -29,7 +29,7 @@
       "action": "requirements",
       "variant": "secondary",
       "icon": "description",
-       "textColor": "white",
+      "textColor": "white",
       "bgcolor": "#5b0f14"
     },
     {
@@ -67,5 +67,79 @@
     "resourceCountKey": "assignedResources",
     "completionKey": "completionPercentage",
     "teamCountKey": "teamSize"
+  },
+
+  "allocationActions": {
+    "editRequirements": {
+      "label": "Edit Requirements",
+      "action": "editRequirements",
+      "variant": "light",
+      "icon": "edit",
+      "size": "sm",
+      "bgColor": "#e5e7eb",
+      "textColor": "#374151",
+      "borderColor": "#d1d5db"
+    },
+    "editAllocations": {
+      "label": "Edit Allocations",
+      "action": "editAllocations",
+      "variant": "secondary",
+      "icon": "edit",
+      "size": "sm",
+      "bgColor": "#d97706",
+      "textColor": "white",
+      "borderColor": "#b45309"
+    },
+    "allocateResources": {
+      "label": "Allocate Resources",
+      "action": "allocate",
+      "variant": "primary",
+      "icon": "group_add",
+      "size": "sm",
+      "bgColor": "#5b0f14",
+      "textColor": "white",
+      "borderColor": "#7a1419"
+    },
+    "addMoreResources": {
+      "label": "Add More",
+      "action": "addMoreResources",
+      "variant": "primary",
+      "icon": "add_circle",
+      "size": "sm",
+      "bgColor": "#5b0f14",
+      "textColor": "white",
+      "borderColor": "#7a1419"
+    },
+    
+    "defineRequirements": {
+      "label": "Define Requirements",
+      "action": "defineRequirements",
+      "variant": "secondary",
+      "icon": "assignment",
+      "size": "md",
+      "bgColor": "#4b5563",
+      "textColor": "white",
+      "borderColor": "#6b7280"
+    },
+    "editAllocationsLarge": {
+      "label": "Edit Allocations",
+      "action": "editAllocations",
+      "variant": "secondary",
+      "icon": "edit",
+      "size": "md",
+      "bgColor": "#d97706",
+      "textColor": "white",
+      "borderColor": "#b45309"
+    },
+    "viewDetailsLarge": {
+      "label": "View All Details",
+      "action": "viewAllocationDetails",
+      "variant": "light",
+      "icon": "visibility",
+      "size": "md",
+      "bgColor": "#dbeafe",
+      "textColor": "#1e40af",
+      "borderColor": "#93c5fd"
+    }
   }
 }

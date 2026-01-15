@@ -43,6 +43,11 @@ export class ProjectAllocationComponent implements OnInit {
   roleAllocations: any[] = [];
   isLoading = true;
   projectId: string = '';
+  
+  // Add these properties for edit mode
+  existingAllocations: any[] = [];
+  editMode = false;
+  isEditing = false;
 
   allocationForm: any = {
     startDate: this.getTodayDate()
@@ -65,6 +70,25 @@ export class ProjectAllocationComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.projectId = params['id'];
       console.log('📝 Project ID from route:', this.projectId);
+      
+      // Check for existing allocations in navigation state
+      const navigation = this.router.getCurrentNavigation();
+      const navigationState = navigation?.extras?.state;
+      
+      if (navigationState) {
+        this.existingAllocations = navigationState['existingAllocations'] || [];
+        this.editMode = navigationState['mode'] === 'edit';
+        this.isEditing = this.editMode;
+        
+        if (this.editMode && this.existingAllocations.length > 0) {
+          console.log('🔄 Edit mode with existing allocations:', this.existingAllocations.length);
+          
+          // Set start date from existing allocations if available
+          if (this.existingAllocations[0]?.startDate) {
+            this.allocationForm.startDate = this.existingAllocations[0].startDate;
+          }
+        }
+      }
       
       if (this.projectId) {
         this.loadProjectAndRequirements();
@@ -186,16 +210,55 @@ export class ProjectAllocationComponent implements OnInit {
 
     console.log('🎯 Initializing role allocations from:', this.requirements.roleExperienceMap);
 
-    this.roleAllocations = this.requirements.roleExperienceMap.map((roleReq: any) => ({
-      role: roleReq.role,
-      roleName: roleReq.roleName,
-      requiredCount: roleReq.requiredCount || roleReq.count || 1,
-      minExperience: roleReq.minExperience || 0,
-      qualification: roleReq.qualification || 'Any',
-      requiredSkills: roleReq.requiredSkills || '',
-      allocatedEmployees: [],
-      availablePositions: roleReq.requiredCount || roleReq.count || 1
-    }));
+    // Initialize role allocations from requirements
+    this.roleAllocations = this.requirements.roleExperienceMap.map((roleReq: any) => {
+      const roleName = roleReq.roleName;
+      const requiredCount = roleReq.requiredCount || roleReq.count || 1;
+      
+      // If in edit mode, find existing allocations for this role
+      let allocatedEmployees: any[] = [];
+      let availablePositions = requiredCount;
+      
+      if (this.editMode && this.existingAllocations.length > 0) {
+        // Filter allocations for this specific role
+        allocatedEmployees = this.existingAllocations
+          .filter((alloc: any) => alloc.roleInProject === roleName)
+          .map((alloc: any) => {
+            // Create allocation object with employee details
+            return {
+              id: alloc.id,
+              employeeId: alloc.employeeId,
+              employeeCode: alloc.employeeCode,
+              employeeName: alloc.employeeName,
+              department: alloc.department,
+              allocationStartDate: alloc.startDate,
+              roleInProject: alloc.roleInProject,
+              allocationPercentage: alloc.allocationPercentage || 100,
+              startDate: alloc.startDate,
+              notes: alloc.notes,
+              allocatedDate: alloc.allocatedDate,
+              status: alloc.status || 'Active'
+            };
+          });
+        
+        availablePositions = Math.max(0, requiredCount - allocatedEmployees.length);
+        
+        console.log(`✅ Pre-filled ${allocatedEmployees.length} employees for role: ${roleName}`);
+      }
+
+      return {
+        role: roleReq.role,
+        roleName: roleName,
+        requiredCount: requiredCount,
+        minExperience: roleReq.minExperience || 0,
+        qualification: roleReq.qualification || 'Any',
+        requiredSkills: roleReq.requiredSkills || '',
+        allocatedEmployees: allocatedEmployees,
+        availablePositions: availablePositions,
+        // Store original count for reference
+        originalRequiredCount: requiredCount
+      };
+    });
 
     console.log('✅ Role allocations initialized:', this.roleAllocations);
   }
@@ -222,10 +285,15 @@ export class ProjectAllocationComponent implements OnInit {
         
         this.employees = employeeList.map((emp: any) => ({
           ...emp,
-          selected: false,
+          selected: false, // Will be updated by markExistingEmployeesAsAllocated()
           allocatedRole: '',
           currentProjects: this.getEmployeeProjectCount(emp.id)
         }));
+        
+        // If we have existing allocations, mark those employees as selected
+        if (this.editMode && this.existingAllocations.length > 0) {
+          this.markExistingEmployeesAsAllocated();
+        }
         
         this.checkAllDataLoaded();
       },
@@ -233,12 +301,24 @@ export class ProjectAllocationComponent implements OnInit {
         console.error('❌ Error loading employees:', err);
         this.employees = [];
         this.checkAllDataLoaded();
+        
         Swal.fire({
           icon: 'warning',
           title: 'Employees Not Loaded',
           text: 'Could not load employee list.',
           confirmButtonColor: '#5b0f14'
         });
+      }
+    });
+  }
+
+  private markExistingEmployeesAsAllocated(): void {
+    this.existingAllocations.forEach(alloc => {
+      const employee = this.employees.find(emp => emp.id === alloc.employeeId);
+      if (employee) {
+        employee.selected = true;
+        employee.allocatedRole = alloc.roleInProject;
+        console.log(`✅ Marked employee ${employee.employeeName} as allocated to ${alloc.roleInProject}`);
       }
     });
   }
@@ -327,6 +407,7 @@ export class ProjectAllocationComponent implements OnInit {
       return;
     }
     
+    // Check if employee is already allocated to this role
     if (roleAllocation.allocatedEmployees.some((emp: any) => emp.id === employee.id)) {
       Swal.fire('Info', 'Employee already allocated to this role', 'info');
       return;
@@ -343,6 +424,7 @@ export class ProjectAllocationComponent implements OnInit {
       return;
     }
     
+    // Allocate employee
     roleAllocation.allocatedEmployees.push({
       ...employee,
       allocationStartDate: this.allocationForm.startDate,
@@ -368,6 +450,7 @@ export class ProjectAllocationComponent implements OnInit {
       roleAllocation.allocatedEmployees.splice(index, 1);
       roleAllocation.availablePositions++;
       
+      // Find and update employee
       const employee = this.employees.find(emp => emp.id === employeeId);
       if (employee) {
         employee.selected = false;
@@ -414,6 +497,7 @@ export class ProjectAllocationComponent implements OnInit {
     const allocationsUrl = this.config.apiEndpoints?.allocations?.replace('{{API_BASE}}', environment.API_BASE) || 
                           `${environment.API_BASE}/project-allocations`;
     
+    // Prepare all allocations
     const allAllocations: any[] = [];
     
     this.roleAllocations.forEach(role => {
@@ -444,20 +528,123 @@ export class ProjectAllocationComponent implements OnInit {
     
     console.log('📤 Saving allocations:', allAllocations);
     
-    this.checkExistingAllocations(allAllocations).then(filteredAllocations => {
-      if (filteredAllocations.length === 0) {
-        Swal.fire('Info', 'All allocations already exist in the system', 'info');
-        this.isLoading = false;
-        this.cdr.detectChanges();
-        this.router.navigate(['/projects', this.projectId]);
-        return;
+    // If editing, handle updates/deletes
+    if (this.editMode && this.existingAllocations.length > 0) {
+      this.handleEditAllocationsSave(allAllocations, allocationsUrl);
+    } else {
+      // Normal save (create new allocations)
+      this.saveBatchAllocations(allAllocations, allocationsUrl);
+    }
+  }
+
+  private handleEditAllocationsSave(newAllocations: any[], url: string): void {
+    console.log('🔄 Handling edit mode allocations save');
+    
+    // Find allocations to delete (existing but not in new list)
+    const allocationsToDelete = this.existingAllocations.filter(existing => {
+      return !newAllocations.some(newAlloc => 
+        newAlloc.employeeId === existing.employeeId && 
+        newAlloc.roleInProject === existing.roleInProject
+      );
+    });
+    
+    // Find allocations to add (new but not in existing list)
+    const allocationsToAdd = newAllocations.filter(newAlloc => {
+      return !this.existingAllocations.some(existing => 
+        existing.employeeId === newAlloc.employeeId && 
+        existing.roleInProject === newAlloc.roleInProject
+      );
+    });
+    
+    console.log(`📊 Edit Summary: Add ${allocationsToAdd.length}, Delete ${allocationsToDelete.length}`);
+    
+    // Show confirmation for deletions
+    if (allocationsToDelete.length > 0) {
+      Swal.fire({
+        title: 'Remove Allocations?',
+        html: `
+          <div class="text-left">
+            <p>The following allocations will be removed:</p>
+            <div class="mt-2 p-2 bg-red-50 border border-red-100 rounded max-h-32 overflow-y-auto">
+              ${allocationsToDelete.map(alloc => 
+                `<div class="text-sm text-red-700">${alloc.employeeName} - ${alloc.roleInProject}</div>`
+              ).join('')}
+            </div>
+            <p class="text-sm text-gray-500 mt-2">Total: ${allocationsToDelete.length} allocation(s)</p>
+            <p class="text-sm text-gray-500">New allocations: ${allocationsToAdd.length} allocation(s)</p>
+          </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Save Changes',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#5b0f14',
+        cancelButtonColor: '#6c757d'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.processEditAllocations(allocationsToAdd, allocationsToDelete, url);
+        } else {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      this.processEditAllocations(allocationsToAdd, allocationsToDelete, url);
+    }
+  }
+
+  private async processEditAllocations(
+    allocationsToAdd: any[], 
+    allocationsToDelete: any[], 
+    url: string
+  ): Promise<void> {
+    try {
+      // Delete old allocations
+      for (const alloc of allocationsToDelete) {
+        if (alloc.id) {
+          await this.http.delete(`${url}/${alloc.id}`).toPromise();
+          console.log(`🗑️ Deleted allocation for ${alloc.employeeName}`);
+        }
       }
       
-      this.saveBatchAllocations(filteredAllocations, allocationsUrl);
-    }).catch(error => {
-      console.error('❌ Error checking existing allocations:', error);
-      this.saveBatchAllocations(allAllocations, allocationsUrl);
-    });
+      // Add new allocations
+      for (const alloc of allocationsToAdd) {
+        await this.http.post(url, alloc).toPromise();
+        console.log(`✅ Added allocation for ${alloc.employeeName}`);
+      }
+      
+      this.isLoading = false;
+      this.cdr.detectChanges();
+      
+      const totalChanges = allocationsToAdd.length + allocationsToDelete.length;
+      Swal.fire({
+        icon: 'success',
+        title: 'Changes Saved!',
+        html: `
+          <div class="text-left">
+            <p><strong>Allocations updated successfully!</strong></p>
+            <p class="mt-2">✅ Added: ${allocationsToAdd.length} allocation(s)</p>
+            <p>🗑️ Removed: ${allocationsToDelete.length} allocation(s)</p>
+            <p class="text-sm text-gray-500 mt-3">Total changes: ${totalChanges}</p>
+          </div>
+        `,
+        confirmButtonColor: '#5b0f14'
+      }).then(() => {
+        this.router.navigate(['/projects', this.projectId]);
+      });
+      
+    } catch (error: any) {
+      console.error('❌ Error processing edit allocations:', error);
+      this.isLoading = false;
+      this.cdr.detectChanges();
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Save Failed',
+        text: 'Failed to save allocation changes. Please try again.',
+        confirmButtonColor: '#5b0f14'
+      });
+    }
   }
 
   private checkExistingAllocations(allocations: any[]): Promise<any[]> {
@@ -494,28 +681,43 @@ export class ProjectAllocationComponent implements OnInit {
   }
 
   private saveBatchAllocations(allocations: any[], url: string): void {
-  if (allocations.length > 5) {
-    console.log('🔄 Large batch detected, using sequential saves to avoid json-server issues');
-    this.saveSequentialAllocations(allocations, url);
-    return;
-  }
-  
-  this.http.post(url, allocations).subscribe({
-    next: (response: any) => {
-      console.log('✅ Batch save response:', response);
-      
-      if (response && typeof response === 'object' && !Array.isArray(response)) {
-        const savedCount = Object.keys(response).filter(key => !isNaN(Number(key))).length;
+    if (allocations.length > 5) {
+      console.log('🔄 Large batch detected, using sequential saves to avoid json-server issues');
+      this.saveSequentialAllocations(allocations, url);
+      return;
+    }
+    
+    this.http.post(url, allocations).subscribe({
+      next: (response: any) => {
+        console.log('✅ Batch save response:', response);
         
-        if (savedCount > 0) {
-          console.log(`✅ Saved ${savedCount}/${allocations.length} allocations`);
+        if (response && typeof response === 'object' && !Array.isArray(response)) {
+          const savedCount = Object.keys(response).filter(key => !isNaN(Number(key))).length;
+          
+          if (savedCount > 0) {
+            console.log(`✅ Saved ${savedCount}/${allocations.length} allocations`);
+            this.isLoading = false;
+            this.cdr.detectChanges();
+            
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: `Allocated ${savedCount} employee(s) successfully`,
+              confirmButtonColor: '#5b0f14'
+            }).then(() => {
+              this.router.navigate(['/projects', this.projectId]);
+            });
+          } else {
+            this.saveSequentialAllocations(allocations, url);
+          }
+        } else if (Array.isArray(response)) {
           this.isLoading = false;
           this.cdr.detectChanges();
           
           Swal.fire({
             icon: 'success',
             title: 'Success!',
-            text: `Allocated ${savedCount} employee(s) successfully`,
+            text: `Allocated ${response.length} employee(s) successfully`,
             confirmButtonColor: '#5b0f14'
           }).then(() => {
             this.router.navigate(['/projects', this.projectId]);
@@ -523,62 +725,47 @@ export class ProjectAllocationComponent implements OnInit {
         } else {
           this.saveSequentialAllocations(allocations, url);
         }
-      } else if (Array.isArray(response)) {
+      },
+      error: (err: any) => {
+        console.error('❌ Batch save error:', err);
+        this.saveSequentialAllocations(allocations, url);
+      }
+    });
+  }
+
+  private saveSequentialAllocations(allocations: any[], url: string): void {
+    console.log('🔄 Starting sequential saves for', allocations.length, 'allocations');
+    
+    let savedCount = 0;
+    let failedCount = 0;
+    const failedAllocations: any[] = [];
+    
+    const saveNext = async (index: number) => {
+      if (index >= allocations.length) {
         this.isLoading = false;
         this.cdr.detectChanges();
         
-        Swal.fire({
-          icon: 'success',
-          title: 'Success!',
-          text: `Allocated ${response.length} employee(s) successfully`,
-          confirmButtonColor: '#5b0f14'
-        }).then(() => {
-          this.router.navigate(['/projects', this.projectId]);
-        });
-      } else {
-        this.saveSequentialAllocations(allocations, url);
+        this.showSaveResults(savedCount, failedCount, allocations.length, failedAllocations);
+        return;
       }
-    },
-    error: (err: any) => {
-      console.error('❌ Batch save error:', err);
-      this.saveSequentialAllocations(allocations, url);
-    }
-  });
-}
-
-private saveSequentialAllocations(allocations: any[], url: string): void {
-  console.log('🔄 Starting sequential saves for', allocations.length, 'allocations');
-  
-  let savedCount = 0;
-  let failedCount = 0;
-  const failedAllocations: any[] = [];
-  
-  const saveNext = async (index: number) => {
-    if (index >= allocations.length) {
-      this.isLoading = false;
-      this.cdr.detectChanges();
       
-      this.showSaveResults(savedCount, failedCount, allocations.length, failedAllocations);
-      return;
-    }
+      const allocation = allocations[index];
+      
+      try {
+        const response = await this.http.post(url, allocation).toPromise();
+        savedCount++;
+        console.log(`✅ [${index + 1}/${allocations.length}] Saved ${allocation.employeeName} as ${allocation.roleInProject}`);
+      } catch (error: any) {
+        failedCount++;
+        failedAllocations.push(allocation);
+        console.warn(`❌ [${index + 1}/${allocations.length}] Failed to save ${allocation.employeeName}:`, error?.message || error);
+      }
+      
+      setTimeout(() => saveNext(index + 1), 300);
+    };
     
-    const allocation = allocations[index];
-    
-    try {
-      const response = await this.http.post(url, allocation).toPromise();
-      savedCount++;
-      console.log(`✅ [${index + 1}/${allocations.length}] Saved ${allocation.employeeName} as ${allocation.roleInProject}`);
-    } catch (error: any) {
-      failedCount++;
-      failedAllocations.push(allocation);
-      console.warn(`❌ [${index + 1}/${allocations.length}] Failed to save ${allocation.employeeName}:`, error?.message || error);
-    }
-    
-    setTimeout(() => saveNext(index + 1), 300);
-  };
-  
-  saveNext(0);
-}
+    saveNext(0);
+  }
 
   private saveIndividualAllocationsWithDelay(allocations: any[], url: string): void {
     let savedCount = 0;
@@ -679,5 +866,15 @@ private saveSequentialAllocations(allocations: any[], url: string): void {
 
   getAction(actionId: string): any {
     return this.config.actions?.find((a: any) => a.id === actionId) || {};
+  }
+
+  // Helper method to get page title based on mode
+  getPageTitle(): string {
+    return this.editMode ? 'Edit Resource Allocations' : 'Allocate Resources';
+  }
+
+  // Helper method to get save button text based on mode
+  getSaveButtonText(): string {
+    return this.editMode ? 'Update Allocations' : 'Save Allocations';
   }
 }

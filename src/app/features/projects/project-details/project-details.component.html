@@ -9,10 +9,15 @@
     <mat-icon class="!text-5xl text-gray-400 mb-4">error_outline</mat-icon>
     <h3 class="text-lg font-semibold text-gray-700 mb-2">Project Not Found</h3>
     <p class="text-gray-600">The requested project could not be loaded.</p>
-    <button routerLink="/projects" 
-            class="mt-4 px-4 py-2 bg-[#5b0f14] text-white rounded-lg hover:bg-[#7a1419] transition-colors">
-      Back to Projects
-    </button>
+    <atom-button
+      label="Back to Projects"
+      variant="primary"
+      size="md"
+      bgColor="#5b0f14"
+      textColor="white"
+      routerLink="/projects"
+      class="mt-4">
+    </atom-button>
   </div>
 </div>
 
@@ -31,15 +36,46 @@
       <div class="flex justify-between items-center mb-3">
         <h4 class="font-semibold text-gray-800">Resource Allocation</h4>
         <div class="flex gap-2">
-          <button *ngIf="project.requirements" 
-                  (click)="openRequirementsModal()"
-                  class="text-sm px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-            Edit Requirements
-          </button>
-          <button (click)="handleResourceAllocation()"
-                  class="text-sm px-3 py-1 bg-[#5b0f14] text-white rounded hover:bg-[#7a1419]">
-            Allocate Resources
-          </button>
+          <!-- Edit Requirements Button (only show if allocations don't exist) -->
+          <atom-button
+            *ngIf="project.requirements && allocations.length === 0"
+            [label]="getAllocationAction('editRequirements').label"
+            [variant]="getAllocationAction('editRequirements').variant"
+            [icon]="getAllocationAction('editRequirements').icon"
+            [size]="getAllocationAction('editRequirements').size"
+            [bgColor]="getAllocationAction('editRequirements').bgColor"
+            [textColor]="getAllocationAction('editRequirements').textColor"
+            [borderColor]="getAllocationAction('editRequirements').borderColor"
+            (onClick)="openRequirementsModal()"
+            class="shadow-sm hover:shadow">
+          </atom-button>
+          
+          <!-- Edit Allocations Button (show when allocations exist) -->
+          <atom-button
+            *ngIf="allocations.length > 0"
+            [label]="getAllocationAction('editAllocations').label"
+            [variant]="getAllocationAction('editAllocations').variant"
+            [icon]="getAllocationAction('editAllocations').icon"
+            [size]="getAllocationAction('editAllocations').size"
+            [bgColor]="getAllocationAction('editAllocations').bgColor"
+            [textColor]="getAllocationAction('editAllocations').textColor"
+            [borderColor]="getAllocationAction('editAllocations').borderColor"
+            (onClick)="handleEditAllocations()"
+            class="shadow-sm hover:shadow">
+          </atom-button>
+          
+          <!-- Allocate Resources Button (always show) -->
+          <atom-button
+            [label]="allocations.length > 0 ? getAllocationAction('addMoreResources').label : getAllocationAction('allocateResources').label"
+            [variant]="getAllocationAction('allocateResources').variant"
+            [icon]="allocations.length > 0 ? getAllocationAction('addMoreResources').icon : getAllocationAction('allocateResources').icon"
+            [size]="getAllocationAction('allocateResources').size"
+            [bgColor]="getAllocationAction('allocateResources').bgColor"
+            [textColor]="getAllocationAction('allocateResources').textColor"
+            [borderColor]="getAllocationAction('allocateResources').borderColor"
+            (onClick)="handleResourceAllocation()"
+            class="shadow-sm hover:shadow">
+          </atom-button>
         </div>
       </div>
       
@@ -51,14 +87,30 @@
               <mat-icon class="!text-base text-green-600">check_circle</mat-icon>
               <span class="font-semibold text-gray-800">{{ allocations.length }} resources allocated</span>
             </div>
-            <span class="text-xs font-medium px-2 py-1 bg-green-100 text-green-800 rounded-full">
-              Active
-            </span>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-medium px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                Active
+              </span>
+              <atom-button
+                [label]="getAllocationAction('viewAllocationDetails').label"
+                [variant]="getAllocationAction('viewAllocationDetails').variant"
+                [icon]="getAllocationAction('viewAllocationDetails').icon"
+                [size]="getAllocationAction('viewAllocationDetails').size"
+                [bgColor]="getAllocationAction('viewAllocationDetails').bgColor"
+                [textColor]="getAllocationAction('viewAllocationDetails').textColor"
+                [borderColor]="getAllocationAction('viewAllocationDetails').borderColor"
+                (onClick)="viewAllocationDetails()"
+                class="!text-xs">
+              </atom-button>
+            </div>
           </div>
           
           <!-- Allocations by Role -->
           <div *ngIf="getUniqueRoles().length > 0" class="mb-4">
-            <h5 class="text-sm font-medium text-gray-700 mb-2">Allocations by Role:</h5>
+            <div class="flex items-center justify-between mb-2">
+              <h5 class="text-sm font-medium text-gray-700">Allocations by Role:</h5>
+              <span class="text-xs text-gray-500">{{ getUniqueRoles().length }} roles</span>
+            </div>
             <div class="flex flex-wrap gap-2">
               <span *ngFor="let role of getUniqueRoles()" 
                     class="text-xs px-3 py-1.5 bg-white border border-gray-300 rounded-lg 
@@ -71,7 +123,17 @@
           
           <!-- Recent Allocations List -->
           <div class="mt-4">
-            <h5 class="text-sm font-medium text-gray-700 mb-2">Recent Allocations:</h5>
+            <div class="flex items-center justify-between mb-2">
+              <h5 class="text-sm font-medium text-gray-700">Recent Allocations:</h5>
+              <atom-button
+                label="See All"
+                variant="text"
+                size="xs"
+                textColor="#5b0f14"
+                (onClick)="viewAllocationDetails()"
+                class="!text-xs hover:!text-[#7a1419]">
+              </atom-button>
+            </div>
             <div class="space-y-2 max-h-48 overflow-y-auto pr-2">
               <div *ngFor="let allocation of allocations.slice(0, 5)" 
                    class="p-3 bg-white border border-gray-200 rounded-lg hover:border-[#5b0f14]/30 transition-colors">
@@ -97,18 +159,50 @@
             </div>
           </div>
           
-          <!-- View All Allocations Button -->
-          <button (click)="viewAllocationDetails()"
-                  class="mt-4 w-full text-center text-sm text-[#5b0f14] hover:text-[#7a1419] 
-                         font-medium py-2 border border-[#5b0f14]/20 rounded-lg hover:border-[#5b0f14]/40 
-                         transition-colors">
-            View All Allocations
-          </button>
+          <!-- Action Buttons -->
+          <div class="mt-6 flex gap-2">
+            <atom-button
+              [label]="getAllocationAction('editAllocationsLarge').label"
+              [variant]="getAllocationAction('editAllocationsLarge').variant"
+              [icon]="getAllocationAction('editAllocationsLarge').icon"
+              [size]="getAllocationAction('editAllocationsLarge').size"
+              [bgColor]="getAllocationAction('editAllocationsLarge').bgColor"
+              [textColor]="getAllocationAction('editAllocationsLarge').textColor"
+              [borderColor]="getAllocationAction('editAllocationsLarge').borderColor"
+              (onClick)="handleEditAllocations()"
+              class="flex-1">
+            </atom-button>
+            
+            <atom-button
+              [label]="getAllocationAction('viewDetailsLarge').label"
+              [variant]="getAllocationAction('viewDetailsLarge').variant"
+              [icon]="getAllocationAction('viewDetailsLarge').icon"
+              [size]="getAllocationAction('viewDetailsLarge').size"
+              [bgColor]="getAllocationAction('viewDetailsLarge').bgColor"
+              [textColor]="getAllocationAction('viewDetailsLarge').textColor"
+              [borderColor]="getAllocationAction('viewDetailsLarge').borderColor"
+              (onClick)="viewAllocationDetails()"
+              class="flex-1">
+            </atom-button>
+          </div>
         </div>
         
         <!-- Requirements Info -->
         <div *ngIf="project.requirements" class="mt-4 pt-4 border-t border-gray-300">
-          <h5 class="text-sm font-medium text-gray-700 mb-2">Requirements Summary:</h5>
+          <div class="flex items-center justify-between mb-2">
+            <h5 class="text-sm font-medium text-gray-700">Requirements Summary:</h5>
+            <atom-button
+              *ngIf="allocations.length === 0"
+              label="Edit"
+              variant="light"
+              size="xs"
+              bgColor="#f3f4f6"
+              textColor="#374151"
+              borderColor="#d1d5db"
+              (onClick)="openRequirementsModal()"
+              class="!text-xs">
+            </atom-button>
+          </div>
           <div class="p-3 bg-white border border-gray-200 rounded">
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2">
@@ -146,11 +240,33 @@
             <mat-icon class="!text-xl text-gray-500">group</mat-icon>
           </div>
           <p class="text-gray-600 mb-4">No resources allocated yet</p>
-          <button (click)="handleResourceAllocation()"
-                  class="px-4 py-2 bg-gradient-to-r from-[#5b0f14] to-[#7a1419] text-white 
-                         rounded-lg hover:from-[#7a1419] hover:to-[#5b0f14] transition-all">
-            Allocate Resources
-          </button>
+          <div class="flex gap-2 justify-center">
+            <atom-button
+              *ngIf="project.requirements"
+              [label]="getAllocationAction('allocateResources').label"
+              [variant]="getAllocationAction('allocateResources').variant"
+              [icon]="getAllocationAction('allocateResources').icon"
+              [size]="getAllocationAction('allocateResources').size"
+              [bgColor]="getAllocationAction('allocateResources').bgColor"
+              [textColor]="getAllocationAction('allocateResources').textColor"
+              [borderColor]="getAllocationAction('allocateResources').borderColor"
+              (onClick)="handleResourceAllocation()"
+              class="shadow-md hover:shadow-lg">
+            </atom-button>
+            
+            <atom-button
+              *ngIf="!project.requirements"
+              [label]="getAllocationAction('defineRequirements').label"
+              [variant]="getAllocationAction('defineRequirements').variant"
+              [icon]="getAllocationAction('defineRequirements').icon"
+              [size]="getAllocationAction('defineRequirements').size"
+              [bgColor]="getAllocationAction('defineRequirements').bgColor"
+              [textColor]="getAllocationAction('defineRequirements').textColor"
+              [borderColor]="getAllocationAction('defineRequirements').borderColor"
+              (onClick)="openRequirementsModal()"
+              class="shadow-md hover:shadow-lg">
+            </atom-button>
+          </div>
         </div>
         
         <!-- Loading State for Allocations -->
@@ -160,7 +276,7 @@
         </div>
         
         <!-- No Requirements Warning -->
-        <div *ngIf="!project.requirements && !loading" class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded">
+        <div *ngIf="!project.requirements && !loading && allocations.length === 0" class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded">
           <div class="flex items-center gap-2">
             <mat-icon class="!text-base text-amber-600">warning</mat-icon>
             <div class="text-sm">
@@ -168,10 +284,16 @@
               <p class="text-amber-700 mt-1">Define requirements before allocating resources</p>
             </div>
           </div>
-          <button (click)="openRequirementsModal()"
-                  class="mt-2 text-sm px-3 py-1 bg-amber-600 text-white rounded hover:bg-amber-700">
-            Define Requirements
-          </button>
+          <atom-button
+            label="Define Requirements"
+            variant="secondary"
+            size="sm"
+            bgColor="#d97706"
+            textColor="white"
+            borderColor="#b45309"
+            (onClick)="openRequirementsModal()"
+            class="mt-2">
+          </atom-button>
         </div>
       </div>
     </div>
