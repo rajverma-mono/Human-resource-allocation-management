@@ -2,287 +2,296 @@
   <div class="px-10 pb-10 bg-white">
 
     <!-- Loading State -->
-    @if (isLoading && !project) {
-    <div class="flex flex-col items-center justify-center py-20">
-      <div class="w-12 h-12 border-4 border-[#801519]/20 border-t-[#801519] rounded-full animate-spin"></div>
-      <p class="mt-4 text-sm font-bold text-gray-500 uppercase tracking-widest">
-        Loading project allocation...
-      </p>
-    </div>
+    @if (isLoading) {
+      <div class="flex flex-col items-center justify-center py-20">
+        <div class="w-12 h-12 border-4 border-[#801519]/20 border-t-[#801519] rounded-full animate-spin"></div>
+        <p class="mt-4 text-sm font-bold text-gray-500 uppercase tracking-widest">
+          Loading project allocation...
+        </p>
+        <p class="mt-2 text-xs text-gray-400">Loading project, requirements, and employees</p>
+      </div>
     }
 
     @if (!isLoading && config && project) {
 
-    <!-- Page Header -->
-    <app-page-header 
-      [title]="config.title" 
-      icon="group_add">
-      <div class="text-sm text-gray-600">
-        Allocating resources to: <strong>{{ project.projectName }}</strong>
-      </div>
-    </app-page-header>
+      <!-- Page Header -->
+      <app-page-header 
+        [title]="config.title" 
+        icon="group_add">
+        <div class="text-sm text-gray-600">
+          Allocating resources to: <strong>{{ project.projectName }}</strong>
+        </div>
+      </app-page-header>
 
-    <!-- Project Details Section -->
-    @for(section of config.sections; track section.title) {
-      @if(section.type === 'info-grid') {
+      <!-- Project & Requirements Info -->
+      @if (requirements) {
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <h3 class="text-lg font-bold text-blue-800 mb-4 flex items-center gap-2">
+            <i class="material-icons">description</i>
+            Project Requirements
+          </h3>
+          
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <div class="text-sm text-blue-600 mb-1">Total Required Positions</div>
+              <div class="text-2xl font-bold text-blue-800">{{ requirements.requiredHeadcount || 0 }}</div>
+            </div>
+            <div>
+              <div class="text-sm text-blue-600 mb-1">Work Type</div>
+              <div class="text-lg font-semibold text-blue-800">{{ requirements.workType }}</div>
+            </div>
+          </div>
+          
+          <!-- Allocation Start Date -->
+          <div class="mt-6">
+            <label class="block text-sm font-semibold text-blue-700 mb-2">
+              <i class="material-icons align-middle text-sm">calendar_today</i>
+              Allocation Start Date
+            </label>
+            <atom-date-picker 
+              [value]="allocationForm.startDate"
+              (valueChange)="allocationForm.startDate = $event"
+              [required]="true">
+            </atom-date-picker>
+          </div>
+        </div>
+      }
+
+      <!-- Role-based Allocation Section -->
       <div class="mt-8">
         <h3 class="text-lg font-bold text-[#801519] mb-6 flex items-center gap-3">
-          <i class="material-icons">{{ section.icon || 'info' }}</i>
-          {{ section.title }}
+          <i class="material-icons">assignment_ind</i>
+          Role-based Allocation
         </h3>
-        
-        <div class="grid grid-cols-2 gap-6">
-          @for(field of section.fields; track field.key) {
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                <i class="material-icons text-sm">{{ field.icon }}</i>
-                <span>{{ field.label }}</span>
-              </div>
-              <div class="font-medium text-gray-800">
-                {{ project[field.key] }}
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-      }
-    }
 
-    <!-- Employee Selection Section -->
-    <div class="mt-8">
-      <h3 class="text-lg font-bold text-[#801519] mb-6 flex items-center gap-3">
-        <i class="material-icons">people</i>
-        Select Employees
-      </h3>
-
-      <!-- Search and Filters -->
-      <div class="grid grid-cols-2 gap-6 mb-6">
-        <div>
-          <label class="block text-sm font-semibold mb-2">Search Employee</label>
-          <atom-input 
-            [value]="searchTerm"
-            (valueChange)="searchTerm = $event; filterEmployees()"
-            type="text"
-            placeholder="Search by name, code, or role">
-          </atom-input>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-semibold mb-2">Filter by Department</label>
-          <atom-select 
-            [options]="[
-              {value: 'All Departments', label: 'All Departments'},
-              {value: 'Information Technology (IT)', label: 'IT'},
-              {value: 'Human Resource (HR)', label: 'HR'},
-              {value: 'Finance', label: 'Finance'},
-              {value: 'Sales', label: 'Sales'},
-              {value: 'Marketing', label: 'Marketing'},
-              {value: 'Development', label: 'Development'}
-            ]"
-            [value]="selectedDepartment"
-            (valueChange)="selectedDepartment = $event; filterEmployees()"
-            placeholder="Select Department">
-          </atom-select>
-        </div>
-      </div>
-
-      <!-- Employees Table -->
-      <div class="border rounded-lg overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Select
-                </th>
-                @for(column of config.tableConfig.columns; track column.key) {
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {{ column.label }}
-                  </th>
-                }
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              @for(employee of filteredEmployees; track employee.id) {
-                <tr [class.bg-blue-50]="employee.selected" 
-                    [class.bg-gray-100]="employee.allocated">
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    @if(employee.allocated) {
-                      <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
-                        Allocated
+        @if (roleAllocations && roleAllocations.length > 0) {
+          <div class="space-y-6">
+            @for (role of roleAllocations; track role.roleName) {
+              <div class="border rounded-lg overflow-hidden">
+                <!-- Role Header -->
+                <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
+                  <div>
+                    <h4 class="font-bold text-gray-800">{{ role.roleName }}</h4>
+                    <div class="text-sm text-gray-600 mt-1">
+                      <span class="inline-flex items-center gap-1 mr-4">
+                        <i class="material-icons text-sm">person</i>
+                        Required: {{ role.requiredCount }}
                       </span>
-                    } @else {
-                      <input type="checkbox" 
-                             [checked]="employee.selected"
-                             (change)="toggleEmployeeSelection(employee)"
-                             class="h-4 w-4 text-[#5b0f14] focus:ring-[#5b0f14] border-gray-300 rounded">
-                    }
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">
-                      {{ employee.employeeCode }}
+                      <span class="inline-flex items-center gap-1 mr-4">
+                        <i class="material-icons text-sm">timeline</i>
+                        Min Exp: {{ role.minExperience }} years
+                      </span>
+                      <span class="inline-flex items-center gap-1">
+                        <i class="material-icons text-sm">school</i>
+                        {{ role.qualification }}
+                      </span>
                     </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                      <div class="text-sm font-medium text-gray-900">
-                        {{ employee.employeeName }}
-                      </div>
-                      @if(employee.jobTitle) {
-                        <div class="ml-2 text-xs text-gray-500">
-                          ({{ employee.jobTitle }})
+                  </div>
+                  <div class="text-right">
+                    <span class="inline-block px-3 py-1 rounded-full text-sm font-medium"
+                          [ngClass]="{
+                            'bg-green-100 text-green-800': role.availablePositions === 0,
+                            'bg-yellow-100 text-yellow-800': role.availablePositions > 0 && role.availablePositions < role.requiredCount,
+                            'bg-red-100 text-red-800': role.availablePositions === role.requiredCount
+                          }">
+                      {{ role.allocatedEmployees.length }}/{{ role.requiredCount }} filled
+                    </span>
+                    <div class="text-xs text-gray-500 mt-1">
+                      {{ role.availablePositions }} positions available
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Allocated Employees -->
+                <div class="p-6 bg-gray-50">
+                  <h5 class="text-sm font-semibold text-gray-700 mb-3">Allocated Employees:</h5>
+                  
+                  @if (role.allocatedEmployees.length > 0) {
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      @for (emp of role.allocatedEmployees; track emp.id) {
+                        <div class="bg-white border rounded p-3 flex justify-between items-center">
+                          <div>
+                            <div class="font-medium">{{ emp.employeeName }}</div>
+                            <div class="text-sm text-gray-500">{{ emp.employeeCode }} • {{ emp.department }}</div>
+                            <div class="text-xs text-gray-400">Start: {{ emp.allocationStartDate | date:'shortDate' }}</div>
+                          </div>
+                          <button (click)="removeAllocation(role.roleName, emp.id)"
+                                  class="text-red-600 hover:text-red-800">
+                            <i class="material-icons">delete</i>
+                          </button>
                         </div>
                       }
                     </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ employee.department }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ employee.currentProjects || 0 }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button *ngIf="employee.selected && !employee.allocated"
-                            (click)="removeSelectedEmployee(employee)"
-                            class="text-red-600 hover:text-red-900">
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Selected Employees Count -->
-      @if(selectedEmployees.length > 0) {
-        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center text-blue-800">
-              <i class="material-icons mr-2">check_circle</i>
-              <span class="font-medium">{{ selectedEmployees.length }} employee(s) selected</span>
-            </div>
-            <button (click)="selectedEmployees = []" 
-                    class="text-sm text-blue-600 hover:text-blue-800">
-              Clear All
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-
-    <!-- Allocation Details Section -->
-    <div class="mt-8">
-      <h3 class="text-lg font-bold text-[#801519] mb-6 flex items-center gap-3">
-        <i class="material-icons">assignment</i>
-        Allocation Details
-      </h3>
-
-      <div class="grid grid-cols-2 gap-6">
-        @for(field of config.sections[2].fields; track field.id) {
-          <div>
-            @switch(field.type) {
-              @case('select') {
-                <label class="block text-sm font-semibold mb-2">
-                  {{field.label}}
-                  @if(field.required) {
-                    <span class="text-red-500">*</span>
+                  } @else {
+                    <div class="text-center py-4 text-gray-400">
+                      <i class="material-icons text-2xl mb-2">person_add</i>
+                      <p>No employees allocated yet</p>
+                    </div>
                   }
-                </label>
-                <atom-select 
-                  [options]="field.options" 
-                  [value]="allocationForm[field.id]"
-                  (valueChange)="allocationForm[field.id] = $event"
-                  [placeholder]="field.placeholder || 'Select ' + field.label">
-                </atom-select>
-              }
-              
-              @case('number') {
-                <label class="block text-sm font-semibold mb-2">
-                  {{field.label}}
-                  @if(field.required) {
-                    <span class="text-red-500">*</span>
-                  }
-                </label>
-                <atom-input 
-                  [value]="allocationForm[field.id]"
-                  (valueChange)="allocationForm[field.id] = $event"
-                  type="number"
-                  [placeholder]="field.placeholder || field.label">
-                </atom-input>
-                @if(field.suffix) {
-                  <span class="text-sm text-gray-500 ml-2">{{ field.suffix }}</span>
-                }
-                <!-- Validation notes -->
-                @if(field.min || field.max) {
-                  <div class="text-xs text-gray-500 mt-1">
-                    @if(field.min && field.max) {
-                      Range: {{ field.min }} - {{ field.max }}
-                    } @else if(field.min) {
-                      Minimum: {{ field.min }}
-                    } @else if(field.max) {
-                      Maximum: {{ field.max }}
-                    }
-                  </div>
-                }
-              }
-              
-              @case('date') {
-                <atom-date-picker 
-                  [value]="allocationForm[field.id]"
-                  (valueChange)="allocationForm[field.id] = $event"
-                  [label]="field.label"
-                  [required]="field.required || false">
-                </atom-date-picker>
-              }
-              
-              @case('textarea') {
-                <label class="block text-sm font-semibold mb-2">{{field.label}}</label>
-                <atom-textarea 
-                  [value]="allocationForm[field.id]"
-                  (valueChange)="allocationForm[field.id] = $event"
-                  [rows]="field.rows || 3"
-                  [placeholder]="field.placeholder || field.label">
-                </atom-textarea>
-              }
+                </div>
+              </div>
             }
+          </div>
+        } @else {
+          <div class="text-center py-8 bg-gray-50 rounded-lg">
+            <i class="material-icons text-4xl text-gray-400 mb-3">warning</i>
+            <p class="text-gray-500">No role requirements defined</p>
+            <p class="text-sm text-gray-400 mt-1">Please define project requirements first</p>
           </div>
         }
       </div>
-    </div>
 
-    <!-- Action Buttons -->
-    <div class="flex justify-end gap-4 mt-12">
-      <atom-button 
-        [label]="getAction('cancel').label" 
-        [variant]="getAction('cancel').variant || 'outlineSecondary'"
-        [size]="getAction('cancel').size || 'md'"
-        [bgColor]="getAction('cancel').bgColor"
-        [textColor]="getAction('cancel').textColor"
-        [borderColor]="getAction('cancel').borderColor"
-        (onClick)="cancel()">
-      </atom-button>
-      
-      <atom-button 
-        [label]="getAction('saveAllocation').label" 
-        [variant]="getAction('saveAllocation').variant || 'primary'"
-        [size]="getAction('saveAllocation').size || 'md'"
-        [bgColor]="getAction('saveAllocation').bgColor"
-        [textColor]="getAction('saveAllocation').textColor"
-        [borderColor]="getAction('saveAllocation').borderColor"
-        (onClick)="saveAllocation()"
-        [disabled]="selectedEmployees.length === 0 || isLoading">
-      </atom-button>
-    </div>
+      <!-- Employee Selection Section -->
+      <div class="mt-8">
+        <h3 class="text-lg font-bold text-[#801519] mb-6 flex items-center gap-3">
+          <i class="material-icons">people</i>
+          Select Employees for Allocation
+        </h3>
 
-    } @else if (!project && !isLoading) {
+        <!-- Search and Filters -->
+        <div class="grid grid-cols-3 gap-6 mb-6">
+          <div>
+            <label class="block text-sm font-semibold mb-2">Search Employee</label>
+            <atom-input 
+              [value]="searchTerm"
+              (valueChange)="searchTerm = $event"
+              type="text"
+              placeholder="Search by name, code, or department">
+            </atom-input>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold mb-2">Filter by Department</label>
+            <atom-select 
+              [options]="[
+                {value: 'All Departments', label: 'All Departments'},
+                {value: 'Information Technology (IT)', label: 'IT'},
+                {value: 'Human Resource (HR)', label: 'HR'},
+                {value: 'Finance', label: 'Finance'},
+                {value: 'Sales', label: 'Sales'},
+                {value: 'Marketing', label: 'Marketing'},
+                {value: 'Development', label: 'Development'}
+              ]"
+              [value]="selectedDepartment"
+              (valueChange)="selectedDepartment = $event"
+              placeholder="Select Department">
+            </atom-select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold mb-2">Filter by Role</label>
+            <atom-select 
+              [options]="getRoles()"
+              [value]="selectedRole"
+              (valueChange)="selectedRole = $event"
+              placeholder="Select Role">
+            </atom-select>
+          </div>
+        </div>
+
+        <!-- Employees Table -->
+        @if (employees.length > 0) {
+          <div class="border rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Select Role</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Emp Code</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Job Title</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Experience</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Projects</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  @for (employee of getFilteredEmployees(); track employee.id) {
+                    <tr [class.bg-green-50]="employee.selected">
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex flex-col gap-2">
+                          @for (role of roleAllocations; track role.roleName) {
+                            @if (role.availablePositions > 0) {
+                              <button (click)="allocateEmployeeToRole(employee, role.roleName)"
+                                      class="text-xs px-3 py-1 bg-[#5b0f14] text-white rounded hover:bg-[#7a1419]">
+                                Assign to {{ role.roleName }}
+                              </button>
+                            }
+                          }
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {{ employee.employeeCode }}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ employee.employeeName }}</div>
+                        @if (employee.allocatedRole) {
+                          <div class="text-xs text-green-600">Allocated to: {{ employee.allocatedRole }}</div>
+                        }
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ employee.department }}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ employee.jobTitle }}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ employee.experienceYears || '0' }} years
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ employee.currentProjects || 0 }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          @if (getFilteredEmployees().length === 0) {
+            <div class="text-center py-8 text-gray-400">
+              No employees match the current filters
+            </div>
+          }
+        } @else {
+          <div class="text-center py-8 bg-gray-50 rounded-lg">
+            <i class="material-icons text-4xl text-gray-400 mb-3">person_search</i>
+            <p class="text-gray-500">No employees found</p>
+          </div>
+        }
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-4 mt-12">
+        <atom-button 
+          [label]="getAction('cancel').label" 
+          [variant]="getAction('cancel').variant || 'outlineSecondary'"
+          [size]="getAction('cancel').size || 'md'"
+          [bgColor]="getAction('cancel').bgColor"
+          [textColor]="getAction('cancel').textColor"
+          [borderColor]="getAction('cancel').borderColor"
+          (onClick)="cancel()">
+        </atom-button>
+        
+        <atom-button 
+          [label]="getAction('saveAllocation').label" 
+          [variant]="getAction('saveAllocation').variant || 'primary'"
+          [size]="getAction('saveAllocation').size || 'md'"
+          [bgColor]="getAction('saveAllocation').bgColor"
+          [textColor]="getAction('saveAllocation').textColor"
+          [borderColor]="getAction('saveAllocation').borderColor"
+          (onClick)="saveAllocations()"
+          [disabled]="isLoading">
+        </atom-button>
+      </div>
+
+    } @else if (!isLoading && (!project || !requirements)) {
       <div class="text-center py-20 text-gray-500">
         <i class="material-icons text-5xl mb-4">error_outline</i>
-        <p>Project not found or failed to load</p>
+        <p>Project or requirements not found</p>
         <button (click)="goBack()" 
                 class="mt-4 px-4 py-2 bg-[#5b0f14] text-white rounded-lg hover:bg-[#7a1419]">
-          Back to Projects
+          Back to Project
         </button>
       </div>
     }

@@ -121,6 +121,7 @@ export class AddEmployeeComponent implements OnInit {
 
     console.log('🟢 Form initialized for add mode:', this.form);
   }
+
   private checkEditMode(): void {
     console.log('🔍 checkEditMode called');
 
@@ -164,7 +165,6 @@ export class AddEmployeeComponent implements OnInit {
     });
   }
 
-
   private loadEmployeeData(id: string | number): void {
     this.isLoading = true;
 
@@ -197,7 +197,6 @@ export class AddEmployeeComponent implements OnInit {
     });
   }
 
-
   private safeDetectChanges(): void {
     if (this.isComponentAlive && this.cdr) {
       try {
@@ -224,12 +223,71 @@ export class AddEmployeeComponent implements OnInit {
       return '';
     }
   }
+
+  // NEW: Calculate total experience from experience list
+  private calculateTotalExperience(): number {
+    if (!this.experienceList || this.experienceList.length === 0) {
+      return 0;
+    }
+
+    let totalMonths = 0;
+
+    this.experienceList.forEach(exp => {
+      if (exp.fromDate && exp.toDate) {
+        const fromDate = new Date(exp.fromDate);
+        const toDate = new Date(exp.toDate);
+        
+        if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime())) {
+          const months = (toDate.getFullYear() - fromDate.getFullYear()) * 12 
+                       + (toDate.getMonth() - fromDate.getMonth());
+          totalMonths += Math.max(0, months); // Ensure positive value
+        }
+      }
+    });
+
+    // Convert months to years (rounded to 1 decimal)
+    const totalYears = totalMonths / 12;
+    return Math.round(totalYears * 10) / 10; // Round to 1 decimal place
+  }
+
+  // NEW: Calculate experience in years and months format
+  private calculateExperienceString(): string {
+    if (!this.experienceList || this.experienceList.length === 0) {
+      return '0 years';
+    }
+
+    let totalMonths = 0;
+
+    this.experienceList.forEach(exp => {
+      if (exp.fromDate && exp.toDate) {
+        const fromDate = new Date(exp.fromDate);
+        const toDate = new Date(exp.toDate);
+        
+        if (!isNaN(fromDate.getTime()) && !isNaN(toDate.getTime())) {
+          const months = (toDate.getFullYear() - fromDate.getFullYear()) * 12 
+                       + (toDate.getMonth() - fromDate.getMonth());
+          totalMonths += Math.max(0, months);
+        }
+      }
+    });
+
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+
+    if (years === 0) {
+      return `${months} month${months !== 1 ? 's' : ''}`;
+    } else if (months === 0) {
+      return `${years} year${years !== 1 ? 's' : ''}`;
+    } else {
+      return `${years} year${years !== 1 ? 's' : ''} ${months} month${months !== 1 ? 's' : ''}`;
+    }
+  }
+
   private prefillFormFromData(employeeData: any): void {
     console.log('🔥 prefillFormFromData CALLED with data:', employeeData);
 
     const dataToUse = employeeData.data || employeeData.result || employeeData;
     console.log('🔥 Using data from:', dataToUse === employeeData ? 'root' : 'nested property');
-
 
     const newForm: any = {};
 
@@ -398,7 +456,6 @@ export class AddEmployeeComponent implements OnInit {
     return null;
   }
 
-
   getAction(id: string, section?: 'experience' | 'certification') {
     if (section === 'experience' && this.formConfig.experienceActions) {
       return this.formConfig.experienceActions.find((a: any) => a.id === id) || {};
@@ -480,10 +537,28 @@ export class AddEmployeeComponent implements OnInit {
         this.addExperience();
       }
     } else {
-      this.experienceList = []; // optional cleanup
+      this.experienceList = [];
     }
   }
 
+  // NEW: Calculate and display experience summary
+  getExperienceSummary(): string {
+    if (this.form.experienceType === 'Fresher' || this.experienceList.length === 0) {
+      return 'Fresher (0 years)';
+    }
+
+    const totalYears = this.calculateTotalExperience();
+    const experienceString = this.calculateExperienceString();
+    
+    return `Experienced (${totalYears} years / ${experienceString})`;
+  }
+
+  // NEW: Update experience when dates change
+  onExperienceDateChange() {
+    // This can be called from the template when dates change
+    // to update the experience summary in real-time
+    this.cdr.detectChanges();
+  }
 
   onCertificateUpload(index: number) {
     Swal.fire(
@@ -538,7 +613,6 @@ export class AddEmployeeComponent implements OnInit {
     }
   }
 
-
   createCertificationBlock() {
     const block: any = {};
     const section = this.formConfig.sections.find(
@@ -567,7 +641,6 @@ export class AddEmployeeComponent implements OnInit {
       this.certificationList = [];
     }
   }
-
 
   nextStep() {
     if (this.activeStep < this.stepperSteps.length - 1) {
@@ -640,6 +713,10 @@ export class AddEmployeeComponent implements OnInit {
       url = apiEndpoint.replace('{{API_BASE}}', environment.API_BASE);
     }
 
+    // Calculate total experience before saving
+    const totalExperienceYears = this.calculateTotalExperience();
+    const experienceString = this.calculateExperienceString();
+
     const payload: any = {
       employeeName: this.form.employeeName,
       employeeCode: this.form.employeeCode,
@@ -667,6 +744,10 @@ export class AddEmployeeComponent implements OnInit {
       ifscCode: this.form.ifscCode,
       accountType: this.form.accountType,
       bankRemarks: this.form.bankRemarks,
+      // NEW: Add experience summary fields
+      experienceType: this.form.experienceType,
+      totalExperienceYears: totalExperienceYears,
+      experienceSummary: experienceString,
       experience: this.experienceList.map(exp => ({
         companyName: exp.companyName,
         role: exp.role,
@@ -685,6 +766,7 @@ export class AddEmployeeComponent implements OnInit {
     };
 
     console.log(`📤 ${httpMethod.toUpperCase()} →`, url, payload);
+    console.log(`🎯 Total Experience Calculated: ${totalExperienceYears} years (${experienceString})`);
 
     const apiCall = httpMethod === 'put'
       ? this.http.put(url, payload)

@@ -3,100 +3,20 @@
   "apiEndpoints": {
     "employees": "{{API_BASE}}/employees",
     "projects": "{{API_BASE}}/projects",
-    "allocations": "{{API_BASE}}/project-allocations",
-    "getByProject": "{{API_BASE}}/project-allocations?projectId={projectId}",
-    "getByEmployee": "{{API_BASE}}/project-allocations?employeeId={employeeId}"
+    "requirements": "{{API_BASE}}/requirements?projectId={projectId}",
+    "allocations": "{{API_BASE}}/project-allocations"
   },
   
   "sections": [
     {
-      "title": "Project Details",
+      "title": "Project & Requirements",
       "type": "info-grid",
       "columns": 2,
       "fields": [
         { "label": "Project Name", "key": "projectName", "icon": "description" },
-        { "label": "Project Code", "key": "workOrderNumber", "icon": "code" },
         { "label": "Client", "key": "clientName", "icon": "business" },
-        { "label": "Status", "key": "projectStatus", "icon": "status" }
-      ]
-    },
-    {
-      "title": "Select Employees to Allocate",
-      "type": "employee-selection",
-      "fields": [
-        {
-          "id": "searchEmployee",
-          "label": "Search Employee",
-          "type": "text",
-          "placeholder": "Search by name, code, or role"
-        },
-        {
-          "id": "filterDepartment",
-          "label": "Filter by Department",
-          "type": "select",
-          "options": [
-            "All Departments",
-            "Information Technology (IT)",
-            "Human Resource (HR)",
-            "Finance",
-            "Sales",
-            "Marketing",
-            "Development"
-          ]
-        }
-      ]
-    },
-    {
-      "title": "Allocation Details",
-      "type": "allocation-form",
-      "fields": [
-        {
-          "id": "roleInProject",
-          "label": "Role in Project",
-          "type": "select",
-          "required": true,
-          "options": [
-            "Project Manager",
-            "Team Lead",
-            "Senior Developer",
-            "Developer",
-            "QA Engineer",
-            "Business Analyst",
-            "UI/UX Designer",
-            "DevOps Engineer",
-            "Support"
-          ]
-        },
-        {
-          "id": "allocationPercentage",
-          "label": "Allocation Percentage",
-          "type": "number",
-          "required": true,
-          "min": 10,
-          "max": 100,
-          "step": 10,
-          "default": 100,
-          "suffix": "%"
-        },
-        {
-          "id": "startDate",
-          "label": "Allocation Start Date",
-          "type": "date",
-          "required": true
-        },
-        {
-          "id": "endDate",
-          "label": "Allocation End Date",
-          "type": "date",
-          "required": false
-        },
-        {
-          "id": "notes",
-          "label": "Allocation Notes",
-          "type": "textarea",
-          "rows": 3,
-          "placeholder": "Any special notes about this allocation..."
-        }
+        { "label": "Required Positions", "key": "requiredHeadcount", "icon": "group" },
+        { "label": "Work Type", "key": "workType", "icon": "work" }
       ]
     }
   ],
@@ -104,7 +24,7 @@
   "actions": [
     {
       "id": "saveAllocation",
-      "label": "Save Allocation",
+      "label": "Save Allocations",
       "variant": "primary",
       "icon": "save",
       "bgColor": "#5b0f14",
@@ -116,15 +36,5 @@
       "variant": "outlineSecondary",
       "icon": "cancel"
     }
-  ],
-  
-  "tableConfig": {
-    "columns": [
-      { "key": "employeeCode", "label": "Emp Code", "width": "100px" },
-      { "key": "employeeName", "label": "Name", "width": "200px" },
-      { "key": "department", "label": "Department", "width": "150px" },
-      { "key": "currentProjects", "label": "Current Projects", "width": "100px" },
-      { "key": "actions", "label": "Actions", "width": "150px" }
-    ]
-  }
+  ]
 }
