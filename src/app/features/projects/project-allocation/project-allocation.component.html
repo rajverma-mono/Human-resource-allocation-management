@@ -1,0 +1,291 @@
+<div class="max-w-6xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden mt-8">
+  <div class="px-10 pb-10 bg-white">
+
+    <!-- Loading State -->
+    @if (isLoading && !project) {
+    <div class="flex flex-col items-center justify-center py-20">
+      <div class="w-12 h-12 border-4 border-[#801519]/20 border-t-[#801519] rounded-full animate-spin"></div>
+      <p class="mt-4 text-sm font-bold text-gray-500 uppercase tracking-widest">
+        Loading project allocation...
+      </p>
+    </div>
+    }
+
+    @if (!isLoading && config && project) {
+
+    <!-- Page Header -->
+    <app-page-header 
+      [title]="config.title" 
+      icon="group_add">
+      <div class="text-sm text-gray-600">
+        Allocating resources to: <strong>{{ project.projectName }}</strong>
+      </div>
+    </app-page-header>
+
+    <!-- Project Details Section -->
+    @for(section of config.sections; track section.title) {
+      @if(section.type === 'info-grid') {
+      <div class="mt-8">
+        <h3 class="text-lg font-bold text-[#801519] mb-6 flex items-center gap-3">
+          <i class="material-icons">{{ section.icon || 'info' }}</i>
+          {{ section.title }}
+        </h3>
+        
+        <div class="grid grid-cols-2 gap-6">
+          @for(field of section.fields; track field.key) {
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                <i class="material-icons text-sm">{{ field.icon }}</i>
+                <span>{{ field.label }}</span>
+              </div>
+              <div class="font-medium text-gray-800">
+                {{ project[field.key] }}
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+      }
+    }
+
+    <!-- Employee Selection Section -->
+    <div class="mt-8">
+      <h3 class="text-lg font-bold text-[#801519] mb-6 flex items-center gap-3">
+        <i class="material-icons">people</i>
+        Select Employees
+      </h3>
+
+      <!-- Search and Filters -->
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        <div>
+          <label class="block text-sm font-semibold mb-2">Search Employee</label>
+          <atom-input 
+            [value]="searchTerm"
+            (valueChange)="searchTerm = $event; filterEmployees()"
+            type="text"
+            placeholder="Search by name, code, or role">
+          </atom-input>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold mb-2">Filter by Department</label>
+          <atom-select 
+            [options]="[
+              {value: 'All Departments', label: 'All Departments'},
+              {value: 'Information Technology (IT)', label: 'IT'},
+              {value: 'Human Resource (HR)', label: 'HR'},
+              {value: 'Finance', label: 'Finance'},
+              {value: 'Sales', label: 'Sales'},
+              {value: 'Marketing', label: 'Marketing'},
+              {value: 'Development', label: 'Development'}
+            ]"
+            [value]="selectedDepartment"
+            (valueChange)="selectedDepartment = $event; filterEmployees()"
+            placeholder="Select Department">
+          </atom-select>
+        </div>
+      </div>
+
+      <!-- Employees Table -->
+      <div class="border rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Select
+                </th>
+                @for(column of config.tableConfig.columns; track column.key) {
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {{ column.label }}
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              @for(employee of filteredEmployees; track employee.id) {
+                <tr [class.bg-blue-50]="employee.selected" 
+                    [class.bg-gray-100]="employee.allocated">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    @if(employee.allocated) {
+                      <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                        Allocated
+                      </span>
+                    } @else {
+                      <input type="checkbox" 
+                             [checked]="employee.selected"
+                             (change)="toggleEmployeeSelection(employee)"
+                             class="h-4 w-4 text-[#5b0f14] focus:ring-[#5b0f14] border-gray-300 rounded">
+                    }
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ employee.employeeCode }}
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="text-sm font-medium text-gray-900">
+                        {{ employee.employeeName }}
+                      </div>
+                      @if(employee.jobTitle) {
+                        <div class="ml-2 text-xs text-gray-500">
+                          ({{ employee.jobTitle }})
+                        </div>
+                      }
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ employee.department }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ employee.currentProjects || 0 }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button *ngIf="employee.selected && !employee.allocated"
+                            (click)="removeSelectedEmployee(employee)"
+                            class="text-red-600 hover:text-red-900">
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Selected Employees Count -->
+      @if(selectedEmployees.length > 0) {
+        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center text-blue-800">
+              <i class="material-icons mr-2">check_circle</i>
+              <span class="font-medium">{{ selectedEmployees.length }} employee(s) selected</span>
+            </div>
+            <button (click)="selectedEmployees = []" 
+                    class="text-sm text-blue-600 hover:text-blue-800">
+              Clear All
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Allocation Details Section -->
+    <div class="mt-8">
+      <h3 class="text-lg font-bold text-[#801519] mb-6 flex items-center gap-3">
+        <i class="material-icons">assignment</i>
+        Allocation Details
+      </h3>
+
+      <div class="grid grid-cols-2 gap-6">
+        @for(field of config.sections[2].fields; track field.id) {
+          <div>
+            @switch(field.type) {
+              @case('select') {
+                <label class="block text-sm font-semibold mb-2">
+                  {{field.label}}
+                  @if(field.required) {
+                    <span class="text-red-500">*</span>
+                  }
+                </label>
+                <atom-select 
+                  [options]="field.options" 
+                  [value]="allocationForm[field.id]"
+                  (valueChange)="allocationForm[field.id] = $event"
+                  [placeholder]="field.placeholder || 'Select ' + field.label">
+                </atom-select>
+              }
+              
+              @case('number') {
+                <label class="block text-sm font-semibold mb-2">
+                  {{field.label}}
+                  @if(field.required) {
+                    <span class="text-red-500">*</span>
+                  }
+                </label>
+                <atom-input 
+                  [value]="allocationForm[field.id]"
+                  (valueChange)="allocationForm[field.id] = $event"
+                  type="number"
+                  [placeholder]="field.placeholder || field.label">
+                </atom-input>
+                @if(field.suffix) {
+                  <span class="text-sm text-gray-500 ml-2">{{ field.suffix }}</span>
+                }
+                <!-- Validation notes -->
+                @if(field.min || field.max) {
+                  <div class="text-xs text-gray-500 mt-1">
+                    @if(field.min && field.max) {
+                      Range: {{ field.min }} - {{ field.max }}
+                    } @else if(field.min) {
+                      Minimum: {{ field.min }}
+                    } @else if(field.max) {
+                      Maximum: {{ field.max }}
+                    }
+                  </div>
+                }
+              }
+              
+              @case('date') {
+                <atom-date-picker 
+                  [value]="allocationForm[field.id]"
+                  (valueChange)="allocationForm[field.id] = $event"
+                  [label]="field.label"
+                  [required]="field.required || false">
+                </atom-date-picker>
+              }
+              
+              @case('textarea') {
+                <label class="block text-sm font-semibold mb-2">{{field.label}}</label>
+                <atom-textarea 
+                  [value]="allocationForm[field.id]"
+                  (valueChange)="allocationForm[field.id] = $event"
+                  [rows]="field.rows || 3"
+                  [placeholder]="field.placeholder || field.label">
+                </atom-textarea>
+              }
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end gap-4 mt-12">
+      <atom-button 
+        [label]="getAction('cancel').label" 
+        [variant]="getAction('cancel').variant || 'outlineSecondary'"
+        [size]="getAction('cancel').size || 'md'"
+        [bgColor]="getAction('cancel').bgColor"
+        [textColor]="getAction('cancel').textColor"
+        [borderColor]="getAction('cancel').borderColor"
+        (onClick)="cancel()">
+      </atom-button>
+      
+      <atom-button 
+        [label]="getAction('saveAllocation').label" 
+        [variant]="getAction('saveAllocation').variant || 'primary'"
+        [size]="getAction('saveAllocation').size || 'md'"
+        [bgColor]="getAction('saveAllocation').bgColor"
+        [textColor]="getAction('saveAllocation').textColor"
+        [borderColor]="getAction('saveAllocation').borderColor"
+        (onClick)="saveAllocation()"
+        [disabled]="selectedEmployees.length === 0 || isLoading">
+      </atom-button>
+    </div>
+
+    } @else if (!project && !isLoading) {
+      <div class="text-center py-20 text-gray-500">
+        <i class="material-icons text-5xl mb-4">error_outline</i>
+        <p>Project not found or failed to load</p>
+        <button (click)="goBack()" 
+                class="mt-4 px-4 py-2 bg-[#5b0f14] text-white rounded-lg hover:bg-[#7a1419]">
+          Back to Projects
+        </button>
+      </div>
+    }
+
+  </div>
+</div>

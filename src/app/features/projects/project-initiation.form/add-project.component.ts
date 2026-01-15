@@ -49,11 +49,11 @@ export class AddProjectComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute
   ) { 
-    // Listen to router events to capture state
+   
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
-      // Get state from browser history
+     
       const navigation = this.router.getCurrentNavigation();
       if (navigation?.extras?.state) {
         this.navigationState = navigation.extras.state;
@@ -66,7 +66,7 @@ export class AddProjectComponent implements OnInit, OnDestroy {
     console.log('🔵 AddProjectComponent initialized');
     console.log('🔵 Current route:', this.router.url);
     
-    // Try to get state from browser history
+   
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state) {
       this.navigationState = navigation.extras.state;
@@ -88,7 +88,7 @@ export class AddProjectComponent implements OnInit, OnDestroy {
     console.log('🔍 checkEditMode called');
     console.log('📦 Available navigation state:', this.navigationState);
     
-    // Check route params
+   
     this.routeParamsSubscription = this.route.params.subscribe(params => {
       console.log('📝 Route params:', params);
       
@@ -97,7 +97,7 @@ export class AddProjectComponent implements OnInit, OnDestroy {
         this.projectId = params['id'];
         console.log('🎯 Edit mode detected via route param, ID:', this.projectId);
         
-        // Check if we have data in navigation state
+       
         if (this.navigationState?.projectData) {
           console.log('🚀 Pre-filling from navigation state');
           this.prefillFormFromState(this.navigationState.projectData);
@@ -108,7 +108,7 @@ export class AddProjectComponent implements OnInit, OnDestroy {
       } else {
         console.log('➕ Add mode (no ID in params)');
         
-        // Even in add mode, check if we have data to prefill (for cloning)
+       
         if (this.navigationState?.projectData) {
           console.log('📋 Pre-filling for clone mode');
           this.prefillFormForClone(this.navigationState.projectData);
@@ -138,7 +138,7 @@ export class AddProjectComponent implements OnInit, OnDestroy {
   private prefillFormFromState(projectData: any) {
     console.log('🔥 Prefilling form from state data:', projectData);
     
-    // Format date fields if they exist
+   
     const dateFields = ['projectStartDate', 'projectEndDate'];
     dateFields.forEach(field => {
       if (projectData[field]) {
@@ -146,12 +146,12 @@ export class AddProjectComponent implements OnInit, OnDestroy {
       }
     });
     
-    // Merge with existing form data
+   
     this.form = { ...this.form, ...projectData };
     
     console.log('✅ Form pre-filled from state:', this.form);
     
-    // Still load from API to ensure we have complete data
+   
     setTimeout(() => {
       if (this.projectId) {
         console.log('📡 Loading additional data from API...');
@@ -163,7 +163,7 @@ export class AddProjectComponent implements OnInit, OnDestroy {
   private prefillFormForClone(projectData: any) {
     console.log('📋 Prefilling form for clone:', projectData);
     
-    // Format date fields if they exist
+   
     const dateFields = ['projectStartDate', 'projectEndDate'];
     dateFields.forEach(field => {
       if (projectData[field]) {
@@ -171,13 +171,13 @@ export class AddProjectComponent implements OnInit, OnDestroy {
       }
     });
     
-    // Clone the data but remove the ID so it creates a new project
+   
     const clonedData = { ...projectData };
     delete clonedData.id;
     delete clonedData.createdAt;
     delete clonedData.updatedAt;
     
-    // Update the form
+   
     this.form = { ...this.form, ...clonedData };
     
     console.log('✅ Form pre-filled for clone:', this.form);
@@ -203,7 +203,7 @@ export class AddProjectComponent implements OnInit, OnDestroy {
       next: (project: any) => {
         console.log('📥 Project data loaded from API:', project);
         
-        // Format date fields if they exist
+       
         const dateFields = ['projectStartDate', 'projectEndDate'];
         dateFields.forEach(field => {
           if (project[field]) {
@@ -211,7 +211,6 @@ export class AddProjectComponent implements OnInit, OnDestroy {
           }
         });
         
-        // Merge with existing form data (preserving state data)
         this.form = { ...this.form, ...project };
         
         console.log('✅ Final form after API load:', this.form);
@@ -331,14 +330,12 @@ export class AddProjectComponent implements OnInit, OnDestroy {
 
   async save() {
     try {
-      // Validate required fields
       if (!this.validateForm()) {
         return;
       }
 
       this.isLoading = true;
 
-      // Show loading alert
       Swal.fire({
         title: 'Saving...',
         text: 'Please wait while we save the project',
@@ -348,7 +345,7 @@ export class AddProjectComponent implements OnInit, OnDestroy {
         }
       });
 
-      // Generate unique ID if not in edit mode
+     
       if (!this.isEditMode) {
         this.form.id = this.generateUniqueId();
         this.form.createdAt = new Date().toISOString();
@@ -357,7 +354,7 @@ export class AddProjectComponent implements OnInit, OnDestroy {
 
       console.log('✅ Project Payload:', this.form);
 
-      // Read API endpoints from JSON config
+     
       const apiEndpoints = this.formConfig.apiEndpoints || {};
 
       let apiUrl: string;
@@ -480,7 +477,7 @@ export class AddProjectComponent implements OnInit, OnDestroy {
     return 'proj-' + Math.random().toString(36).substr(2, 9);
   }
 
-  // Helper method to check if form has data
+ 
   hasFormData(): boolean {
     return Object.values(this.form).some(value => 
       value !== null && value !== undefined && value !== ''

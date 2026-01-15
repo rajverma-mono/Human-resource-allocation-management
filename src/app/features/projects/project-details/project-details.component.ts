@@ -272,17 +272,22 @@ private handleEditProject() {
   });
 }
 
-  private handleResourceAllocation() {
-    console.log('Resource allocation for:', this.project);
-    // Navigate to allocation page
-    // this.router.navigate(['/projects', this.project.id, 'allocation']);
+private handleResourceAllocation() {
+  if (!this.project?.id) {
     Swal.fire({
-      icon: 'info',
-      title: 'Resource Allocation',
-      text: 'Resource allocation feature coming soon!',
+      icon: 'error',
+      title: 'Error',
+      text: 'Cannot allocate resources: No project ID found.',
       confirmButtonColor: '#5b0f14'
     });
+    return;
   }
+
+  console.log('📤 Navigating to allocation for project:', this.project);
+  
+  // Navigate to allocation page
+  this.router.navigate(['/projects', this.project.id, 'allocate']);
+}
 
   private generateReport() {
     console.log('Generate report for:', this.project);
