@@ -1,7 +1,6 @@
 <div class="max-w-6xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden mt-8">
   <div class="px-10 pb-10 bg-white">
 
-    <!-- Loading State -->
     @if (isLoading) {
       <div class="flex flex-col items-center justify-center py-20">
         <div class="w-12 h-12 border-4 border-[#801519]/20 border-t-[#801519] rounded-full animate-spin"></div>
@@ -14,16 +13,14 @@
 
     @if (!isLoading && config && project) {
 
-      <!-- Page Header -->
       <app-page-header 
-        [title]="config.title" 
+        [title]="getPageTitle()" 
         icon="group_add">
         <div class="text-sm text-gray-600">
-          Allocating resources to: <strong>{{ project.projectName }}</strong>
+          {{ editMode ? 'Editing allocations for' : 'Allocating resources to' }}: <strong>{{ project.projectName }}</strong>
         </div>
       </app-page-header>
 
-      <!-- Project & Requirements Info -->
       @if (requirements) {
         <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
           <h3 class="text-lg font-bold text-blue-800 mb-4 flex items-center gap-2">
@@ -42,7 +39,6 @@
             </div>
           </div>
           
-          <!-- Allocation Start Date -->
           <div class="mt-6">
             <label class="block text-sm font-semibold text-blue-700 mb-2">
               <i class="material-icons align-middle text-sm">calendar_today</i>
@@ -57,18 +53,16 @@
         </div>
       }
 
-      <!-- Role-based Allocation Section -->
       <div class="mt-8">
         <h3 class="text-lg font-bold text-[#801519] mb-6 flex items-center gap-3">
           <i class="material-icons">assignment_ind</i>
-          Role-based Allocation
+          Role-based Allocation Summary
         </h3>
 
         @if (roleAllocations && roleAllocations.length > 0) {
           <div class="space-y-6">
             @for (role of roleAllocations; track role.roleName) {
               <div class="border rounded-lg overflow-hidden">
-                <!-- Role Header -->
                 <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
                   <div>
                     <h4 class="font-bold text-gray-800">{{ role.roleName }}</h4>
@@ -102,7 +96,6 @@
                   </div>
                 </div>
 
-                <!-- Allocated Employees -->
                 <div class="p-6 bg-gray-50">
                   <h5 class="text-sm font-semibold text-gray-700 mb-3">Allocated Employees:</h5>
                   
@@ -113,11 +106,11 @@
                           <div>
                             <div class="font-medium">{{ emp.employeeName }}</div>
                             <div class="text-sm text-gray-500">{{ emp.employeeCode }} • {{ emp.department }}</div>
-                            <div class="text-xs text-gray-400">Start: {{ emp.allocationStartDate | date:'shortDate' }}</div>
+                            <div class="text-xs text-gray-400">Start: {{ allocationForm.startDate | date:'shortDate' }}</div>
                           </div>
                           <button (click)="removeAllocation(role.roleName, emp.id)"
-                                  class="text-red-600 hover:text-red-800">
-                            <i class="material-icons">delete</i>
+                                  class="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50">
+                            <i class="material-icons text-lg">delete</i>
                           </button>
                         </div>
                       }
@@ -141,82 +134,63 @@
         }
       </div>
 
-      <!-- Employee Selection Section -->
       <div class="mt-8">
         <h3 class="text-lg font-bold text-[#801519] mb-6 flex items-center gap-3">
           <i class="material-icons">people</i>
           Select Employees for Allocation
         </h3>
 
-        <!-- Search and Filters -->
-        <div class="grid grid-cols-3 gap-6 mb-6">
-          <div>
-            <label class="block text-sm font-semibold mb-2">Search Employee</label>
-            <atom-input 
-              [value]="searchTerm"
-              (valueChange)="searchTerm = $event"
-              type="text"
-              placeholder="Search by name, code, or department">
-            </atom-input>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-semibold mb-2">Filter by Department</label>
-            <atom-select 
-              [options]="[
-                {value: 'All Departments', label: 'All Departments'},
-                {value: 'Information Technology (IT)', label: 'IT'},
-                {value: 'Human Resource (HR)', label: 'HR'},
-                {value: 'Finance', label: 'Finance'},
-                {value: 'Sales', label: 'Sales'},
-                {value: 'Marketing', label: 'Marketing'},
-                {value: 'Development', label: 'Development'}
-              ]"
-              [value]="selectedDepartment"
-              (valueChange)="selectedDepartment = $event"
-              placeholder="Select Department">
-            </atom-select>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-semibold mb-2">Filter by Role</label>
-            <atom-select 
-              [options]="getRoles()"
-              [value]="selectedRole"
-              (valueChange)="selectedRole = $event"
-              placeholder="Select Role">
-            </atom-select>
-          </div>
+        <div class="mb-6">
+          <atom-search-filter 
+            [config]="getSearchFilterConfig()"
+            [data]="employees"
+            (filtered)="onEmployeeFiltered($event)">
+          </atom-search-filter>
         </div>
 
-        <!-- Employees Table -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold mb-2">Filter by Required Role</label>
+          <atom-select 
+            [options]="getRoles()"
+            [value]="selectedRole"
+            (valueChange)="selectedRole = $event"
+            placeholder="Select Role to View Matching Employees">
+          </atom-select>
+        </div>
+
         @if (employees.length > 0) {
           <div class="border rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Select Role</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Select Roles</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Emp Code</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Job Title</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Experience</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Projects</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qualification</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  @for (employee of getFilteredEmployees(); track employee.id) {
+                  @for (employee of getDisplayedEmployees(); track employee.id) {
                     <tr [class.bg-green-50]="employee.selected">
                       <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex flex-col gap-2">
-                          @for (role of roleAllocations; track role.roleName) {
-                            @if (role.availablePositions > 0) {
-                              <button (click)="allocateEmployeeToRole(employee, role.roleName)"
-                                      class="text-xs px-3 py-1 bg-[#5b0f14] text-white rounded hover:bg-[#7a1419]">
-                                Assign to {{ role.roleName }}
-                              </button>
-                            }
+                        <div class="w-64">
+                          <atom-multi-select
+                            [options]="getAvailableRolesForEmployee(employee)"
+                            [(ngModel)]="employeeRoleSelections[employee.id]"
+                            (ngModelChange)="onEmployeeRoleSelection(employee.id, $event)"
+                            placeholder="Select roles..."
+                            [clearable]="true"
+                            [searchable]="true">
+                          </atom-multi-select>
+                          
+                          @if (employeeRoleSelections[employee.id] && employeeRoleSelections[employee.id].length > 0) {
+                            <div class="mt-1 text-xs text-green-600">
+                              Selected: {{ employeeRoleSelections[employee.id].join(', ') }}
+                            </div>
                           }
                         </div>
                       </td>
@@ -225,8 +199,8 @@
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm font-medium text-gray-900">{{ employee.employeeName }}</div>
-                        @if (employee.allocatedRole) {
-                          <div class="text-xs text-green-600">Allocated to: {{ employee.allocatedRole }}</div>
+                        @if (employee.selected) {
+                          <div class="text-xs text-green-600">Allocated to project</div>
                         }
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -239,7 +213,7 @@
                         {{ employee.experienceYears || '0' }} years
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ employee.currentProjects || 0 }}
+                        {{ employee.education || '-' }}
                       </td>
                     </tr>
                   }
@@ -248,7 +222,7 @@
             </div>
           </div>
           
-          @if (getFilteredEmployees().length === 0) {
+          @if (getDisplayedEmployees().length === 0) {
             <div class="text-center py-8 text-gray-400">
               No employees match the current filters
             </div>
@@ -261,7 +235,6 @@
         }
       </div>
 
-      <!-- Action Buttons -->
       <div class="flex justify-end gap-4 mt-12">
         <atom-button 
           [label]="getAction('cancel').label" 
@@ -274,7 +247,7 @@
         </atom-button>
         
         <atom-button 
-          [label]="getAction('saveAllocation').label" 
+          [label]="getSaveButtonText()" 
           [variant]="getAction('saveAllocation').variant || 'primary'"
           [size]="getAction('saveAllocation').size || 'md'"
           [bgColor]="getAction('saveAllocation').bgColor"

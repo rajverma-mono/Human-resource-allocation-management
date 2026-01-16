@@ -21,6 +21,31 @@
     }
   ],
   
+  "searchFilter": {
+    "placeholder": "Search employees by name, code, department, or job title",
+    "keys": ["employeeName", "employeeCode", "department", "jobTitle"],
+    "filters": [
+      {
+        "key": "department",
+        "label": "All Departments",
+        "options": [
+          "All Departments",
+          "Information Technology (IT)",
+          "Human Resource (HR)",
+          "Finance",
+          "Sales",
+          "Marketing",
+          "Development"
+        ]
+      },
+      {
+        "key": "jobTitle",
+        "label": "All Job Titles",
+        "options": []
+      }
+    ]
+  },
+  
   "actions": [
     {
       "id": "saveAllocation",
